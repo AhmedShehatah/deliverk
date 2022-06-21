@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:deliverk/presentation/widgets/common/text_field.dart';
+import '../../widgets/common/text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 

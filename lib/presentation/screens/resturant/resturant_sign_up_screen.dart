@@ -1,6 +1,7 @@
 import 'dart:io';
-import 'package:deliverk/presentation/widgets/common/text_field.dart';
-import 'package:deliverk/presentation/widgets/common/zone.dart';
+import '../../../constants/enums.dart';
+import '../../widgets/common/text_field.dart';
+import '../../widgets/common/spinner.dart';
 
 import '../../../constants/strings.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,7 @@ class _ResturantSignUpScreenState extends State<ResturantSignUpScreen> {
 
   final TextEditingController _restPlaceInDetials = TextEditingController();
   File? _image;
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -48,7 +50,11 @@ class _ResturantSignUpScreenState extends State<ResturantSignUpScreen> {
                       inputType: TextInputType.phone,
                     ),
                   ),
-                  const Zone(),
+                  const Spinner(
+                    "المنطقة",
+                    ["المنيب", "الجيزة", "رمسيس"],
+                    SpinnerEnum.zone,
+                  ),
                   Container(
                     margin: const EdgeInsets.all(10),
                     child: CustomTextField(

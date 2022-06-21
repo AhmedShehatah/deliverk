@@ -1,3 +1,6 @@
+import 'providers/new_order_provider.dart';
+import 'package:provider/provider.dart';
+
 import '../presentation/screens/resturant/restaurant_base_screen.dart';
 import '../presentation/screens/resturant/restaurant_new_order.dart';
 
@@ -21,7 +24,10 @@ class AppRouter {
       case restaurantBaseScreenRoute:
         return MaterialPageRoute(builder: (_) => const RestaurantBaseScreen());
       case restuarntNewOrderScreenRoute:
-        return MaterialPageRoute(builder: (_) => RestaurantNewOrder());
+        return MaterialPageRoute(
+            builder: (_) => ChangeNotifierProvider(
+                create: (context) => NewOrderProvider(),
+                child: RestaurantNewOrder()));
 
       // delivery reoute
       case delivarySignUpRoute:
