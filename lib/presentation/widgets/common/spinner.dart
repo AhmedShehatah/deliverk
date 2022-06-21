@@ -1,7 +1,14 @@
+import '../../../constants/enums.dart';
+import '../../../helpers/providers/new_order_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class Zone extends StatelessWidget {
-  const Zone({Key? key}) : super(key: key);
+class Spinner extends StatelessWidget {
+  const Spinner(this.hint, this.items, this.spinnerEnum, {Key? key})
+      : super(key: key);
+  final String hint;
+  final List<String> items;
+  final SpinnerEnum spinnerEnum;
 
   @override
   Widget build(BuildContext context) {
@@ -16,9 +23,14 @@ class Zone extends StatelessWidget {
             borderRadius: BorderRadius.circular(5),
           ),
         ),
-        hint: const Text("المنطقة"),
-        onChanged: (_) {},
-        items: <String>["المنيب", "الجيزة", "رمسيس"].map((value) {
+        hint: Text(hint),
+        onChanged: (value) {
+          if (value != null && spinnerEnum == SpinnerEnum.paymentState) {
+            Provider.of<NewOrderProvider>(context, listen: false)
+                .changeText(value);
+          }
+        },
+        items: items.map((value) {
           return DropdownMenuItem<String>(
             value: value,
             alignment: AlignmentDirectional.centerEnd,

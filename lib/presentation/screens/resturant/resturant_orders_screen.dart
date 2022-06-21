@@ -1,5 +1,6 @@
-import '../../widgets/restaurant/empty_orders.dart';
 import 'package:flutter/material.dart';
+
+import '../../widgets/restaurant/empty_orders.dart';
 
 class RestaurantOrdersScreen extends StatelessWidget {
   RestaurantOrdersScreen({Key? key}) : super(key: key);

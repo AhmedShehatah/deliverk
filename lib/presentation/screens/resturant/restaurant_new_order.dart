@@ -1,15 +1,21 @@
 import 'dart:math';
 
-import 'package:deliverk/presentation/widgets/common/text_field.dart';
+import '../../../constants/enums.dart';
+import '../../../helpers/providers/new_order_provider.dart';
+import '../../widgets/common/text_field.dart';
 import 'package:flutter/material.dart';
 
-import '../../widgets/common/zone.dart';
+import 'package:provider/provider.dart';
+
+import '../../widgets/common/spinner.dart';
 
 class RestaurantNewOrder extends StatelessWidget {
-  RestaurantNewOrder({Key? key}) : super(key: key);
   final TextEditingController _priceController = TextEditingController();
-  final TextEditingController _timeController = TextEditingController();
+
   final int code = Random().nextInt(10000);
+
+  RestaurantNewOrder({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,6 +42,7 @@ class RestaurantNewOrder extends StatelessWidget {
   }
 
   Widget _buildOrderDetails(BuildContext context) {
+    var provider = Provider.of<NewOrderProvider>(context);
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Container(
@@ -49,42 +56,41 @@ class RestaurantNewOrder extends StatelessWidget {
               style: const TextStyle(
                   color: Color.fromARGB(150, 0, 0, 0), fontSize: 28),
             ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: _buildPlaceAutoFill(),
+            ),
+            Container(
+              margin: const EdgeInsets.only(left: 20),
+              width: double.infinity,
+              child: const Text(
+                "تكلفة التوصيل",
+                textAlign: TextAlign.left,
+              ),
+            ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [
-                Expanded(child: Zone()),
-                Expanded(
-                  child: Text(
-                    "التكلفة",
-                    textAlign: TextAlign.right,
+              children: [
+                const Expanded(
+                  child: Spinner(
+                    "مدة التحضير",
+                    ["جاهز", "5 دقائق", "10 دقائق", "20 دقيقة", "نصف ساعه"],
+                    SpinnerEnum.preparationTime,
                   ),
+                ),
+                Expanded(
+                  child: _buildPaymentStatus(),
                 ),
               ],
             ),
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: CustomTextField(
-                      controller: _priceController,
-                      hint: "سعر الطلب",
-                      inputType: TextInputType.number,
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Expanded(
-                    child: CustomTextField(
-                        inputType: TextInputType.number,
-                        controller: _timeController,
-                        hint: "مدة التحضير بالدقائق"),
-                  ),
-                ],
+            if (provider.selectedState == "غير مدفوع")
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: CustomTextField(
+                  controller: _priceController,
+                  hint: "سعر الطلب",
+                  inputType: TextInputType.number,
+                ),
               ),
-            ),
-            _buildPaymentStatus(),
             Container(
               padding: const EdgeInsets.all(10),
               width: double.infinity,
@@ -112,27 +118,40 @@ class RestaurantNewOrder extends StatelessWidget {
   }
 
   Widget _buildPaymentStatus() {
-    return Container(
-      margin: const EdgeInsets.all(10),
-      child: DropdownButtonFormField<String>(
-        decoration: InputDecoration(
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(5),
+    return const Spinner(
+      "حالة الدفع",
+      ["مدفوع", "غير مدفوع"],
+      SpinnerEnum.paymentState,
+    );
+  }
+
+  final List<String> _places = ["المنيب", "الجيزة", "رمسيس"];
+  Widget _buildPlaceAutoFill() {
+    return Autocomplete<String>(
+      fieldViewBuilder: (BuildContext context,
+          TextEditingController textEditingController,
+          FocusNode focusNode,
+          VoidCallback onFieldSubmitted) {
+        return TextFormField(
+          controller: textEditingController,
+          focusNode: focusNode,
+          decoration: InputDecoration(
+            label: const Text("المنطقة"),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(5)),
           ),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(5),
-          ),
-        ),
-        hint: const Text("حالة الدفع"),
-        onChanged: (_) {},
-        items: <String>["غير مدفوع", "مدفوع"].map((value) {
-          return DropdownMenuItem<String>(
-            value: value,
-            alignment: AlignmentDirectional.centerEnd,
-            child: Text(value),
-          );
-        }).toList(),
-      ),
+          onFieldSubmitted: (String value) {
+            onFieldSubmitted();
+          },
+        );
+      },
+      optionsBuilder: ((textEditingValue) {
+        if (textEditingValue.text == '') {
+          return const Iterable<String>.empty();
+        }
+        return _places.where((String option) {
+          return option.contains(textEditingValue.text.toLowerCase());
+        });
+      }),
     );
   }
 }
