@@ -79,7 +79,7 @@ class SplashScreen extends StatelessWidget {
                             Navigator.of(context)
                                 .popAndPushNamed(resturantSignUpRoute);
                           },
-                          child: const Text("مطعم"),
+                          child: const Text("محل"),
                         ),
                       ],
                     ),

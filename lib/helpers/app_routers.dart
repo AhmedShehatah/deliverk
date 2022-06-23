@@ -1,15 +1,13 @@
-import 'providers/new_order_provider.dart';
-import 'package:provider/provider.dart';
-
-import '../presentation/screens/resturant/restaurant_base_screen.dart';
-import '../presentation/screens/resturant/restaurant_new_order.dart';
-
-import '../presentation/screens/delivery/delivery_sign_up_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../constants/strings.dart';
 import '../presentation/screens/common/splash_screen.dart';
+import '../presentation/screens/delivery/delivery_sign_up_screen.dart';
+import '../presentation/screens/resturant/restaurant_base_screen.dart';
+import '../presentation/screens/resturant/restaurant_new_order.dart';
 import '../presentation/screens/resturant/resturant_sign_up_screen.dart';
+import 'providers/new_order_provider.dart';
 
 class AppRouter {
   Route? onGenerateRoute(RouteSettings settings) {

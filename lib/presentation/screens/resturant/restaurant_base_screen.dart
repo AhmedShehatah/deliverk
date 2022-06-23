@@ -1,5 +1,6 @@
+import 'package:deliverk/presentation/screens/resturant/unpaied_orders_screen.dart';
+
 import '../../../constants/strings.dart';
-import '../delivery/delivery_sign_up_screen.dart';
 import 'resturant_orders_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -59,7 +60,7 @@ class _RestaurantBaseScreenState extends State<RestaurantBaseScreen> {
   List<Widget> _buildScreens() {
     return [
       RestaurantOrdersScreen(),
-      const DeliverySignUpScreen(),
+      const UnpaiedOrdersScreen(),
     ];
   }
 
@@ -72,8 +73,8 @@ class _RestaurantBaseScreenState extends State<RestaurantBaseScreen> {
         inactiveColorPrimary: CupertinoColors.systemGrey,
       ),
       PersistentBottomNavBarItem(
-        icon: const Icon(CupertinoIcons.home),
-        title: ("الطلبات الحالية"),
+        icon: const Icon(CupertinoIcons.layers),
+        title: ("طلبات غير مدفوعة"),
         activeColorPrimary: CupertinoColors.activeBlue,
         inactiveColorPrimary: CupertinoColors.systemGrey,
       ),
