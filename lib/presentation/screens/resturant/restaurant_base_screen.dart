@@ -1,3 +1,4 @@
+import 'package:deliverk/presentation/screens/resturant/restaurtant_profile_screen.dart';
 import 'package:deliverk/presentation/screens/resturant/unpaied_orders_screen.dart';
 
 import '../../../constants/strings.dart';
@@ -61,6 +62,7 @@ class _RestaurantBaseScreenState extends State<RestaurantBaseScreen> {
     return [
       RestaurantOrdersScreen(),
       const UnpaiedOrdersScreen(),
+      const RestaurantProfileScreen(),
     ];
   }
 
@@ -75,6 +77,12 @@ class _RestaurantBaseScreenState extends State<RestaurantBaseScreen> {
       PersistentBottomNavBarItem(
         icon: const Icon(CupertinoIcons.layers),
         title: ("طلبات غير مدفوعة"),
+        activeColorPrimary: CupertinoColors.activeBlue,
+        inactiveColorPrimary: CupertinoColors.systemGrey,
+      ),
+      PersistentBottomNavBarItem(
+        icon: const Icon(CupertinoIcons.profile_circled),
+        title: ("بروفايل المحل"),
         activeColorPrimary: CupertinoColors.activeBlue,
         inactiveColorPrimary: CupertinoColors.systemGrey,
       ),

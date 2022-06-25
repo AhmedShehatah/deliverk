@@ -100,7 +100,7 @@ class _ResturantSignUpScreenState extends State<ResturantSignUpScreen> {
                         Image.asset(
                           "assets/images/camera.png",
                         ),
-                        const Text("لوجو المطعم")
+                        const Text("لوجو المحل")
                       ],
                     )
                   : CircleAvatar(
