@@ -1,19 +1,15 @@
-import 'package:deliverk/presentation/widgets/restaurant/order_details_dialog.dart';
-
-import '../../widgets/restaurant/current_orders_model.dart';
+import 'package:deliverk/presentation/widgets/restaurant/unpaied_orders_model.dart';
 import 'package:flutter/material.dart';
 
-import '../../widgets/restaurant/empty_orders.dart';
+import '../../widgets/restaurant/order_details_dialog.dart';
 
-class RestaurantOrdersScreen extends StatelessWidget {
-  RestaurantOrdersScreen({Key? key}) : super(key: key);
-  final List<String> _list = [''];
+class UnpaiedOrdersScreen extends StatelessWidget {
+  const UnpaiedOrdersScreen({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: _list.isEmpty ? const EmptyOrders() : _buildOrders(context),
-      ),
+      body: SafeArea(child: _buildOrders(context)),
     );
   }
 
@@ -26,17 +22,22 @@ class RestaurantOrdersScreen extends StatelessWidget {
           expandedHeight: 200.0,
           flexibleSpace: FlexibleSpaceBar(
             centerTitle: true,
-            title: Text('الطلبات الحالية'),
+            title: Text('طلبات لم يتم تسليم حسابها'),
           ),
         ),
-        SliverList(
+        SliverGrid(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              childAspectRatio: 3 / 2),
           delegate: SliverChildBuilderDelegate((ctx, i) {
             return InkWell(
                 onTap: () {
                   showDialog(
                       context: ctx, builder: (c) => const OrderDetailsDialog());
                 },
-                child: const CurrentOrdersModel());
+                child: const UnpaiedOrdersModel());
           }),
         ),
       ],

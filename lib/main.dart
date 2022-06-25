@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../constants/colors.dart';
 import 'constants/strings.dart';
 import 'helpers/app_routers.dart';
 
@@ -21,9 +20,9 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         onGenerateRoute: AppRouter().onGenerateRoute,
         theme: ThemeData(
-          primaryColor: MyColor().primaryColor,
-          primaryColorLight: MyColor().primaryLightColor,
-          primaryColorDark: MyColor().primaryDarkColor,
+          // primaryColor: MyColor().primaryColor,
+          // primaryColorLight: MyColor().primaryLightColor,
+          // primaryColorDark: MyColor().primaryDarkColor,
           fontFamily: "NotoKufiArabic",
         ),
       ),
