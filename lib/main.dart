@@ -20,9 +20,6 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         onGenerateRoute: AppRouter().onGenerateRoute,
         theme: ThemeData(
-          // primaryColor: MyColor().primaryColor,
-          // primaryColorLight: MyColor().primaryLightColor,
-          // primaryColorDark: MyColor().primaryDarkColor,
           fontFamily: "NotoKufiArabic",
         ),
       ),
