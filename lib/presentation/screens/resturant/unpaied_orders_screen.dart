@@ -1,4 +1,4 @@
-import 'package:deliverk/presentation/widgets/restaurant/unpaied_orders_model.dart';
+import '../../widgets/restaurant/unpaied_orders_model.dart';
 import 'package:flutter/material.dart';
 
 import '../../widgets/restaurant/order_details_dialog.dart';

@@ -1,5 +1,5 @@
-import 'package:deliverk/presentation/screens/resturant/restaurtant_profile_screen.dart';
-import 'package:deliverk/presentation/screens/resturant/unpaied_orders_screen.dart';
+import 'restaurtant_profile_screen.dart';
+import 'unpaied_orders_screen.dart';
 
 import '../../../constants/strings.dart';
 import 'resturant_orders_screen.dart';

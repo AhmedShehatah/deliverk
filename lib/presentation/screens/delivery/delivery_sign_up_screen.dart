@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import '../../../constants/strings.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -25,22 +26,28 @@ class _DeliverySignUpScreenState extends State<DeliverySignUpScreen> {
     return Scaffold(
         body: SafeArea(
       child: SingleChildScrollView(
-        child: Column(
-          children: [
-            buildDeliveryImage(),
-            CustomTextField(
-                controller: _deliveryNameController,
-                hint: "الاسم",
-                inputType: TextInputType.name),
-            CustomTextField(
-                controller: _deliveryPhoneNumberContoller,
-                hint: "رقم التلفون",
-                inputType: TextInputType.phone),
-            buildPickIDPhoto(),
-            buildPickDrividingLicencePhoto(),
-            buildPickMotorLicencePhoto(),
-            buildSignUpButton(),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              buildDeliveryImage(),
+              CustomTextField(
+                  controller: _deliveryNameController,
+                  hint: "الاسم",
+                  inputType: TextInputType.name),
+              const SizedBox(
+                height: 10,
+              ),
+              CustomTextField(
+                  controller: _deliveryPhoneNumberContoller,
+                  hint: "رقم التلفون",
+                  inputType: TextInputType.phone),
+              buildPickIDPhoto(),
+              buildPickDrividingLicencePhoto(),
+              buildPickMotorLicencePhoto(),
+              buildSignUpButton(),
+            ],
+          ),
         ),
       ),
     ));
@@ -205,7 +212,9 @@ class _DeliverySignUpScreenState extends State<DeliverySignUpScreen> {
       margin: const EdgeInsets.only(top: 10, left: 50, right: 50, bottom: 40),
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.of(context).popAndPushNamed(deliveryBaseScreen);
+        },
         child: const Text("تسجيل"),
       ),
     );
