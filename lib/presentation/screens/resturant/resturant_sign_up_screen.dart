@@ -1,11 +1,12 @@
 import 'dart:io';
-import '../../../constants/enums.dart';
-import '../../widgets/common/text_field.dart';
-import '../../widgets/common/spinner.dart';
 
-import '../../../constants/strings.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+
+import '../../../constants/enums.dart';
+import '../../../constants/strings.dart';
+import '../../widgets/common/spinner.dart';
+import '../../widgets/common/text_field.dart';
 
 class ResturantSignUpScreen extends StatefulWidget {
   const ResturantSignUpScreen({Key? key}) : super(key: key);

@@ -1,3 +1,4 @@
+import '../presentation/screens/delivery/delivery_base_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -18,7 +19,10 @@ class AppRouter {
 
       // returant routes
       case resturantSignUpRoute:
-        return MaterialPageRoute(builder: (_) => const ResturantSignUpScreen());
+        return MaterialPageRoute(
+            builder: (_) => ChangeNotifierProvider(
+                create: (context) => NewOrderProvider(),
+                child: const ResturantSignUpScreen()));
       case restaurantBaseScreenRoute:
         return MaterialPageRoute(builder: (_) => const RestaurantBaseScreen());
       case restuarntNewOrderScreenRoute:
@@ -30,6 +34,8 @@ class AppRouter {
       // delivery reoute
       case delivarySignUpRoute:
         return MaterialPageRoute(builder: (_) => const DeliverySignUpScreen());
+      case deliveryBaseScreen:
+        return MaterialPageRoute(builder: (_) => DeliveryBaseScreen());
     }
     return null;
   }

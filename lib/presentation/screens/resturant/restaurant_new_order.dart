@@ -11,6 +11,7 @@ import '../../widgets/common/spinner.dart';
 
 class RestaurantNewOrder extends StatelessWidget {
   final TextEditingController _priceController = TextEditingController();
+  final TextEditingController _preparationController = TextEditingController();
 
   final int code = Random().nextInt(10000);
 
@@ -77,7 +78,7 @@ class RestaurantNewOrder extends StatelessWidget {
                 const Expanded(
                   child: Spinner(
                     "مدة التحضير",
-                    ["جاهز", "5 دقائق", "10 دقائق", "20 دقيقة", "نصف ساعه"],
+                    ["جاهز", "غير جاهز"],
                     SpinnerEnum.preparationTime,
                   ),
                 ),
@@ -86,15 +87,32 @@ class RestaurantNewOrder extends StatelessWidget {
                 ),
               ],
             ),
-            if (provider.selectedState == "غير مدفوع")
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: CustomTextField(
-                  controller: _priceController,
-                  hint: "سعر الطلب",
-                  inputType: TextInputType.number,
-                ),
-              ),
+            Row(
+              children: [
+                if (provider.preparationState == "غير جاهز")
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: CustomTextField(
+                        controller: _preparationController,
+                        hint: "مدة التجهيز",
+                        inputType: TextInputType.number,
+                      ),
+                    ),
+                  ),
+                if (provider.paymentState == "غير مدفوع")
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: CustomTextField(
+                        controller: _priceController,
+                        hint: "سعر الطلب",
+                        inputType: TextInputType.number,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
             Container(
               padding: const EdgeInsets.all(10),
               width: double.infinity,

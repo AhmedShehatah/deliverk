@@ -1,40 +1,24 @@
-import 'restaurtant_profile_screen.dart';
-import 'unpaied_orders_screen.dart';
-
-import '../../../constants/strings.dart';
-import 'resturant_orders_screen.dart';
+import 'deliver_current_orders_screen.dart';
+import 'delivery_doing_orders_screen.dart';
+import 'delivery_profile_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 
-class RestaurantBaseScreen extends StatefulWidget {
-  const RestaurantBaseScreen({Key? key}) : super(key: key);
-
-  @override
-  State<RestaurantBaseScreen> createState() => _RestaurantBaseScreenState();
-}
-
-class _RestaurantBaseScreenState extends State<RestaurantBaseScreen> {
+class DeliveryBaseScreen extends StatelessWidget {
+  DeliveryBaseScreen({Key? key}) : super(key: key);
   final PersistentTabController _controller =
       PersistentTabController(initialIndex: 0);
-  bool _isOrdersScreenSelected = true;
   @override
   Widget build(BuildContext context) {
     return PersistentTabView(
-      floatingActionButton:
-          _isOrdersScreenSelected ? _buildFloatingActionButton(context) : null,
       context,
       controller: _controller,
       screens: _buildScreens(),
       items: _navBarsItems(),
       confineInSafeArea: true,
       backgroundColor: Colors.white,
-      onItemSelected: (idx) {
-        setState(() {
-          _isOrdersScreenSelected = idx == 0;
-        });
-      },
+      onItemSelected: (idx) {},
       handleAndroidBackButtonPress: true,
       resizeToAvoidBottomInset: true,
       stateManagement: true,
@@ -60,9 +44,9 @@ class _RestaurantBaseScreenState extends State<RestaurantBaseScreen> {
 
   List<Widget> _buildScreens() {
     return [
-      RestaurantOrdersScreen(),
-      const UnpaiedOrdersScreen(),
-      const RestaurantProfileScreen(),
+      const DeliveryCurrentOrdersScreen(),
+      const DeliveryDoingOrderScreen(),
+      const DeliveryProfileScreen(),
     ];
   }
 
@@ -75,27 +59,17 @@ class _RestaurantBaseScreenState extends State<RestaurantBaseScreen> {
         inactiveColorPrimary: CupertinoColors.systemGrey,
       ),
       PersistentBottomNavBarItem(
-        icon: const Icon(CupertinoIcons.layers),
-        title: ("طلبات غير مدفوعة"),
+        icon: const Icon(Icons.motorcycle),
+        title: ("جاري التسليم"),
         activeColorPrimary: CupertinoColors.activeBlue,
         inactiveColorPrimary: CupertinoColors.systemGrey,
       ),
       PersistentBottomNavBarItem(
         icon: const Icon(CupertinoIcons.profile_circled),
-        title: ("بروفايل المحل"),
+        title: ("الملف الشخصي"),
         activeColorPrimary: CupertinoColors.activeBlue,
         inactiveColorPrimary: CupertinoColors.systemGrey,
       ),
     ];
-  }
-
-  Widget _buildFloatingActionButton(BuildContext context) {
-    return FloatingActionButton.extended(
-      onPressed: () {
-        Navigator.of(context).pushNamed(restuarntNewOrderScreenRoute);
-      },
-      label: const Text("اضف طلب جديد"),
-      icon: const Icon(Icons.restaurant_menu),
-    );
   }
 }

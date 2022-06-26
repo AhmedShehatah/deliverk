@@ -9,4 +9,5 @@ const String restaurantBaseScreenRoute = "/restaurant-base-screen";
 const String restuarntNewOrderScreenRoute = "/new-order-screen";
 
 // ~~~~~~~Delivery Routers names ~~~~~`
-const String delivarySignUpRoute = "/delivery-sigm-up";
+const String delivarySignUpRoute = "/delivery-sign-up";
+const String deliveryBaseScreen = "/delivery-base-screen";

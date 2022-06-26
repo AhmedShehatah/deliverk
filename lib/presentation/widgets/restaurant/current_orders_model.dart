@@ -11,7 +11,7 @@ class CurrentOrdersModel extends StatelessWidget {
       child: Card(
         elevation: 5,
         child: Container(
-          height: 100,
+          height: 120,
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           width: double.infinity,
           child: Row(
@@ -35,7 +35,8 @@ class CurrentOrdersModel extends StatelessWidget {
                       fontSize: 12,
                       color: Colors.black38,
                     ),
-                  )
+                  ),
+                  // SizedBox(child: Image.asset("assets/images/pendulum.gif"))
                 ],
               ),
               Column(

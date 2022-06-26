@@ -1,4 +1,4 @@
-import 'package:deliverk/presentation/widgets/restaurant/order_details_dialog.dart';
+import '../../widgets/restaurant/order_details_dialog.dart';
 
 import '../../widgets/restaurant/current_orders_model.dart';
 import 'package:flutter/material.dart';
