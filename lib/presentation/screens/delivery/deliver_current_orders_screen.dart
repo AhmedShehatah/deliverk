@@ -1,6 +1,7 @@
-import '../../widgets/delivery/delivery_current_orders_model.dart';
 import 'package:flutter/material.dart';
+
 import '../../widgets/delivery/deliver_order_dilaog.dart';
+import '../../widgets/delivery/delivery_current_orders_model.dart';
 
 class DeliveryCurrentOrdersScreen extends StatelessWidget {
   const DeliveryCurrentOrdersScreen({Key? key}) : super(key: key);

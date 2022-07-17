@@ -1,9 +1,9 @@
 import 'dart:io';
 
-import '../../../constants/strings.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../constants/strings.dart';
 import '../../widgets/common/text_field.dart';
 
 class DeliverySignUpScreen extends StatefulWidget {

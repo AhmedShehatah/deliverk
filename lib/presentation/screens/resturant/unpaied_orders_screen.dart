@@ -1,7 +1,7 @@
-import '../../widgets/restaurant/unpaied_orders_model.dart';
 import 'package:flutter/material.dart';
 
 import '../../widgets/restaurant/order_details_dialog.dart';
+import '../../widgets/restaurant/unpaied_orders_model.dart';
 
 class UnpaiedOrdersScreen extends StatelessWidget {
   const UnpaiedOrdersScreen({Key? key}) : super(key: key);

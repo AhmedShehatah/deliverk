@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../constants/enums.dart';
@@ -22,7 +23,7 @@ class _ResturantSignUpScreenState extends State<ResturantSignUpScreen> {
 
   final TextEditingController _restPlaceInDetials = TextEditingController();
   File? _image;
-
+  LatLng? _location;
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -55,6 +56,34 @@ class _ResturantSignUpScreenState extends State<ResturantSignUpScreen> {
                     "المنطقة",
                     ["المنيب", "الجيزة", "رمسيس"],
                     SpinnerEnum.zone,
+                  ),
+                  Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.all(10),
+                    child: TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pushNamed(mapRoute).then(
+                          (value) {
+                            setState(() {
+                              _location = value as LatLng?;
+                            });
+                          },
+                        );
+                      },
+                      child: _location == null
+                          ? Row(
+                              children: const [
+                                Text("الموقع على الخريطة"),
+                                Icon(Icons.location_on)
+                              ],
+                            )
+                          : Row(
+                              children: const [
+                                Text("تم اختيار الموقع بنجاح"),
+                                Icon(Icons.check)
+                              ],
+                            ),
+                    ),
                   ),
                   Container(
                     margin: const EdgeInsets.all(10),

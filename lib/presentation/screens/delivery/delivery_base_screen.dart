@@ -1,9 +1,10 @@
-import 'deliver_current_orders_screen.dart';
-import 'delivery_doing_orders_screen.dart';
-import 'delivery_profile_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
+
+import 'deliver_current_orders_screen.dart';
+import 'delivery_doing_orders_screen.dart';
+import 'delivery_profile_screen.dart';
 
 class DeliveryBaseScreen extends StatelessWidget {
   DeliveryBaseScreen({Key? key}) : super(key: key);
