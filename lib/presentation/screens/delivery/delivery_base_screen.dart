@@ -1,3 +1,4 @@
+import 'package:deliverk/presentation/screens/delivery/delivery_unpaid_orders_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
@@ -47,6 +48,7 @@ class DeliveryBaseScreen extends StatelessWidget {
     return [
       const DeliveryCurrentOrdersScreen(),
       const DeliveryDoingOrderScreen(),
+      const DeliveryUnpaidOrdersScreen(),
       const DeliveryProfileScreen(),
     ];
   }
@@ -62,6 +64,12 @@ class DeliveryBaseScreen extends StatelessWidget {
       PersistentBottomNavBarItem(
         icon: const Icon(Icons.motorcycle),
         title: ("جاري التسليم"),
+        activeColorPrimary: CupertinoColors.activeBlue,
+        inactiveColorPrimary: CupertinoColors.systemGrey,
+      ),
+      PersistentBottomNavBarItem(
+        icon: const Icon(Icons.layers),
+        title: ("طلبات غير مدفوعة"),
         activeColorPrimary: CupertinoColors.activeBlue,
         inactiveColorPrimary: CupertinoColors.systemGrey,
       ),

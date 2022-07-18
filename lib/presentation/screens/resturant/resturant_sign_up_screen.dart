@@ -22,6 +22,7 @@ class _ResturantSignUpScreenState extends State<ResturantSignUpScreen> {
   final TextEditingController _restPhoneNumber = TextEditingController();
 
   final TextEditingController _restPlaceInDetials = TextEditingController();
+  final _passwordController = TextEditingController();
   File? _image;
   LatLng? _location;
   @override
@@ -43,14 +44,6 @@ class _ResturantSignUpScreenState extends State<ResturantSignUpScreen> {
                         controller: _restName,
                         hint: "اسم المطعم",
                         inputType: TextInputType.name),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.all(10),
-                    child: CustomTextField(
-                      controller: _restPhoneNumber,
-                      hint: "رقم التلفون",
-                      inputType: TextInputType.phone,
-                    ),
                   ),
                   const Spinner(
                     "المنطقة",
@@ -95,6 +88,31 @@ class _ResturantSignUpScreenState extends State<ResturantSignUpScreen> {
                   ),
                   const SizedBox(
                     height: 10,
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 100),
+                    child: Divider(
+                      color: Colors.black45,
+                      height: 1,
+                      thickness: 1,
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.all(10),
+                    child: CustomTextField(
+                      controller: _restPhoneNumber,
+                      hint: "رقم التلفون",
+                      inputType: TextInputType.phone,
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.all(10),
+                    child: CustomTextField(
+                      controller: _passwordController,
+                      hint: "الرقم السري",
+                      inputType: TextInputType.phone,
+                      secure: true,
+                    ),
                   ),
                   buildSignUpButton(),
                 ],

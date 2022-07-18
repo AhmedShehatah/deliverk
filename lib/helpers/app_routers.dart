@@ -1,4 +1,6 @@
 import 'package:deliverk/business_logic/restaurant/cubit/spinner_cubit.dart';
+import 'package:deliverk/presentation/screens/delivery/delivery_login_screen.dart';
+import 'package:deliverk/presentation/screens/resturant/restaurant_login_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../presentation/screens/common/map_screen.dart';
@@ -34,6 +36,8 @@ class AppRouter {
         );
       case restaurantBaseScreenRoute:
         return MaterialPageRoute(builder: (_) => const RestaurantBaseScreen());
+      case restaurantLoginRoute:
+        return MaterialPageRoute(builder: (_) => RestaurantLoginScreen());
       case restuarntNewOrderScreenRoute:
         return MaterialPageRoute(
             builder: (_) => BlocProvider<SpinnerCubit>(
@@ -45,6 +49,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const DeliverySignUpScreen());
       case deliveryBaseScreen:
         return MaterialPageRoute(builder: (_) => DeliveryBaseScreen());
+      case deliveryLoginRoute:
+        return MaterialPageRoute(builder: (_) => DeliveryLoginScreen());
     }
     return null;
   }
