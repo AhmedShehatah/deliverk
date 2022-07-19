@@ -29,12 +29,13 @@ class DeliveryDoingOrderScreen extends StatelessWidget {
           delegate: SliverChildBuilderDelegate(
             (ctx, i) {
               return InkWell(
-                  onTap: () {
-                    showDialog(
-                        context: ctx,
-                        builder: (c) => const DeliveryOrderDetialsDialog());
-                  },
-                  child: const DeliveryCurrentOrderModel());
+                onTap: () {
+                  showDialog(
+                      context: ctx,
+                      builder: (c) => const DeliveryOrderDetialsDialog());
+                },
+                child: const DeliveryCurrentOrderModel(),
+              );
             },
             childCount: 10,
           ),

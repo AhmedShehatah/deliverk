@@ -3,9 +3,16 @@ import 'package:flutter/material.dart';
 import '../../widgets/delivery/deliver_order_dilaog.dart';
 import '../../widgets/delivery/delivery_current_orders_model.dart';
 
-class DeliveryCurrentOrdersScreen extends StatelessWidget {
+class DeliveryCurrentOrdersScreen extends StatefulWidget {
   const DeliveryCurrentOrdersScreen({Key? key}) : super(key: key);
 
+  @override
+  State<DeliveryCurrentOrdersScreen> createState() =>
+      _DeliveryCurrentOrdersScreenState();
+}
+
+class _DeliveryCurrentOrdersScreenState
+    extends State<DeliveryCurrentOrdersScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,9 +22,12 @@ class DeliveryCurrentOrdersScreen extends StatelessWidget {
     );
   }
 
+  Future<void> refresh() async {}
+
   Widget _buildOrders(BuildContext context) {
-    return CustomScrollView(
-      slivers: [
+    return NestedScrollView(
+      floatHeaderSlivers: false,
+      headerSliverBuilder: (context, innerBoxIsScrolled) => [
         const SliverAppBar(
           pinned: true,
           centerTitle: true,
@@ -27,21 +37,24 @@ class DeliveryCurrentOrdersScreen extends StatelessWidget {
             title: Text('الطلبات الحالية'),
           ),
         ),
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (ctx, i) {
-              return InkWell(
-                  onTap: () {
-                    showDialog(
-                        context: ctx,
-                        builder: (c) => const DeliveryOrderDetialsDialog());
-                  },
-                  child: const DeliveryCurrentOrderModel());
-            },
-            childCount: 10,
-          ),
-        ),
       ],
+      body: RefreshIndicator(
+        onRefresh: refresh,
+        child: ListView.builder(
+          padding: EdgeInsets.zero,
+          itemBuilder: (BuildContext context, int index) {
+            return InkWell(
+              onTap: () {
+                showDialog(
+                    context: context,
+                    builder: (c) => const DeliveryOrderDetialsDialog());
+              },
+              child: const DeliveryCurrentOrderModel(),
+            );
+          },
+          itemCount: 10,
+        ),
+      ),
     );
   }
 }
