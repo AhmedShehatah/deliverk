@@ -1,7 +1,8 @@
-import '../../../constants/enums.dart';
-import '../../../helpers/providers/new_order_provider.dart';
+import 'package:deliverk/business_logic/restaurant/cubit/spinner_cubit.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:logger/logger.dart';
+import '../../../constants/enums.dart';
 
 class Spinner extends StatelessWidget {
   const Spinner(this.hint, this.items, this.spinnerEnum, {Key? key})
@@ -12,7 +13,7 @@ class Spinner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final state = Provider.of<NewOrderProvider>(context, listen: false);
+    final state = BlocProvider.of<SpinnerCubit>(context);
     return Container(
       margin: const EdgeInsets.all(10),
       child: DropdownButtonFormField<String>(
@@ -29,7 +30,11 @@ class Spinner extends StatelessWidget {
           if (value != null) {
             switch (spinnerEnum) {
               case SpinnerEnum.paymentState:
-                state.changePaymentSate(value);
+                try {
+                  state.changePaymentSate(value);
+                } catch (e) {
+                  Logger().e(e);
+                }
                 break;
               case SpinnerEnum.preparationTime:
                 state.changePreparationState(value);

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../constants/enums.dart';
@@ -21,8 +22,9 @@ class _ResturantSignUpScreenState extends State<ResturantSignUpScreen> {
   final TextEditingController _restPhoneNumber = TextEditingController();
 
   final TextEditingController _restPlaceInDetials = TextEditingController();
+  final _passwordController = TextEditingController();
   File? _image;
-
+  LatLng? _location;
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -43,18 +45,38 @@ class _ResturantSignUpScreenState extends State<ResturantSignUpScreen> {
                         hint: "اسم المطعم",
                         inputType: TextInputType.name),
                   ),
-                  Container(
-                    margin: const EdgeInsets.all(10),
-                    child: CustomTextField(
-                      controller: _restPhoneNumber,
-                      hint: "رقم التلفون",
-                      inputType: TextInputType.phone,
-                    ),
-                  ),
                   const Spinner(
                     "المنطقة",
                     ["المنيب", "الجيزة", "رمسيس"],
                     SpinnerEnum.zone,
+                  ),
+                  Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.all(10),
+                    child: TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pushNamed(mapRoute).then(
+                          (value) {
+                            setState(() {
+                              _location = value as LatLng?;
+                            });
+                          },
+                        );
+                      },
+                      child: _location == null
+                          ? Row(
+                              children: const [
+                                Text("الموقع على الخريطة"),
+                                Icon(Icons.location_on)
+                              ],
+                            )
+                          : Row(
+                              children: const [
+                                Text("تم اختيار الموقع بنجاح"),
+                                Icon(Icons.check)
+                              ],
+                            ),
+                    ),
                   ),
                   Container(
                     margin: const EdgeInsets.all(10),
@@ -66,6 +88,31 @@ class _ResturantSignUpScreenState extends State<ResturantSignUpScreen> {
                   ),
                   const SizedBox(
                     height: 10,
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 100),
+                    child: Divider(
+                      color: Colors.black45,
+                      height: 1,
+                      thickness: 1,
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.all(10),
+                    child: CustomTextField(
+                      controller: _restPhoneNumber,
+                      hint: "رقم التلفون",
+                      inputType: TextInputType.phone,
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.all(10),
+                    child: CustomTextField(
+                      controller: _passwordController,
+                      hint: "الرقم السري",
+                      inputType: TextInputType.phone,
+                      secure: true,
+                    ),
                   ),
                   buildSignUpButton(),
                 ],

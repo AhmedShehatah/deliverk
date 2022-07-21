@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:logger/logger.dart';
 
 import 'constants/strings.dart';
 import 'helpers/app_routers.dart';
@@ -13,9 +14,14 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return Directionality(
@@ -26,12 +32,27 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         onGenerateRoute: AppRouter().onGenerateRoute,
         theme: ThemeData(
-          // primaryColor: MyColor().primaryColor,
-          // primaryColorLight: MyColor().primaryLightColor,
-          // primaryColorDark: MyColor().primaryDarkColor,
           fontFamily: "NotoKufiArabic",
         ),
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    Logger().d("closed baby");
   }
 }

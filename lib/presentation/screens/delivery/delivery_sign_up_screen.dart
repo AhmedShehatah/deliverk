@@ -1,9 +1,9 @@
 import 'dart:io';
 
-import '../../../constants/strings.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../constants/strings.dart';
 import '../../widgets/common/text_field.dart';
 
 class DeliverySignUpScreen extends StatefulWidget {
@@ -16,6 +16,7 @@ class DeliverySignUpScreen extends StatefulWidget {
 class _DeliverySignUpScreenState extends State<DeliverySignUpScreen> {
   final _deliveryNameController = TextEditingController();
   final _deliveryPhoneNumberContoller = TextEditingController();
+  final _passwordController = TextEditingController();
 
   File? _deliveryPhoto;
   File? _deliveryId;
@@ -31,20 +32,44 @@ class _DeliverySignUpScreenState extends State<DeliverySignUpScreen> {
           child: Column(
             children: [
               buildDeliveryImage(),
-              CustomTextField(
-                  controller: _deliveryNameController,
-                  hint: "الاسم",
-                  inputType: TextInputType.name),
               const SizedBox(
                 height: 10,
               ),
-              CustomTextField(
-                  controller: _deliveryPhoneNumberContoller,
-                  hint: "رقم التلفون",
-                  inputType: TextInputType.phone),
               buildPickIDPhoto(),
               buildPickDrividingLicencePhoto(),
               buildPickMotorLicencePhoto(),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 100),
+                child: Divider(
+                  color: Colors.black45,
+                  height: 1,
+                  thickness: 1,
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.all(10),
+                child: CustomTextField(
+                    controller: _deliveryNameController,
+                    hint: "الاسم",
+                    inputType: TextInputType.name),
+              ),
+              Container(
+                margin: const EdgeInsets.all(10),
+                child: CustomTextField(
+                  controller: _deliveryPhoneNumberContoller,
+                  hint: "رقم التلفون",
+                  inputType: TextInputType.phone,
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.all(10),
+                child: CustomTextField(
+                  controller: _passwordController,
+                  hint: "الرقم السري",
+                  inputType: TextInputType.phone,
+                  secure: true,
+                ),
+              ),
               buildSignUpButton(),
             ],
           ),

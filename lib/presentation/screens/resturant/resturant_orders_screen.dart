@@ -1,9 +1,8 @@
-import '../../widgets/restaurant/order_details_dialog.dart';
-
-import '../../widgets/restaurant/current_orders_model.dart';
 import 'package:flutter/material.dart';
 
+import '../../widgets/restaurant/current_orders_model.dart';
 import '../../widgets/restaurant/empty_orders.dart';
+import '../../widgets/restaurant/order_details_dialog.dart';
 
 class RestaurantOrdersScreen extends StatelessWidget {
   RestaurantOrdersScreen({Key? key}) : super(key: key);

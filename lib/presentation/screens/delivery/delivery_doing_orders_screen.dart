@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../widgets/delivery/deliver_order_dilaog.dart';
 import '../../widgets/delivery/delivery_current_orders_model.dart';
 
@@ -28,12 +29,13 @@ class DeliveryDoingOrderScreen extends StatelessWidget {
           delegate: SliverChildBuilderDelegate(
             (ctx, i) {
               return InkWell(
-                  onTap: () {
-                    showDialog(
-                        context: ctx,
-                        builder: (c) => const DeliveryOrderDetialsDialog());
-                  },
-                  child: const DeliveryCurrentOrderModel());
+                onTap: () {
+                  showDialog(
+                      context: ctx,
+                      builder: (c) => const DeliveryOrderDetialsDialog());
+                },
+                child: const DeliveryCurrentOrderModel(),
+              );
             },
             childCount: 10,
           ),

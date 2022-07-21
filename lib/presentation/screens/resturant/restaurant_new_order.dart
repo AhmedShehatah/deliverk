@@ -1,13 +1,12 @@
 import 'dart:math';
 
-import '../../../constants/enums.dart';
-import '../../../helpers/providers/new_order_provider.dart';
-import '../../widgets/common/text_field.dart';
+import 'package:deliverk/business_logic/restaurant/cubit/spinner_cubit.dart';
 import 'package:flutter/material.dart';
-
-import 'package:provider/provider.dart';
-
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:logger/logger.dart';
+import '../../../constants/enums.dart';
 import '../../widgets/common/spinner.dart';
+import '../../widgets/common/text_field.dart';
 
 class RestaurantNewOrder extends StatelessWidget {
   final TextEditingController _priceController = TextEditingController();
@@ -47,7 +46,6 @@ class RestaurantNewOrder extends StatelessWidget {
   }
 
   Widget _buildOrderDetails(BuildContext context) {
-    var provider = Provider.of<NewOrderProvider>(context);
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Container(
@@ -87,32 +85,9 @@ class RestaurantNewOrder extends StatelessWidget {
                 ),
               ],
             ),
-            Row(
-              children: [
-                if (provider.preparationState == "غير جاهز")
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: CustomTextField(
-                        controller: _preparationController,
-                        hint: "مدة التجهيز",
-                        inputType: TextInputType.number,
-                      ),
-                    ),
-                  ),
-                if (provider.paymentState == "غير مدفوع")
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: CustomTextField(
-                        controller: _priceController,
-                        hint: "سعر الطلب",
-                        inputType: TextInputType.number,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
+
+            /// logic
+            _buildFields(context),
             Container(
               padding: const EdgeInsets.all(10),
               width: double.infinity,
@@ -135,6 +110,58 @@ class RestaurantNewOrder extends StatelessWidget {
             )
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildFields(BuildContext context) {
+    return BlocBuilder<SpinnerCubit, SpinnerState>(
+      builder: (ctx, state) {
+        Logger().d(state);
+        if (state is SpinnerInitial) {
+          Logger().d(state.paymentState);
+          Logger().d(state.preparationState);
+          if (state.paymentState == "غير مدفوع" &&
+              state.preparationState == "غير جاهز") {
+            Logger().d("Here I'm Brooooooo");
+            return Row(
+              children: [
+                Expanded(child: _buildPreparationField()),
+                Expanded(child: _buildPriceField()),
+              ],
+            );
+          } else if (state.paymentState == "غير مدفوع") {
+            return _buildPriceField();
+          } else if (state.preparationState == "غير جاهز") {
+            return _buildPreparationField();
+          } else {
+            return const Text('');
+          }
+        }
+        Logger().d("I got here Brooooooooo");
+        return const Text('');
+      },
+    );
+  }
+
+  Widget _buildPreparationField() {
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: CustomTextField(
+        controller: _preparationController,
+        hint: "مدة التجهيز",
+        inputType: TextInputType.number,
+      ),
+    );
+  }
+
+  Widget _buildPriceField() {
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: CustomTextField(
+        controller: _priceController,
+        hint: "سعر الطلب",
+        inputType: TextInputType.number,
       ),
     );
   }
