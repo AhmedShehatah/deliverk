@@ -25,10 +25,10 @@ class DeliveryUnpaidOrdersScreen extends StatelessWidget {
         ),
         SliverList(
           delegate: SliverChildBuilderDelegate(
-            childCount: 10,
             (ctx, i) {
               return const DeliveryUnpaidOrdersModel();
             },
+            childCount: 10,
           ),
         ),
       ],

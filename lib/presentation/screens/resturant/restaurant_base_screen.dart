@@ -24,9 +24,9 @@ class _RestaurantBaseScreenState extends State<RestaurantBaseScreen> {
   @override
   Widget build(BuildContext context) {
     return PersistentTabView(
+      context,
       floatingActionButton:
           _isOrdersScreenSelected ? _buildFloatingActionButton(context) : null,
-      context,
       controller: _controller,
       screens: _buildScreens(),
       items: _navBarsItems(),
