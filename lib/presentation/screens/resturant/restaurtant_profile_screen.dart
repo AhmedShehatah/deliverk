@@ -6,25 +6,23 @@ class RestaurantProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              _buildHeader(),
-              Container(
-                margin: const EdgeInsets.only(top: 80, right: 30, left: 30),
-                child: const PopupMenuDivider(),
-              ),
-              _buildMoneyInfo(),
-              const SizedBox(
-                height: 10,
-              ),
-              _buildProfileInfo(),
-              const SizedBox(
-                height: 30,
-              )
-            ],
-          ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            _buildHeader(),
+            Container(
+              margin: const EdgeInsets.only(top: 80, right: 30, left: 30),
+              child: const PopupMenuDivider(),
+            ),
+            _buildMoneyInfo(),
+            const SizedBox(
+              height: 10,
+            ),
+            _buildProfileInfo(),
+            const SizedBox(
+              height: 30,
+            )
+          ],
         ),
       ),
     );

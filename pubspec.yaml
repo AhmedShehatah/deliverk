@@ -15,7 +15,6 @@ dependencies:
     sdk: flutter
   flutter_bloc: ^8.0.1
   flutter_polyline_points: ^1.0.0
-  # geolocator: ^9.0.1
   google_maps_flutter: ^2.1.8
   http: ^0.13.4
   image_picker: ^0.8.5+3

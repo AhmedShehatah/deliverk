@@ -9,7 +9,7 @@ class DeliveryDoingOrderScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(child: _buildOrders(context)),
+      body: _buildOrders(context),
     );
   }
 
