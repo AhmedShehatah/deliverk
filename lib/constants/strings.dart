@@ -4,6 +4,9 @@ const String appName = "Deliverk";
 // ~~~~~~~~ Splash Screen router ~~~~~~~~~~
 const String splashRouter = "/splash-screen";
 
+// ~~~~~ Base URL ~~~~~~~~~~~~~~
+const String baseUrl = "https://deliverk.herokuapp.com/api";
+
 // ~~~~~~~~~~ Map Screen Router ~~~~~~~~
 const String mapRoute = "/map-screen";
 // ~~~~~ Resturant Routers names ~~~~~~~
