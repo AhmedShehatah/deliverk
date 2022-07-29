@@ -93,7 +93,6 @@ class _MapScreenState extends State<MapScreen> {
               );
             });
           },
-          myLocationButtonEnabled: false,
           markers: _markers,
           onTap: (latLng) {
             setState(() {

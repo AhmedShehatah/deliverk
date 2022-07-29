@@ -16,7 +16,9 @@ class _DeliveryCurrentOrdersScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _buildOrders(context),
+      body: SafeArea(
+        child: _buildOrders(context),
+      ),
     );
   }
 

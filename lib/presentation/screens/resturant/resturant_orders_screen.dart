@@ -10,7 +10,9 @@ class RestaurantOrdersScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _list.isEmpty ? const EmptyOrders() : _buildOrders(context),
+      body: SafeArea(
+        child: _list.isEmpty ? const EmptyOrders() : _buildOrders(context),
+      ),
     );
   }
 
