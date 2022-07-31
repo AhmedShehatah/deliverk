@@ -1,4 +1,4 @@
-part of 'spinner_cubit.dart';
+part of '../cubit/spinner_cubit.dart';
 
 @immutable
 abstract class SpinnerState {}

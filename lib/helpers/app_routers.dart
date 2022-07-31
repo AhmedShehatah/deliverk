@@ -1,6 +1,12 @@
-import 'package:deliverk/business_logic/restaurant/cubit/spinner_cubit.dart';
+import 'package:deliverk/business_logic/common/cubit/spinner_cubit.dart';
+import 'package:deliverk/business_logic/delivery/cubit/delivery_login_cubit.dart';
+import 'package:deliverk/business_logic/restaurant/cubit/restaurant_login_cubit.dart';
+import 'package:deliverk/constants/enums.dart';
+import 'package:deliverk/helpers/shared_preferences.dart';
 import 'package:deliverk/presentation/screens/delivery/delivery_login_screen.dart';
 import 'package:deliverk/presentation/screens/resturant/restaurant_login_screen.dart';
+import 'package:deliverk/repos/delivery/delivery_repo.dart';
+import 'package:deliverk/repos/restaurant/resturant_repo.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../presentation/screens/common/map_screen.dart';
@@ -20,6 +26,19 @@ class AppRouter {
     switch (settings.name) {
       // base
       case "/":
+        if (DeliverkSharedPreferences.getToken() == null) {
+          return MaterialPageRoute(builder: (_) => const SplashScreen());
+        } else {
+          if (DeliverkSharedPreferences.getUserType() ==
+              UserType.restaurant.name) {
+            return MaterialPageRoute(
+                builder: (_) => const RestaurantBaseScreen());
+          } else {
+            return MaterialPageRoute(builder: (_) => DeliveryBaseScreen());
+          }
+        }
+
+      case splashRouter:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
 
       // map
@@ -37,7 +56,11 @@ class AppRouter {
       case restaurantBaseScreenRoute:
         return MaterialPageRoute(builder: (_) => const RestaurantBaseScreen());
       case restaurantLoginRoute:
-        return MaterialPageRoute(builder: (_) => RestaurantLoginScreen());
+        return MaterialPageRoute(
+            builder: (_) => BlocProvider<RestaurantLoginCubit>(
+                  create: (context) => RestaurantLoginCubit(RestaurantRepo()),
+                  child: RestaurantLoginScreen(),
+                ));
       case restuarntNewOrderScreenRoute:
         return MaterialPageRoute(
             builder: (_) => BlocProvider<SpinnerCubit>(
@@ -50,7 +73,11 @@ class AppRouter {
       case deliveryBaseScreen:
         return MaterialPageRoute(builder: (_) => DeliveryBaseScreen());
       case deliveryLoginRoute:
-        return MaterialPageRoute(builder: (_) => DeliveryLoginScreen());
+        return MaterialPageRoute(
+            builder: (_) => BlocProvider<DeliveryLoginCubit>(
+                  create: (context) => DeliveryLoginCubit(DeliveryRepo()),
+                  child: DeliveryLoginScreen(),
+                ));
     }
     return null;
   }

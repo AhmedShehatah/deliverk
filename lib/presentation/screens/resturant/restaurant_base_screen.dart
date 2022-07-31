@@ -1,5 +1,6 @@
 import 'package:deliverk/presentation/screens/resturant/restaurant_record_screen.dart';
 
+import '../common/splash_screen.dart';
 import 'restaurtant_profile_screen.dart';
 import 'unpaied_orders_screen.dart';
 
@@ -12,6 +13,15 @@ import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 
 class RestaurantBaseScreen extends StatefulWidget {
   const RestaurantBaseScreen({Key? key}) : super(key: key);
+  static void pop(BuildContext context) {
+    Navigator.pushAndRemoveUntil<dynamic>(
+      context,
+      MaterialPageRoute<dynamic>(
+        builder: (BuildContext context) => const SplashScreen(),
+      ),
+      (route) => false, //if you want to disable back feature set to false
+    );
+  }
 
   @override
   State<RestaurantBaseScreen> createState() => _RestaurantBaseScreenState();
@@ -65,7 +75,9 @@ class _RestaurantBaseScreenState extends State<RestaurantBaseScreen> {
       RestaurantOrdersScreen(),
       const UnpaiedOrdersScreen(),
       const RestaurantRecordScreen(),
-      const RestaurantProfileScreen(),
+      RestaurantProfileScreen(
+        context: context,
+      ),
     ];
   }
 

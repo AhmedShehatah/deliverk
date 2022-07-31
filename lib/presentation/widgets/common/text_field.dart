@@ -7,12 +7,14 @@ class CustomTextField extends StatelessWidget {
       required this.controller,
       required this.hint,
       this.secure,
+      this.action,
       Key? key})
       : super(key: key);
   final TextInputType inputType;
   final TextEditingController controller;
   final String hint;
   bool? secure = false;
+  TextInputAction? action;
   @override
   Widget build(BuildContext context) {
     return Directionality(
@@ -25,6 +27,7 @@ class CustomTextField extends StatelessWidget {
           label: Text(hint),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(5)),
         ),
+        textInputAction: action,
       ),
     );
   }

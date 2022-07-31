@@ -1,8 +1,15 @@
+import 'package:deliverk/constants/strings.dart';
+import 'package:deliverk/helpers/shared_preferences.dart';
+import 'package:deliverk/presentation/screens/common/splash_screen.dart';
+import 'package:deliverk/presentation/screens/delivery/delivery_base_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DeliveryProfileScreen extends StatelessWidget {
-  const DeliveryProfileScreen({Key? key}) : super(key: key);
-
+  const DeliveryProfileScreen({Key? key, required this.context})
+      : super(key: key);
+  final BuildContext context;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,10 +26,10 @@ class DeliveryProfileScreen extends StatelessWidget {
               const SizedBox(
                 height: 10,
               ),
-              _buildProfileInfo(),
+              _buildProfileInfo(context),
               const SizedBox(
                 height: 30,
-              )
+              ),
             ],
           ),
         ),
@@ -30,7 +37,7 @@ class DeliveryProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileInfo() {
+  Widget _buildProfileInfo(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 30),
       child: Card(
@@ -45,6 +52,16 @@ class DeliveryProfileScreen extends StatelessWidget {
             //   _buildInfoTexts("رقم تلفون المحل", "01093766715"),
             //   const Divider(),
             //   _buildInfoTexts("العنوان على الخريطة", "اضغط للعرض"),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(primary: Colors.red),
+              onPressed: () {
+                logout();
+              },
+              child: const Text(
+                "تسجيل خروج",
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
           ],
         ),
       ),
@@ -131,5 +148,11 @@ class DeliveryProfileScreen extends StatelessWidget {
         )
       ],
     );
+  }
+
+  void logout() {
+    DeliverkSharedPreferences.deleteToken().then((value) {
+      DeliveryBaseScreen.pop(context);
+    });
   }
 }

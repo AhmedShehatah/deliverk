@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:deliverk/business_logic/restaurant/cubit/spinner_cubit.dart';
+import 'package:deliverk/business_logic/common/cubit/spinner_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logger/logger.dart';

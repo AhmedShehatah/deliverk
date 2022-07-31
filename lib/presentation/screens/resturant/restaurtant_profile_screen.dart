@@ -1,8 +1,12 @@
+import 'package:deliverk/presentation/screens/resturant/restaurant_base_screen.dart';
 import 'package:flutter/material.dart';
 
-class RestaurantProfileScreen extends StatelessWidget {
-  const RestaurantProfileScreen({Key? key}) : super(key: key);
+import '../../../helpers/shared_preferences.dart';
 
+class RestaurantProfileScreen extends StatelessWidget {
+  const RestaurantProfileScreen({Key? key, required this.context})
+      : super(key: key);
+  final BuildContext context;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,6 +49,16 @@ class RestaurantProfileScreen extends StatelessWidget {
             _buildInfoTexts("رقم تلفون المحل", "01093766715"),
             const Divider(),
             _buildInfoTexts("العنوان على الخريطة", "اضغط للعرض"),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(primary: Colors.red),
+              onPressed: () {
+                logout();
+              },
+              child: const Text(
+                "تسجيل خروج",
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
           ],
         ),
       ),
@@ -131,5 +145,11 @@ class RestaurantProfileScreen extends StatelessWidget {
         )
       ],
     );
+  }
+
+  void logout() {
+    DeliverkSharedPreferences.deleteToken().then((value) {
+      RestaurantBaseScreen.pop(context);
+    });
   }
 }

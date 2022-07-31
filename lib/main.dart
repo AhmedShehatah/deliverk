@@ -1,3 +1,4 @@
+import 'package:deliverk/helpers/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
@@ -5,12 +6,13 @@ import 'package:logger/logger.dart';
 import 'constants/strings.dart';
 import 'helpers/app_routers.dart';
 
-void main() {
+Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]).then((value) => runApp(const MyApp()));
+  await DeliverkSharedPreferences.init();
   runApp(const MyApp());
 }
 

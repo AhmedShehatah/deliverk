@@ -1,3 +1,5 @@
+import 'package:deliverk/constants/strings.dart';
+import 'package:deliverk/presentation/screens/common/splash_screen.dart';
 import 'package:deliverk/presentation/screens/delivery/delivery_unpaid_orders_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -11,12 +13,13 @@ class DeliveryBaseScreen extends StatelessWidget {
   DeliveryBaseScreen({Key? key}) : super(key: key);
   final PersistentTabController _controller =
       PersistentTabController(initialIndex: 0);
+
   @override
   Widget build(BuildContext context) {
     return PersistentTabView(
       context,
       controller: _controller,
-      screens: _buildScreens(),
+      screens: _buildScreens(context),
       items: _navBarsItems(),
       confineInSafeArea: true,
       backgroundColor: Colors.white,
@@ -44,12 +47,14 @@ class DeliveryBaseScreen extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildScreens() {
+  List<Widget> _buildScreens(BuildContext context) {
     return [
       const DeliveryCurrentOrdersScreen(),
       const DeliveryDoingOrderScreen(),
       const DeliveryUnpaidOrdersScreen(),
-      const DeliveryProfileScreen(),
+      DeliveryProfileScreen(
+        context: context,
+      ),
     ];
   }
 
@@ -80,5 +85,22 @@ class DeliveryBaseScreen extends StatelessWidget {
         inactiveColorPrimary: CupertinoColors.systemGrey,
       ),
     ];
+  }
+
+  static void pop(BuildContext context) {
+    Navigator.pushAndRemoveUntil<dynamic>(
+      context,
+      MaterialPageRoute<dynamic>(
+        builder: (BuildContext context) => const SplashScreen(),
+      ),
+      (route) => false, //if you want to disable back feature set to false
+    );
+    // pushNewScreen(
+    //   context,
+    //   screen: const SplashScreen(),
+
+    //   withNavBar: false, // OPTIONAL VALUE. True by default.
+    //   pageTransitionAnimation: PageTransitionAnimation.slideRight, // OPTIONAL
+    // );
   }
 }

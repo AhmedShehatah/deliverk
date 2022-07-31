@@ -3,3 +3,8 @@ enum SpinnerEnum {
   zone,
   preparationTime,
 }
+
+enum UserType {
+  restaurant,
+  delivery,
+}

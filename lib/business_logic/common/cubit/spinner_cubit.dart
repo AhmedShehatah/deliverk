@@ -4,7 +4,7 @@ import 'package:logger/logger.dart';
 // ignore: depend_on_referenced_packages
 import 'package:meta/meta.dart';
 
-part 'spinner_state.dart';
+part '../state/spinner_state.dart';
 
 class SpinnerCubit extends Cubit<SpinnerState> {
   SpinnerCubit() : super(SpinnerInitial());

@@ -1,5 +1,11 @@
+import 'package:deliverk/business_logic/restaurant/cubit/restaurant_login_cubit.dart';
+import 'package:deliverk/constants/enums.dart';
+import 'package:deliverk/helpers/shared_preferences.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
+import '../../../business_logic/restaurant/state/restaurant_login_state.dart';
 import '../../../constants/strings.dart';
 import '../../widgets/common/text_field.dart';
 
@@ -16,38 +22,74 @@ class RestaurantLoginScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 30),
         child: SizedBox(
           width: double.infinity,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CustomTextField(
-                inputType: TextInputType.phone,
-                controller: _phoneNumberController,
-                hint: 'رقم التلفون',
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              CustomTextField(
-                inputType: TextInputType.visiblePassword,
-                controller: _passwordController,
-                hint: 'كلمة المرور',
-                secure: true,
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pushReplacementNamed(
-                      context, restaurantBaseScreenRoute);
-                },
-                child: const Text("تسجيل الدخول"),
-              ),
-            ],
+          height: MediaQuery.of(context).size.height,
+          child: Form(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CustomTextField(
+                  inputType: TextInputType.phone,
+                  controller: _phoneNumberController,
+                  hint: 'رقم التلفون',
+                  action: TextInputAction.next,
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                CustomTextField(
+                  inputType: TextInputType.visiblePassword,
+                  controller: _passwordController,
+                  hint: 'كلمة المرور',
+                  secure: true,
+                  action: TextInputAction.next,
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                BlocBuilder<RestaurantLoginCubit, RestaurantLoginState>(
+                  builder: (_, state) {
+                    if (state is RestaurantLoginInitial) {
+                      return _buildLoginButton(context);
+                    } else if (state is LoadingState) {
+                      return const CircularProgressIndicator(
+                        color: Colors.blue,
+                      );
+                    } else if (state is SuccessState) {
+                      WidgetsBinding.instance?.addPostFrameCallback((_) {
+                        DeliverkSharedPreferences.setToken(state.token);
+                        DeliverkSharedPreferences.setUserType(
+                            UserType.restaurant.name);
+                        Navigator.popAndPushNamed(
+                          context,
+                          restaurantBaseScreenRoute,
+                        );
+                        Fluttertoast.showToast(msg: "تم تسجيل الدخول بنجاح");
+                      });
+
+                      return const Text('');
+                    } else {
+                      Fluttertoast.showToast(msg: "فشل تسجيل الدخول");
+                      return _buildLoginButton(context);
+                    }
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildLoginButton(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () {
+        final phone = _phoneNumberController.text.toString();
+        final password = _passwordController.text.toString();
+        BlocProvider.of<RestaurantLoginCubit>(context).login(phone, password);
+      },
+      child: const Text("تسجيل الدخول"),
     );
   }
 }
