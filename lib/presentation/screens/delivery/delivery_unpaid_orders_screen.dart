@@ -1,4 +1,4 @@
-import 'package:deliverk/presentation/widgets/delivery/delivery_unpaid_orders_model.dart';
+import '../../widgets/delivery/delivery_unpaid_orders_model.dart';
 import 'package:flutter/material.dart';
 
 class DeliveryUnpaidOrdersScreen extends StatelessWidget {

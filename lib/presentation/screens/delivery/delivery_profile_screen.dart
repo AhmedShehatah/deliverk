@@ -1,10 +1,6 @@
-import 'package:deliverk/constants/strings.dart';
-import 'package:deliverk/helpers/shared_preferences.dart';
-import 'package:deliverk/presentation/screens/common/splash_screen.dart';
-import 'package:deliverk/presentation/screens/delivery/delivery_base_screen.dart';
+import '../../../helpers/shared_preferences.dart';
+import 'delivery_base_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class DeliveryProfileScreen extends StatelessWidget {
   const DeliveryProfileScreen({Key? key, required this.context})

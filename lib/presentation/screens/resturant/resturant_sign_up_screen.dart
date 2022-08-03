@@ -1,9 +1,20 @@
 import 'dart:io';
 
+import 'package:deliverk/helpers/shared_preferences.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+
+import '../../../business_logic/common/cubit/upload_image_cubit.dart';
+import '../../../business_logic/restaurant/cubit/restaurant_sign_up_cubit.dart';
+import '../../../data/models/restaurant/restaurant_model.dart';
+import '../../../data/models/restaurant/restaurant_sign_up_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:logger/logger.dart';
 
+import '../../../business_logic/restaurant/state/restaurant_sign_up_state.dart';
 import '../../../constants/enums.dart';
 import '../../../constants/strings.dart';
 import '../../widgets/common/spinner.dart';
@@ -114,7 +125,25 @@ class _ResturantSignUpScreenState extends State<ResturantSignUpScreen> {
                       secure: true,
                     ),
                   ),
-                  buildSignUpButton(),
+                  BlocBuilder<RestaurantSignUpCubit, RestaurantSignUpState>(
+                    builder: (context, state) {
+                      if (state is RestaurantSignUpInitial) {
+                        return buildSignUpButton();
+                      } else if (state is SuccessState) {
+                        Hive.box<RestaurantModel>('restaurant')
+                            .add(state.restaurantModel);
+                        DeliverkSharedPreferences.setRestId(
+                                state.restaurantModel.id!)
+                            .then((value) => Navigator.of(context)
+                                .popAndPushNamed(restaurantBaseScreenRoute));
+                        // Navigator.of(context)
+                        //     .popAndPushNamed(restaurantBaseScreenRoute);
+                      } else if (state is FailedState) {
+                        Logger().d(state.message);
+                      }
+                      return buildSignUpButton();
+                    },
+                  ),
                 ],
               ),
             ),
@@ -131,7 +160,10 @@ class _ResturantSignUpScreenState extends State<ResturantSignUpScreen> {
         onTap: () {
           pickImage().then((file) {
             setState(() {
-              if (file != null) _image = File(file.path);
+              if (file != null) {
+                _image = File(file.path);
+                BlocProvider.of<UploadImageCubit>(context).uploadImage(_image!);
+              }
             });
           });
         },
@@ -179,10 +211,54 @@ class _ResturantSignUpScreenState extends State<ResturantSignUpScreen> {
       width: double.infinity,
       child: ElevatedButton(
         onPressed: () {
-          Navigator.of(context).pushReplacementNamed(restaurantBaseScreenRoute);
+          _signUp(context);
         },
         child: const Text("تسجيل"),
       ),
     );
+  }
+
+  bool _chekcer() {
+    if (_image == null ||
+        _restName.text.isEmpty ||
+        _restPhoneNumber.text.isEmpty ||
+        _location == null ||
+        _restPlaceInDetials.text.isEmpty ||
+        _passwordController.text.isEmpty) return false;
+    return true;
+  }
+
+  void _signUp(BuildContext context) {
+    var imageProvider = BlocProvider.of<UploadImageCubit>(context);
+    var signUpProvider = BlocProvider.of<RestaurantSignUpCubit>(context);
+    if (!_chekcer()) {
+      Fluttertoast.showToast(msg: "من فضلك اكمل البيانات");
+      return;
+    }
+    var url = imageProvider.url;
+    var model = RestaurantSignUpModel();
+    model.avatar = url;
+    model.name = _restName.text;
+    model.address = _restPlaceInDetials.text;
+    model.isActive = true;
+    model.mapLat = _location?.latitude.toString();
+    model.mapLong = _location?.longitude.toString();
+    model.password = _passwordController.text;
+    model.phone = _restPhoneNumber.text;
+    model.zoneId = 1;
+
+    signUpProvider.signUp(model.toJson());
+  }
+
+  @override
+  void initState() {
+    Hive.openBox<RestaurantModel>('restaurant');
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    Hive.box('restaurant').close();
+    super.dispose();
   }
 }

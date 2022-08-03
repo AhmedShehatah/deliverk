@@ -1,12 +1,15 @@
-import 'package:deliverk/business_logic/common/cubit/spinner_cubit.dart';
-import 'package:deliverk/business_logic/delivery/cubit/delivery_login_cubit.dart';
-import 'package:deliverk/business_logic/restaurant/cubit/restaurant_login_cubit.dart';
-import 'package:deliverk/constants/enums.dart';
-import 'package:deliverk/helpers/shared_preferences.dart';
-import 'package:deliverk/presentation/screens/delivery/delivery_login_screen.dart';
-import 'package:deliverk/presentation/screens/resturant/restaurant_login_screen.dart';
-import 'package:deliverk/repos/delivery/delivery_repo.dart';
-import 'package:deliverk/repos/restaurant/resturant_repo.dart';
+import '../business_logic/common/cubit/spinner_cubit.dart';
+import '../business_logic/common/cubit/upload_image_cubit.dart';
+import '../business_logic/delivery/cubit/delivery_login_cubit.dart';
+import '../business_logic/restaurant/cubit/restaurant_login_cubit.dart';
+import '../business_logic/restaurant/cubit/restaurant_profile_cubit.dart';
+import '../business_logic/restaurant/cubit/restaurant_sign_up_cubit.dart';
+import '../constants/enums.dart';
+import 'shared_preferences.dart';
+import '../presentation/screens/delivery/delivery_login_screen.dart';
+import '../presentation/screens/resturant/restaurant_login_screen.dart';
+import '../repos/delivery/delivery_repo.dart';
+import '../repos/restaurant/resturant_repo.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../presentation/screens/common/map_screen.dart';
@@ -22,6 +25,9 @@ import '../presentation/screens/resturant/restaurant_new_order.dart';
 import '../presentation/screens/resturant/resturant_sign_up_screen.dart';
 
 class AppRouter {
+  final RestaurantRepo _restaurantRepo = RestaurantRepo();
+  final DeliveryRepo _deliveryRepo = DeliveryRepo();
+
   Route? onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
       // base
@@ -48,17 +54,35 @@ class AppRouter {
       // returant routes
       case resturantSignUpRoute:
         return MaterialPageRoute(
-          builder: (_) => BlocProvider<SpinnerCubit>(
-            create: (context) => SpinnerCubit(),
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider<SpinnerCubit>(
+                create: (context) => SpinnerCubit(),
+              ),
+              BlocProvider<UploadImageCubit>(
+                create: (context) => UploadImageCubit(_restaurantRepo),
+              ),
+              BlocProvider<RestaurantSignUpCubit>(
+                  create: (context) => RestaurantSignUpCubit(_restaurantRepo))
+            ],
             child: const ResturantSignUpScreen(),
           ),
         );
       case restaurantBaseScreenRoute:
-        return MaterialPageRoute(builder: (_) => const RestaurantBaseScreen());
+        return MaterialPageRoute(
+            builder: (_) => MultiBlocProvider(
+                  providers: [
+                    BlocProvider<ResturantProfileCubit>(
+                      create: (context) =>
+                          ResturantProfileCubit(_restaurantRepo),
+                    ),
+                  ],
+                  child: const RestaurantBaseScreen(),
+                ));
       case restaurantLoginRoute:
         return MaterialPageRoute(
             builder: (_) => BlocProvider<RestaurantLoginCubit>(
-                  create: (context) => RestaurantLoginCubit(RestaurantRepo()),
+                  create: (context) => RestaurantLoginCubit(_restaurantRepo),
                   child: RestaurantLoginScreen(),
                 ));
       case restuarntNewOrderScreenRoute:
@@ -75,7 +99,7 @@ class AppRouter {
       case deliveryLoginRoute:
         return MaterialPageRoute(
             builder: (_) => BlocProvider<DeliveryLoginCubit>(
-                  create: (context) => DeliveryLoginCubit(DeliveryRepo()),
+                  create: (context) => DeliveryLoginCubit(_deliveryRepo),
                   child: DeliveryLoginScreen(),
                 ));
     }

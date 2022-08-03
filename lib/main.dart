@@ -1,18 +1,23 @@
-import 'package:deliverk/helpers/shared_preferences.dart';
+import 'data/models/restaurant/restaurant_model.dart';
+import 'helpers/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
-
+import 'package:hive_flutter/hive_flutter.dart';
 import 'constants/strings.dart';
 import 'helpers/app_routers.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations([
+  await DeliverkSharedPreferences.init();
+  Hive.registerAdapter(RestaurantModelAdapter());
+
+  await Hive.initFlutter();
+  await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]).then((value) => runApp(const MyApp()));
-  await DeliverkSharedPreferences.init();
+
   runApp(const MyApp());
 }
 

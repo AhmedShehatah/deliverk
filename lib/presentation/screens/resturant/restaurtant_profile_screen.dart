@@ -1,34 +1,77 @@
-import 'package:deliverk/presentation/screens/resturant/restaurant_base_screen.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:deliverk/business_logic/restaurant/state/generic_state.dart';
+import 'package:deliverk/data/models/restaurant/restaurant_model.dart';
+
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive/hive.dart';
+
+import '../../../business_logic/restaurant/cubit/restaurant_profile_cubit.dart';
+import 'restaurant_base_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../../helpers/shared_preferences.dart';
 
-class RestaurantProfileScreen extends StatelessWidget {
+class RestaurantProfileScreen extends StatefulWidget {
   const RestaurantProfileScreen({Key? key, required this.context})
       : super(key: key);
   final BuildContext context;
+
+  @override
+  State<RestaurantProfileScreen> createState() =>
+      _RestaurantProfileScreenState();
+}
+
+class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
+  RestaurantModel _profileData = RestaurantModel();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              _buildHeader(),
-              Container(
-                margin: const EdgeInsets.only(top: 80, right: 30, left: 30),
-                child: const PopupMenuDivider(),
-              ),
-              _buildMoneyInfo(),
-              const SizedBox(
-                height: 10,
-              ),
-              _buildProfileInfo(),
-              const SizedBox(
-                height: 30,
-              )
-            ],
+    return Scaffold(body: BlocBuilder<ResturantProfileCubit, GenericState>(
+      builder: (context, state) {
+        if (state is GenericSuccessState) {
+          _profileData = RestaurantModel.fromJson(state.data);
+          return _buildTree();
+        }
+        return _buildDownladingData();
+      },
+    ));
+  }
+
+  Widget _buildDownladingData() {
+    return Center(
+        child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SizedBox(
+          height: 150,
+          width: 150,
+          child: Image.asset(
+            'assets/images/loading.gif',
           ),
+        ),
+        const Text("انتظر قليلا")
+      ],
+    ));
+  }
+
+  Widget _buildTree() {
+    return SafeArea(
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            _buildHeader(),
+            Container(
+              margin: const EdgeInsets.only(top: 80, right: 30, left: 30),
+              child: const PopupMenuDivider(),
+            ),
+            _buildMoneyInfo(),
+            const SizedBox(
+              height: 10,
+            ),
+            _buildProfileInfo(),
+            const SizedBox(
+              height: 30,
+            )
+          ],
         ),
       ),
     );
@@ -42,11 +85,11 @@ class RestaurantProfileScreen extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildInfoTexts("اسم المحل", "المطعم السوري"),
+            _buildInfoTexts("اسم المحل", _profileData.name!),
             const Divider(),
-            _buildInfoTexts("عنوان المحل", "شارع الهرم بجوار ماكدونالدز"),
+            _buildInfoTexts("عنوان المحل", _profileData.address!),
             const Divider(),
-            _buildInfoTexts("رقم تلفون المحل", "01093766715"),
+            _buildInfoTexts("رقم تلفون المحل", _profileData.phone!),
             const Divider(),
             _buildInfoTexts("العنوان على الخريطة", "اضغط للعرض"),
             ElevatedButton(
@@ -137,10 +180,22 @@ class RestaurantProfileScreen extends StatelessWidget {
         ),
         Positioned(
           top: 130,
-          child: CircleAvatar(
-            radius: 70,
-            backgroundColor: Colors.grey.shade200,
-            backgroundImage: const AssetImage("assets/images/logo.png"),
+          child: CachedNetworkImage(
+            imageUrl: _profileData.avatar!,
+            imageBuilder: (context, imageProvider) => Container(
+              width: 120.0,
+              height: 120.0,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+              ),
+            ),
+            progressIndicatorBuilder: (context, url, downloadProgress) =>
+                CircleAvatar(
+              radius: 70,
+              backgroundColor: Colors.grey.shade600,
+            ),
+            errorWidget: (context, url, error) => const Icon(Icons.error),
           ),
         )
       ],
@@ -149,7 +204,23 @@ class RestaurantProfileScreen extends StatelessWidget {
 
   void logout() {
     DeliverkSharedPreferences.deleteToken().then((value) {
-      RestaurantBaseScreen.pop(context);
+      Hive.box<RestaurantModel>('restaurant')
+          .clear()
+          .then((value) => RestaurantBaseScreen.pop(widget.context));
+      // RestaurantBaseScreen.pop(widget.context);
     });
+  }
+
+  @override
+  void initState() {
+    int? id = DeliverkSharedPreferences.getRestId();
+    BlocProvider.of<ResturantProfileCubit>(context).getProfileData(id ?? 1);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    // Hive.box<RestaurantModel>('restaurant').close();
+    super.dispose();
   }
 }

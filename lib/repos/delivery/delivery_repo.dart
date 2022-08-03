@@ -1,4 +1,4 @@
-import 'package:deliverk/data/apis/delivery_apis.dart';
+import '../../data/apis/delivery_apis.dart';
 
 class DeliveryRepo {
   final _api = DeliveryApis();

@@ -1,6 +1,5 @@
-import 'package:deliverk/constants/strings.dart';
-import 'package:deliverk/presentation/screens/common/splash_screen.dart';
-import 'package:deliverk/presentation/screens/delivery/delivery_unpaid_orders_screen.dart';
+import '../common/splash_screen.dart';
+import 'delivery_unpaid_orders_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';

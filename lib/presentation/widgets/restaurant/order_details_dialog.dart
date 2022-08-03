@@ -1,8 +1,9 @@
+import 'package:deliverk/data/models/common/order_model.dart';
 import 'package:flutter/material.dart';
 
 class OrderDetailsDialog extends StatelessWidget {
-  const OrderDetailsDialog({Key? key}) : super(key: key);
-
+  const OrderDetailsDialog(this.order, {Key? key}) : super(key: key);
+  final OrderModel order;
   @override
   Widget build(BuildContext context) {
     return Directionality(
@@ -32,30 +33,31 @@ class OrderDetailsDialog extends StatelessWidget {
                       ),
                     ),
                   ],
-                  rows: const <DataRow>[
+                  rows: <DataRow>[
                     DataRow(
                       cells: <DataCell>[
-                        DataCell(Text('كود الطلب')),
-                        DataCell(Text('19')),
+                        const DataCell(Text('كود الطلب')),
+                        DataCell(Text(order.id.toString())),
                       ],
                     ),
                     DataRow(
                       cells: <DataCell>[
-                        DataCell(Text('حالة الطلب')),
-                        DataCell(Text('قيد الانتظار')),
+                        const DataCell(Text('حالة الطلب')),
+                        DataCell(Text(order.status!)),
                       ],
                     ),
                     DataRow(
                       cells: <DataCell>[
-                        DataCell(Text('تكلفة التوصيل')),
-                        DataCell(Text('27')),
+                        const DataCell(Text('تكلفة التوصيل')),
+                        DataCell(Text(order.cost.toString())),
                       ],
                     ),
                     DataRow(
                       cells: <DataCell>[
-                        DataCell(Text('منطقة التوصيل')),
+                        const DataCell(Text('منطقة التوصيل')),
                         DataCell(FittedBox(
-                            fit: BoxFit.cover, child: Text('شارع الهرم'))),
+                            fit: BoxFit.cover,
+                            child: Text(order.areaId.toString()))),
                       ],
                     ),
                   ],

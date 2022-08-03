@@ -8,3 +8,10 @@ enum UserType {
   restaurant,
   delivery,
 }
+
+enum OrderType {
+  pending,
+  coming,
+  delivering,
+  received,
+}

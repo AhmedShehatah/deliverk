@@ -1,5 +1,5 @@
-import 'package:deliverk/data/apis/api_settings.dart';
-import 'package:deliverk/data/models/common/login_model.dart';
+import 'api_settings.dart';
+import '../models/common/login_model.dart';
 import 'package:dio/dio.dart';
 import 'package:logger/logger.dart';
 

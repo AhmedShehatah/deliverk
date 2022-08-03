@@ -1,20 +1,24 @@
+import 'dart:io';
+
 import 'package:bloc/bloc.dart';
 import '../../../repos/restaurant/resturant_repo.dart';
 import 'package:dio/dio.dart';
-import '../state/restaurant_login_state.dart';
+import '../state/upload_image_state.dart';
 
-class RestaurantLoginCubit extends Cubit<RestaurantLoginState> {
-  RestaurantLoginCubit(this.repo) : super(RestaurantLoginInitial());
+class UploadImageCubit extends Cubit<UploadImageState> {
+  UploadImageCubit(this.repo) : super(UploadImageInitial());
   final RestaurantRepo repo;
-  void login(String phone, String password) {
+  late String url;
+  void uploadImage(File file) {
     emit(LoadingState());
-    repo.login(phone, password).then((response) {
+    repo.uploadImage(file).then((response) {
       if (response is DioError) {
         emit(ErrorState());
         return;
       }
       if (response['success']) {
-        emit(SuccessState(response['token']));
+        url = response['url'];
+        emit(SuccessState(response['url']));
       } else {
         emit(FailedState(response['message']));
       }

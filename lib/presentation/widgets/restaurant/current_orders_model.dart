@@ -1,9 +1,11 @@
+import 'package:deliverk/data/models/common/order_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class CurrentOrdersModel extends StatelessWidget {
-  const CurrentOrdersModel({Key? key}) : super(key: key);
+  const CurrentOrdersModel(this.orderModel, {Key? key}) : super(key: key);
 
+  final OrderModel orderModel;
   @override
   Widget build(BuildContext context) {
     return Directionality(
@@ -20,18 +22,18 @@ class CurrentOrdersModel extends StatelessWidget {
               Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text("كود الطلب:123"),
+                children: [
+                  Text("كود الطلب " + orderModel.id.toString()),
                   Text(
-                    "المنيب",
-                    style: TextStyle(
+                    orderModel.areaId.toString(),
+                    style: const TextStyle(
                       fontSize: 12,
                       color: Colors.black38,
                     ),
                   ),
                   Text(
-                    'قيد الانتظار',
-                    style: TextStyle(
+                    orderModel.status!,
+                    style: const TextStyle(
                       fontSize: 12,
                       color: Colors.black38,
                     ),
@@ -42,9 +44,9 @@ class CurrentOrdersModel extends StatelessWidget {
               Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.end,
-                children: const [
-                  Text("23 جنيه"),
-                  Icon(
+                children: [
+                  Text(orderModel.cost.toString() + "ج.م"),
+                  const Icon(
                     CupertinoIcons.delete,
                     color: Colors.redAccent,
                   )

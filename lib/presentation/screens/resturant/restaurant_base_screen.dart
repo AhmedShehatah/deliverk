@@ -1,4 +1,9 @@
-import 'package:deliverk/presentation/screens/resturant/restaurant_record_screen.dart';
+import 'package:deliverk/business_logic/restaurant/cubit/restaurants_current_orders_cubit.dart';
+import 'package:deliverk/repos/restaurant/resturant_repo.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../business_logic/restaurant/cubit/restaurant_profile_cubit.dart';
+import 'restaurant_record_screen.dart';
 
 import '../common/splash_screen.dart';
 import 'restaurtant_profile_screen.dart';
@@ -55,8 +60,7 @@ class _RestaurantBaseScreenState extends State<RestaurantBaseScreen> {
         borderRadius: BorderRadius.circular(10.0),
         colorBehindNavBar: Colors.white,
       ),
-      popAllScreensOnTapOfSelectedTab: true,
-      popActionScreens: PopActionScreensType.all,
+      popAllScreensOnTapOfSelectedTab: false,
       itemAnimationProperties: const ItemAnimationProperties(
         duration: Duration(milliseconds: 200),
         curve: Curves.ease,
@@ -70,13 +74,27 @@ class _RestaurantBaseScreenState extends State<RestaurantBaseScreen> {
     );
   }
 
+  late RestaurantProfileScreen _profileScreen;
+  final _orderScreen = BlocProvider<RestaurantCurrentOrdersCubit>(
+    create: (context) => RestaurantCurrentOrdersCubit(RestaurantRepo()),
+    child: const RestaurantOrdersScreen(),
+  );
+  final _unpaid = BlocProvider<RestaurantCurrentOrdersCubit>(
+    create: (context) => RestaurantCurrentOrdersCubit(RestaurantRepo()),
+    child: UnpaiedOrdersScreen(),
+  );
+  final _recordScreen = BlocProvider<RestaurantCurrentOrdersCubit>(
+    create: (context) => RestaurantCurrentOrdersCubit(RestaurantRepo()),
+    child: const RestaurantRecordScreen(),
+  );
   List<Widget> _buildScreens() {
     return [
-      RestaurantOrdersScreen(),
-      const UnpaiedOrdersScreen(),
-      const RestaurantRecordScreen(),
-      RestaurantProfileScreen(
-        context: context,
+      _orderScreen,
+      _unpaid,
+      _recordScreen,
+      BlocProvider<ResturantProfileCubit>(
+        create: (context) => ResturantProfileCubit(RestaurantRepo()),
+        child: _profileScreen,
       ),
     ];
   }
@@ -118,5 +136,16 @@ class _RestaurantBaseScreenState extends State<RestaurantBaseScreen> {
       label: const Text("اضف طلب جديد"),
       icon: const Icon(Icons.restaurant_menu),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _profileScreen = RestaurantProfileScreen(context: context);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 }
