@@ -18,4 +18,7 @@ class RestaurantRepo {
 
   Future<dynamic> getOrders(Map<String, dynamic> querys, int id) =>
       _api.getOrders(querys, id);
+
+  Future<dynamic> addOrder(Map<String, dynamic> data, String token) =>
+      _api.addOrder(data, token);
 }

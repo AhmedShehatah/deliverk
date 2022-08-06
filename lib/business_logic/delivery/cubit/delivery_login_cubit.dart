@@ -15,7 +15,7 @@ class DeliveryLoginCubit extends Cubit<DeliveryLoginState> {
         return;
       }
       if (response['success']) {
-        emit(SuccessState(response['token']));
+        emit(SuccessState(response['token'], response['delv_id']));
       } else {
         emit(FailedState(response['message']));
       }

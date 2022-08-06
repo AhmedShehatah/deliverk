@@ -55,6 +55,7 @@ class DeliveryLoginScreen extends StatelessWidget {
                     } else if (state is SuccessState) {
                       WidgetsBinding.instance?.addPostFrameCallback((_) {
                         DeliverkSharedPreferences.setToken(state.token);
+                        DeliverkSharedPreferences.setDeliveryId(state.delivId);
                         DeliverkSharedPreferences.setUserType(
                             UserType.delivery.name);
                         Navigator.popAndPushNamed(

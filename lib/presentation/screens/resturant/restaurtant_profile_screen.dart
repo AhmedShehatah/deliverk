@@ -1,9 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:deliverk/business_logic/restaurant/state/generic_state.dart';
+import 'package:deliverk/business_logic/common/state/generic_state.dart';
 import 'package:deliverk/data/models/restaurant/restaurant_model.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hive/hive.dart';
 
 import '../../../business_logic/restaurant/cubit/restaurant_profile_cubit.dart';
 import 'restaurant_base_screen.dart';
@@ -204,10 +203,7 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
 
   void logout() {
     DeliverkSharedPreferences.deleteToken().then((value) {
-      Hive.box<RestaurantModel>('restaurant')
-          .clear()
-          .then((value) => RestaurantBaseScreen.pop(widget.context));
-      // RestaurantBaseScreen.pop(widget.context);
+      RestaurantBaseScreen.pop(widget.context);
     });
   }
 
@@ -220,7 +216,6 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
 
   @override
   void dispose() {
-    // Hive.box<RestaurantModel>('restaurant').close();
     super.dispose();
   }
 }

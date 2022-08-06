@@ -5,6 +5,7 @@ class DeliverkSharedPreferences {
   static const String _token = "token";
   static const String _userType = "user";
   static const String _resId = "restId";
+  static const String _delivId = "delivId";
 
   static Future init() async =>
       _preferences = await SharedPreferences.getInstance();
@@ -24,4 +25,8 @@ class DeliverkSharedPreferences {
   static Future setRestId(int restId) async =>
       _preferences.setInt(_resId, restId);
   static int? getRestId() => _preferences.getInt(_resId);
+
+  static Future setDeliveryId(int delivId) async =>
+      _preferences.setInt(_delivId, delivId);
+  static int? getDelivId() => _preferences.getInt(_delivId);
 }

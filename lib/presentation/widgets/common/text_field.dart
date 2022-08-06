@@ -8,12 +8,14 @@ class CustomTextField extends StatelessWidget {
       required this.hint,
       this.secure,
       this.action,
+      this.validator,
       Key? key})
       : super(key: key);
   final TextInputType inputType;
   final TextEditingController controller;
   final String hint;
   bool? secure = false;
+  final String? validator;
   TextInputAction? action;
   @override
   Widget build(BuildContext context) {
@@ -28,6 +30,9 @@ class CustomTextField extends StatelessWidget {
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(5)),
         ),
         textInputAction: action,
+        validator: (value) {
+          return validator;
+        },
       ),
     );
   }

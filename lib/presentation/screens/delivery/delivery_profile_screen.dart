@@ -1,39 +1,60 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:deliverk/business_logic/common/state/generic_state.dart';
+import 'package:deliverk/business_logic/delivery/cubit/delivery_profile_cubit.dart';
+import 'package:deliverk/data/models/delivery/delivery_model.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../helpers/shared_preferences.dart';
 import 'delivery_base_screen.dart';
 import 'package:flutter/material.dart';
 
-class DeliveryProfileScreen extends StatelessWidget {
+class DeliveryProfileScreen extends StatefulWidget {
   const DeliveryProfileScreen({Key? key, required this.context})
       : super(key: key);
   final BuildContext context;
+
+  @override
+  State<DeliveryProfileScreen> createState() => _DeliveryProfileScreenState();
+}
+
+class _DeliveryProfileScreenState extends State<DeliveryProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Column(
-            children: [
-              _buildHeader(),
-              Container(
-                margin: const EdgeInsets.only(top: 80, right: 30, left: 30),
-                child: const PopupMenuDivider(),
-              ),
-              _buildMoneyInfo(),
-              const SizedBox(
-                height: 10,
-              ),
-              _buildProfileInfo(context),
-              const SizedBox(
-                height: 30,
-              ),
-            ],
+          child: BlocBuilder<DeliveryProfileCubit, GenericState>(
+            builder: (context, state) {
+              if (state is GenericSuccessState) {
+                var info = DeliveryModel.fromJson(state.data);
+                return Column(
+                  children: [
+                    _buildHeader(info.avatar!),
+                    Container(
+                      margin:
+                          const EdgeInsets.only(top: 80, right: 30, left: 30),
+                      child: const PopupMenuDivider(),
+                    ),
+                    _buildMoneyInfo(),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    _buildProfileInfo(context, info.name!, info.phone!),
+                    const SizedBox(
+                      height: 30,
+                    ),
+                  ],
+                );
+              }
+              return _buildDownladingData();
+            },
           ),
         ),
       ),
     );
   }
 
-  Widget _buildProfileInfo(BuildContext context) {
+  Widget _buildProfileInfo(BuildContext context, String name, String phone) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 30),
       child: Card(
@@ -41,13 +62,9 @@ class DeliveryProfileScreen extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildInfoTexts("الاسم", "احمد شحاته"),
+            _buildInfoTexts("الاسم", name),
             const Divider(),
-            _buildInfoTexts("رقم التلفون", "01093766715"),
-            //   const Divider(),
-            //   _buildInfoTexts("رقم تلفون المحل", "01093766715"),
-            //   const Divider(),
-            //   _buildInfoTexts("العنوان على الخريطة", "اضغط للعرض"),
+            _buildInfoTexts("رقم التلفون", phone),
             ElevatedButton(
               style: ElevatedButton.styleFrom(primary: Colors.red),
               onPressed: () {
@@ -124,7 +141,7 @@ class DeliveryProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(String url) {
     return Stack(
       alignment: Alignment.center,
       clipBehavior: Clip.none,
@@ -136,19 +153,55 @@ class DeliveryProfileScreen extends StatelessWidget {
         ),
         Positioned(
           top: 130,
-          child: CircleAvatar(
-            radius: 70,
-            backgroundColor: Colors.grey.shade200,
-            backgroundImage: const AssetImage("assets/images/logo.png"),
+          child: CachedNetworkImage(
+            imageUrl: url,
+            imageBuilder: (context, imageProvider) => Container(
+              width: 120.0,
+              height: 120.0,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+              ),
+            ),
+            progressIndicatorBuilder: (context, url, downloadProgress) =>
+                CircleAvatar(
+              radius: 70,
+              backgroundColor: Colors.grey.shade600,
+            ),
+            errorWidget: (context, url, error) => const Icon(Icons.error),
           ),
         )
       ],
     );
   }
 
+  Widget _buildDownladingData() {
+    return Center(
+        child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SizedBox(
+          height: 150,
+          width: 150,
+          child: Image.asset(
+            'assets/images/loading.gif',
+          ),
+        ),
+        const Text("انتظر قليلا")
+      ],
+    ));
+  }
+
   void logout() {
     DeliverkSharedPreferences.deleteToken().then((value) {
-      DeliveryBaseScreen.pop(context);
+      DeliveryBaseScreen.pop(widget.context);
     });
+  }
+
+  @override
+  void initState() {
+    int? id = DeliverkSharedPreferences.getDelivId();
+    BlocProvider.of<DeliveryProfileCubit>(context).getProfileData(id ?? 1);
+    super.initState();
   }
 }

@@ -11,6 +11,8 @@ enum UserType {
 
 enum OrderType {
   pending,
+  cooked,
+  cooking,
   coming,
   delivering,
   received,

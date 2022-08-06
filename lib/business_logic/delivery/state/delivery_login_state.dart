@@ -6,7 +6,8 @@ class LoadingState extends DeliveryLoginState {}
 
 class SuccessState extends DeliveryLoginState {
   final String token;
-  SuccessState(this.token);
+  final int delivId;
+  SuccessState(this.token, this.delivId);
 }
 
 class FailedState extends DeliveryLoginState {

@@ -52,7 +52,6 @@ class _RestaurantOrdersScreenState extends State<RestaurantOrdersScreen> {
     return BlocBuilder<RestaurantCurrentOrdersCubit, CurrentOrdersState>(
       builder: ((_, state) {
         if (state is CurrentOrdersLoading && state.isFirstFetch) {
-          _log.d('first fetch');
           return _loadingIndicator();
         }
 
@@ -101,7 +100,8 @@ class _RestaurantOrdersScreenState extends State<RestaurantOrdersScreen> {
   }
 
   Future<void> refresh(BuildContext context) async {
-    BlocProvider.of<RestaurantCurrentOrdersCubit>(context).loadOrders();
+    BlocProvider.of<RestaurantCurrentOrdersCubit>(context)
+        .loadOrders(status: OrderType.pending.name);
   }
 
   final _scrollController = ScrollController();

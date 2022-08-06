@@ -1,4 +1,8 @@
-import 'dart:math';
+import 'package:deliverk/business_logic/restaurant/cubit/new_order_cubit.dart';
+import 'package:deliverk/data/models/common/order_model.dart';
+import 'package:deliverk/helpers/shared_preferences.dart';
+
+import 'package:hive/hive.dart';
 
 import '../../../business_logic/common/cubit/spinner_cubit.dart';
 import 'package:flutter/material.dart';
@@ -8,13 +12,25 @@ import '../../../constants/enums.dart';
 import '../../widgets/common/spinner.dart';
 import '../../widgets/common/text_field.dart';
 
-class RestaurantNewOrder extends StatelessWidget {
+class RestaurantNewOrder extends StatefulWidget {
+  const RestaurantNewOrder({Key? key}) : super(key: key);
+
+  @override
+  State<RestaurantNewOrder> createState() => _RestaurantNewOrderState();
+}
+
+class _RestaurantNewOrderState extends State<RestaurantNewOrder> {
   final TextEditingController _priceController = TextEditingController();
+
   final TextEditingController _preparationController = TextEditingController();
-
-  final int code = Random().nextInt(10000);
-
-  RestaurantNewOrder({Key? key}) : super(key: key);
+  final _notesController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  void clearInputs() {
+    _priceController.clear();
+    _preparationController.clear();
+    _notesController.clear();
+    _areaContrller.clear();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +45,7 @@ class RestaurantNewOrder extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               _buildHeaderPhoto(context),
-              _buildOrderDetails(context),
+              Form(key: _formKey, child: _buildOrderDetails(context)),
             ],
           ),
         ),
@@ -45,6 +61,8 @@ class RestaurantNewOrder extends StatelessWidget {
     );
   }
 
+  bool _isForRest = false;
+
   Widget _buildOrderDetails(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -54,55 +72,62 @@ class RestaurantNewOrder extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
-              "كود الطلب $code",
-              style: const TextStyle(
-                  color: Color.fromARGB(150, 0, 0, 0), fontSize: 28),
+            Row(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  child: Text('طلب للمطعم'),
+                ),
+                Switch(
+                    value: _isForRest,
+                    onChanged: (value) {
+                      setState(() {
+                        _isForRest = !_isForRest;
+                      });
+                    }),
+              ],
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: _buildPlaceAutoFill(),
             ),
-            Container(
-              margin: const EdgeInsets.only(left: 20),
-              width: double.infinity,
-              child: const Text(
-                "تكلفة التوصيل",
-                textAlign: TextAlign.left,
-              ),
-            ),
-            Row(
-              children: [
-                const Expanded(
-                  child: Spinner(
-                    "مدة التحضير",
-                    ["جاهز", "غير جاهز"],
-                    SpinnerEnum.preparationTime,
+            if (!_isForRest)
+              Row(
+                children: [
+                  const Expanded(
+                    child: Spinner(
+                      "مدة التحضير",
+                      ["جاهز", "غير جاهز"],
+                      SpinnerEnum.preparationTime,
+                    ),
                   ),
+                  Expanded(
+                    child: _buildPaymentStatus(),
+                  ),
+                ],
+              )
+            else
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: CustomTextField(
+                  inputType: TextInputType.text,
+                  controller: _notesController,
+                  hint: 'ملاحظات',
+                  validator: _notesController.text.isEmpty
+                      ? 'ادخل بيانات الطلب'
+                      : null,
                 ),
-                Expanded(
-                  child: _buildPaymentStatus(),
-                ),
-              ],
-            ),
-
-            /// logic
-            _buildFields(context),
-            Container(
-              padding: const EdgeInsets.all(10),
-              width: double.infinity,
-              child: const Text(
-                "اجمالي المبلغ: 20",
-                textAlign: TextAlign.end,
               ),
-            ),
+            if (!_isForRest) _buildFields(context),
             Row(
               children: [
                 const Spacer(),
                 SizedBox(
                   width: 150,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      addOrder(context);
+                    },
                     child: const Text("اضافة"),
                   ),
                 ),
@@ -119,11 +144,8 @@ class RestaurantNewOrder extends StatelessWidget {
       builder: (ctx, state) {
         Logger().d(state);
         if (state is SpinnerInitial) {
-          Logger().d(state.paymentState);
-          Logger().d(state.preparationState);
           if (state.paymentState == "غير مدفوع" &&
               state.preparationState == "غير جاهز") {
-            Logger().d("Here I'm Brooooooo");
             return Row(
               children: [
                 Expanded(child: _buildPreparationField()),
@@ -138,7 +160,7 @@ class RestaurantNewOrder extends StatelessWidget {
             return const Text('');
           }
         }
-        Logger().d("I got here Brooooooooo");
+
         return const Text('');
       },
     );
@@ -151,6 +173,7 @@ class RestaurantNewOrder extends StatelessWidget {
         controller: _preparationController,
         hint: "مدة التجهيز",
         inputType: TextInputType.number,
+        validator: (_preparationController.text.isEmpty) ? 'ادخل المدة' : null,
       ),
     );
   }
@@ -162,6 +185,7 @@ class RestaurantNewOrder extends StatelessWidget {
         controller: _priceController,
         hint: "سعر الطلب",
         inputType: TextInputType.number,
+        validator: (_priceController.text.isEmpty) ? 'ادخل سعر الطلب' : null,
       ),
     );
   }
@@ -174,7 +198,9 @@ class RestaurantNewOrder extends StatelessWidget {
     );
   }
 
-  final List<String> _places = ["المنيب", "الجيزة", "رمسيس"];
+  final List<String> _places = [];
+  final Map<String, int> areas = {};
+  final _areaContrller = TextEditingController();
   Widget _buildPlaceAutoFill() {
     return Autocomplete<String>(
       fieldViewBuilder: (BuildContext context,
@@ -182,8 +208,15 @@ class RestaurantNewOrder extends StatelessWidget {
           FocusNode focusNode,
           VoidCallback onFieldSubmitted) {
         return TextFormField(
-          controller: textEditingController,
+          controller: _areaContrller,
           focusNode: focusNode,
+          validator: (value) {
+            if (value == null || areas[value] == null) {
+              return 'ادخل منطقة موجودة';
+            } else {
+              return null;
+            }
+          },
           decoration: InputDecoration(
             label: const Text("المنطقة"),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(5)),
@@ -202,5 +235,48 @@ class RestaurantNewOrder extends StatelessWidget {
         });
       }),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initAreas();
+  }
+
+  void initAreas() async {
+    var data = Hive.box<Map<dynamic, dynamic>>('areas').get('areas_name');
+
+    if (data != null) {
+      data.forEach((key, value) {
+        areas[key] = value;
+        _places.add(key);
+      });
+    }
+  }
+
+  void addOrder(BuildContext context) {
+    if (_formKey.currentState!.validate()) {
+      var order = OrderModel();
+      order
+        ..areaId = areas[_areaContrller.text]
+        ..zoneId = 1
+        ..resId = 8
+        ..isPaid = true
+        ..notes = _notesController.text
+        ..duration = _preparationController.text.isNotEmpty
+            ? int.parse(_preparationController.text)
+            : null
+        ..status = order.duration == null
+            ? OrderType.pending.name
+            : OrderType.cooked.name
+        ..cost = _priceController.text.isNotEmpty
+            ? int.parse(_priceController.text)
+            : null;
+      Logger().d(order.toJson());
+      BlocProvider.of<NewOrderCubit>(context).addOrder(
+        order.toJson(),
+        DeliverkSharedPreferences.getToken()!,
+      );
+    }
   }
 }

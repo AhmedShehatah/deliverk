@@ -1,3 +1,7 @@
+import 'package:deliverk/business_logic/delivery/cubit/deliver_sign_up_cubit.dart';
+import 'package:deliverk/business_logic/restaurant/cubit/new_order_cubit.dart';
+import 'package:deliverk/presentation/screens/common/map_show_screen.dart';
+
 import '../business_logic/common/cubit/spinner_cubit.dart';
 import '../business_logic/common/cubit/upload_image_cubit.dart';
 import '../business_logic/delivery/cubit/delivery_login_cubit.dart';
@@ -40,7 +44,8 @@ class AppRouter {
             return MaterialPageRoute(
                 builder: (_) => const RestaurantBaseScreen());
           } else {
-            return MaterialPageRoute(builder: (_) => DeliveryBaseScreen());
+            return MaterialPageRoute(
+                builder: (_) => const DeliveryBaseScreen());
           }
         }
 
@@ -50,6 +55,9 @@ class AppRouter {
       // map
       case mapRoute:
         return MaterialPageRoute(builder: (_) => const MapScreen());
+      case mapShowScreen:
+        return MaterialPageRoute(
+            builder: (_) => const MapShowScreen(), settings: settings);
 
       // returant routes
       case resturantSignUpRoute:
@@ -87,15 +95,35 @@ class AppRouter {
                 ));
       case restuarntNewOrderScreenRoute:
         return MaterialPageRoute(
-            builder: (_) => BlocProvider<SpinnerCubit>(
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider<SpinnerCubit>(
                 create: (context) => SpinnerCubit(),
-                child: RestaurantNewOrder()));
+              ),
+              BlocProvider<NewOrderCubit>(
+                create: (context) => NewOrderCubit(_restaurantRepo),
+              ),
+            ],
+            child: const RestaurantNewOrder(),
+          ),
+        );
 
       // delivery reoute
       case delivarySignUpRoute:
-        return MaterialPageRoute(builder: (_) => const DeliverySignUpScreen());
+        return MaterialPageRoute(
+            builder: (_) => MultiBlocProvider(
+                  providers: [
+                    BlocProvider<UploadImageCubit>(
+                      create: (context) => UploadImageCubit(_restaurantRepo),
+                    ),
+                    BlocProvider<DeliverySignUpCubit>(
+                      create: (context) => DeliverySignUpCubit(_deliveryRepo),
+                    ),
+                  ],
+                  child: const DeliverySignUpScreen(),
+                ));
       case deliveryBaseScreen:
-        return MaterialPageRoute(builder: (_) => DeliveryBaseScreen());
+        return MaterialPageRoute(builder: (_) => const DeliveryBaseScreen());
       case deliveryLoginRoute:
         return MaterialPageRoute(
             builder: (_) => BlocProvider<DeliveryLoginCubit>(

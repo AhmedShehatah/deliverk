@@ -1,3 +1,9 @@
+import 'package:deliverk/business_logic/delivery/cubit/delivery_orders_cubit.dart';
+import 'package:deliverk/business_logic/delivery/cubit/delivery_profile_cubit.dart';
+import 'package:deliverk/business_logic/delivery/cubit/delivery_zone_orders_cubit.dart';
+import 'package:deliverk/repos/delivery/delivery_repo.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../common/splash_screen.dart';
 import 'delivery_unpaid_orders_screen.dart';
 import 'package:flutter/cupertino.dart';
@@ -8,8 +14,23 @@ import 'deliver_current_orders_screen.dart';
 import 'delivery_doing_orders_screen.dart';
 import 'delivery_profile_screen.dart';
 
-class DeliveryBaseScreen extends StatelessWidget {
-  DeliveryBaseScreen({Key? key}) : super(key: key);
+class DeliveryBaseScreen extends StatefulWidget {
+  const DeliveryBaseScreen({Key? key}) : super(key: key);
+  @override
+  State<DeliveryBaseScreen> createState() => _DeliveryBaseScreenState();
+
+  static void pop(BuildContext context) {
+    Navigator.pushAndRemoveUntil<dynamic>(
+      context,
+      MaterialPageRoute<dynamic>(
+        builder: (BuildContext context) => const SplashScreen(),
+      ),
+      (route) => false, //if you want to disable back feature set to false
+    );
+  }
+}
+
+class _DeliveryBaseScreenState extends State<DeliveryBaseScreen> {
   final PersistentTabController _controller =
       PersistentTabController(initialIndex: 0);
 
@@ -46,14 +67,29 @@ class DeliveryBaseScreen extends StatelessWidget {
     );
   }
 
+  final _currentScreen = BlocProvider<DeliveryZoneOrdersCubit>(
+    create: (context) => DeliveryZoneOrdersCubit(DeliveryRepo()),
+    child: const DeliveryCurrentOrdersScreen(),
+  );
+
+  final _doingScreen = BlocProvider<DeliveryOrdersCubit>(
+    create: (context) => DeliveryOrdersCubit(DeliveryRepo()),
+    child: const DeliveryDoingOrderScreen(),
+  );
+
+  final _unpaid = BlocProvider<DeliveryOrdersCubit>(
+    create: (context) => DeliveryOrdersCubit(DeliveryRepo()),
+    child: const DeliveryUnpaidOrdersScreen(),
+  );
+
+  late BlocProvider<DeliveryProfileCubit> _profileScreen;
+
   List<Widget> _buildScreens(BuildContext context) {
     return [
-      const DeliveryCurrentOrdersScreen(),
-      const DeliveryDoingOrderScreen(),
-      const DeliveryUnpaidOrdersScreen(),
-      DeliveryProfileScreen(
-        context: context,
-      ),
+      _currentScreen,
+      _doingScreen,
+      _unpaid,
+      _profileScreen,
     ];
   }
 
@@ -86,20 +122,14 @@ class DeliveryBaseScreen extends StatelessWidget {
     ];
   }
 
-  static void pop(BuildContext context) {
-    Navigator.pushAndRemoveUntil<dynamic>(
-      context,
-      MaterialPageRoute<dynamic>(
-        builder: (BuildContext context) => const SplashScreen(),
+  @override
+  void initState() {
+    _profileScreen = BlocProvider<DeliveryProfileCubit>(
+      create: (context) => DeliveryProfileCubit(DeliveryRepo()),
+      child: DeliveryProfileScreen(
+        context: context,
       ),
-      (route) => false, //if you want to disable back feature set to false
     );
-    // pushNewScreen(
-    //   context,
-    //   screen: const SplashScreen(),
-
-    //   withNavBar: false, // OPTIONAL VALUE. True by default.
-    //   pageTransitionAnimation: PageTransitionAnimation.slideRight, // OPTIONAL
-    // );
+    super.initState();
   }
 }

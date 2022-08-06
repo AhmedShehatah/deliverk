@@ -1,3 +1,6 @@
+import 'package:deliverk/areas.dart';
+import 'package:deliverk/data/models/common/area_model.dart';
+
 import 'data/models/restaurant/restaurant_model.dart';
 import 'helpers/shared_preferences.dart';
 import 'package:flutter/material.dart';
@@ -11,8 +14,12 @@ Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await DeliverkSharedPreferences.init();
   Hive.registerAdapter(RestaurantModelAdapter());
-
+  Hive.registerAdapter(AreaModelAdapter());
   await Hive.initFlutter();
+  try {
+    await Hive.box('areas').clear();
+    // ignore: empty_catches
+  } catch (e) {}
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
@@ -49,6 +56,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance!.addObserver(this);
+    Areas().fetchAreas();
   }
 
   @override
