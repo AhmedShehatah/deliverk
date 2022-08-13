@@ -58,7 +58,20 @@ class DeliveryApis {
     Response response;
     try {
       response = await _dio.patch('/orders/$orderId',
-          data: {'delv_id': 15},
+          data: data,
+          options: Options(headers: {
+            'Authorization': "Bearer ${DeliverkSharedPreferences.getToken()}"
+          }));
+      return response.data;
+    } on DioError catch (e) {
+      return e.response!.data;
+    }
+  }
+
+  Future<dynamic> deleteOrder(int orderId) async {
+    Response response;
+    try {
+      response = await _dio.delete('/orders/$orderId',
           options: Options(headers: {
             'Authorization': "Bearer ${DeliverkSharedPreferences.getToken()}"
           }));

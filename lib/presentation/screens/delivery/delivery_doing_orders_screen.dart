@@ -1,4 +1,9 @@
-import 'package:deliverk/data/models/common/order_model.dart';
+import 'package:deliverk/business_logic/common/cubit/refresh_cubit.dart';
+import 'package:deliverk/business_logic/common/state/reresh_state.dart';
+
+import 'package:deliverk/data/models/delivery/zone_order.dart';
+import 'package:deliverk/presentation/widgets/restaurant/empty_orders.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -25,22 +30,23 @@ class _DeliveryDoingOrderScreenState extends State<DeliveryDoingOrderScreen> {
   Widget build(BuildContext context) {
     setupScrollController(context);
     BlocProvider.of<DeliveryOrdersCubit>(context)
-        .loadOrders(status: OrderType.delivering.name);
+        .loadOrders(status: OrderType.pending.name);
 
     return Scaffold(
       body: SafeArea(
-        child: _buildOrders(context),
+        child: RefreshIndicator(
+            onRefresh: () => refresh(), child: _buildOrders(context)),
       ),
     );
   }
 
-  List<OrderModel> orders = [];
+  List<ZoneOrder> orders = [];
 
   Future<void> refresh() async {
     final provider = BlocProvider.of<DeliveryOrdersCubit>(context);
     provider.page = 1;
     orders.clear();
-    provider.loadOrders(status: OrderType.delivering.name);
+    provider.loadOrders(status: OrderType.pending.name);
   }
 
   Widget _loadingIndicator() {
@@ -80,13 +86,15 @@ class _DeliveryDoingOrderScreenState extends State<DeliveryDoingOrderScreen> {
               orders = state.currentOrders;
             }
 
+            if (orders.isEmpty) return const EmptyOrders();
             return ListView.builder(
               padding: EdgeInsets.zero,
               itemBuilder: (BuildContext context, int index) {
                 if (index < orders.length) {
-                  return InkWell(
-                    key: Key(orders[index].id!.toString()),
-                    onTap: () {},
+                  return BlocListener<RefreshCubit, RefreshState>(
+                    listener: (context, state) {
+                      refresh();
+                    },
                     child: BlocProvider<ResturantProfileCubit>(
                       create: (context) =>
                           ResturantProfileCubit(RestaurantRepo()),
@@ -112,7 +120,7 @@ class _DeliveryDoingOrderScreenState extends State<DeliveryDoingOrderScreen> {
       if (_scrollController.position.atEdge) {
         if (_scrollController.position.pixels != 0) {
           BlocProvider.of<DeliveryOrdersCubit>(context)
-              .loadOrders(status: OrderType.delivering.name);
+              .loadOrders(status: OrderType.pending.name);
         }
       }
     });

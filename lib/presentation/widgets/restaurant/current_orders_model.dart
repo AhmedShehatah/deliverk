@@ -1,13 +1,63 @@
+import 'package:deliverk/business_logic/common/cubit/patch_order_cubit.dart';
+import 'package:deliverk/business_logic/common/cubit/refresh_cubit.dart';
 import 'package:deliverk/data/models/common/order_model.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:deliverk/data/models/restaurant/restaurant_model.dart';
+import 'package:deliverk/helpers/trans.dart';
+import 'package:deliverk/presentation/widgets/restaurant/order_details_dialog.dart';
+import 'package:deliverk/repos/delivery/delivery_repo.dart';
 
-class CurrentOrdersModel extends StatelessWidget {
-  const CurrentOrdersModel(this.orderModel, {Key? key}) : super(key: key);
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'package:hive/hive.dart';
+
+class CurrentOrdersModel extends StatefulWidget {
+  const CurrentOrdersModel(this.orderModel, this.model, {Key? key})
+      : super(key: key);
 
   final OrderModel orderModel;
+  final RestaurantModel model;
+
+  @override
+  State<CurrentOrdersModel> createState() => _CurrentOrdersModelState();
+}
+
+class _CurrentOrdersModelState extends State<CurrentOrdersModel> {
+  String? areaName;
+  bool _isLoaded = false;
+  @override
+  void initState() {
+    getAreaName().then((value) {
+      setState(() {
+        _isLoaded = true;
+      });
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        if (_isLoaded) {
+          showDialog(
+              context: context,
+              builder: (c) => BlocProvider<PatchOrderCubit>(
+                    create: (context) => PatchOrderCubit(DeliveryRepo()),
+                    child: OrderDetailsDialog(
+                        widget.orderModel, widget.model, areaName!),
+                  )).then((value) {
+            if (value == true) {
+              BlocProvider.of<RefreshCubit>(context, listen: false).refresh();
+            }
+          });
+        }
+      },
+      child: _buildTree(),
+    );
+  }
+
+  Widget _buildTree() {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Card(
@@ -23,33 +73,30 @@ class CurrentOrdersModel extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("كود الطلب " + orderModel.id.toString()),
+                  Text("كود الطلب " + widget.orderModel.id.toString()),
                   Text(
-                    orderModel.areaId.toString(),
+                    areaName ?? "اسم المنطقة",
                     style: const TextStyle(
                       fontSize: 12,
                       color: Colors.black38,
                     ),
                   ),
                   Text(
-                    orderModel.status!,
+                    Trans.status[widget.orderModel.status!] as String,
                     style: const TextStyle(
                       fontSize: 12,
                       color: Colors.black38,
                     ),
                   ),
-                  // SizedBox(child: Image.asset("assets/images/pendulum.gif"))
                 ],
               ),
               Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text(orderModel.cost.toString() + "ج.م"),
-                  const Icon(
-                    CupertinoIcons.delete,
-                    color: Colors.redAccent,
-                  )
+                  Text(widget.orderModel.cost == null
+                      ? "مدفوع"
+                      : widget.orderModel.cost.toString() + "ج.م"),
                 ],
               ),
             ],
@@ -57,5 +104,12 @@ class CurrentOrdersModel extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  getAreaName() async {
+    var box = await Hive.openBox<Map<dynamic, dynamic>>('areas');
+    var x = box.get('areas_id');
+    x = x as Map<int, String>;
+    areaName = x[widget.orderModel.areaId!] as String;
   }
 }

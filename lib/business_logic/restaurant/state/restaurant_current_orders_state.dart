@@ -1,5 +1,4 @@
 import 'package:deliverk/data/models/common/order_model.dart';
-import 'package:logger/logger.dart';
 
 abstract class CurrentOrdersState {}
 
@@ -14,9 +13,7 @@ class CurrentOrdersLoading extends CurrentOrdersState {
   final List<OrderModel> oldOrders;
   final bool isFirstFetch;
 
-  CurrentOrdersLoading(this.oldOrders, {this.isFirstFetch = false}) {
-    Logger().d(oldOrders.isEmpty);
-  }
+  CurrentOrdersLoading(this.oldOrders, {this.isFirstFetch = false});
 }
 
 class CurrentOrdersFailed extends CurrentOrdersState {

@@ -58,6 +58,8 @@ class RestaurantLoginScreen extends StatelessWidget {
                     } else if (state is SuccessState) {
                       WidgetsBinding.instance?.addPostFrameCallback((_) {
                         DeliverkSharedPreferences.setToken(state.token);
+                        DeliverkSharedPreferences.setRestId(state.id);
+                        DeliverkSharedPreferences.setZoneId(state.zoneId);
                         DeliverkSharedPreferences.setUserType(
                             UserType.restaurant.name);
                         Navigator.popAndPushNamed(

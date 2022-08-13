@@ -1,15 +1,22 @@
+import 'package:deliverk/areas.dart';
+import 'package:deliverk/business_logic/common/cubit/area_cubit.dart';
+import 'package:deliverk/business_logic/common/cubit/refresh_cubit.dart';
+import 'package:deliverk/business_logic/common/state/generic_state.dart';
 import 'package:deliverk/business_logic/restaurant/cubit/restaurants_current_orders_cubit.dart';
+import 'package:deliverk/presentation/screens/common/map_show_screen.dart';
 import 'package:deliverk/repos/restaurant/resturant_repo.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../../business_logic/restaurant/cubit/restaurant_profile_cubit.dart';
+import '../../../helpers/shared_preferences.dart';
 import 'restaurant_record_screen.dart';
 
 import '../common/splash_screen.dart';
 import 'restaurtant_profile_screen.dart';
 import 'unpaied_orders_screen.dart';
 
-import '../../../constants/strings.dart';
 import 'resturant_orders_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +31,21 @@ class RestaurantBaseScreen extends StatefulWidget {
       MaterialPageRoute<dynamic>(
         builder: (BuildContext context) => const SplashScreen(),
       ),
+
       (route) => false, //if you want to disable back feature set to false
+    );
+  }
+
+  static void showMap(BuildContext context, LatLng latLng) {
+    Navigator.pushAndRemoveUntil<dynamic>(
+      context,
+      MaterialPageRoute<dynamic>(
+        builder: (BuildContext context) => MapShowScreen(
+          latLng: latLng,
+        ),
+      ),
+
+      (route) => true, //if you want to disable back feature set to false
     );
   }
 
@@ -35,66 +56,110 @@ class RestaurantBaseScreen extends StatefulWidget {
 class _RestaurantBaseScreenState extends State<RestaurantBaseScreen> {
   final PersistentTabController _controller =
       PersistentTabController(initialIndex: 0);
-  bool _isOrdersScreenSelected = true;
+
   @override
   Widget build(BuildContext context) {
-    return PersistentTabView(
-      context,
-      floatingActionButton:
-          _isOrdersScreenSelected ? _buildFloatingActionButton(context) : null,
-      controller: _controller,
-      screens: _buildScreens(),
-      items: _navBarsItems(),
-      confineInSafeArea: true,
-      backgroundColor: Colors.white,
-      onItemSelected: (idx) {
-        setState(() {
-          _isOrdersScreenSelected = idx == 0;
-        });
+    return BlocListener<ResturantProfileCubit, GenericState>(
+      listener: (context, state) {
+        if (state is GenericFailureState) {
+          Fluttertoast.showToast(
+              msg: 'حدث خطأ ما من فضلك قم باعادة تسجيل الدخول');
+
+          DeliverkSharedPreferences.deleteAll().then((value) {
+            RestaurantBaseScreen.pop(context);
+          });
+        }
       },
-      handleAndroidBackButtonPress: true,
-      resizeToAvoidBottomInset: true,
-      stateManagement: true,
-      hideNavigationBarWhenKeyboardShows: true,
-      decoration: NavBarDecoration(
-        borderRadius: BorderRadius.circular(10.0),
-        colorBehindNavBar: Colors.white,
+      child: BlocBuilder<AreaCubit, GenericState>(
+        builder: (context, state) {
+          if (state is GenericSuccessState) {
+            return PersistentTabView(
+              context,
+              controller: _controller,
+              screens: _buildScreens(),
+              items: _navBarsItems(),
+              confineInSafeArea: true,
+              backgroundColor: Colors.white,
+              handleAndroidBackButtonPress: true,
+              resizeToAvoidBottomInset: true,
+              stateManagement: true,
+              hideNavigationBarWhenKeyboardShows: true,
+              decoration: NavBarDecoration(
+                borderRadius: BorderRadius.circular(10.0),
+                colorBehindNavBar: Colors.white,
+              ),
+              popAllScreensOnTapOfSelectedTab: false,
+              itemAnimationProperties: const ItemAnimationProperties(
+                duration: Duration(milliseconds: 200),
+                curve: Curves.ease,
+              ),
+              screenTransitionAnimation: const ScreenTransitionAnimation(
+                animateTabTransition: true,
+                curve: Curves.ease,
+                duration: Duration(milliseconds: 200),
+              ),
+              navBarStyle: NavBarStyle.style1,
+            );
+          } else if (state is GenericLoadingState) {
+            return const Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(
+                  color: Colors.blue,
+                ),
+              ),
+            );
+          } else {
+            return const Scaffold(
+              body: Center(
+                child: Text('حدث خطا ما من فضلك قم باعادة تشغيل التطبيق'),
+              ),
+            );
+          }
+        },
       ),
-      popAllScreensOnTapOfSelectedTab: false,
-      itemAnimationProperties: const ItemAnimationProperties(
-        duration: Duration(milliseconds: 200),
-        curve: Curves.ease,
-      ),
-      screenTransitionAnimation: const ScreenTransitionAnimation(
-        animateTabTransition: true,
-        curve: Curves.ease,
-        duration: Duration(milliseconds: 200),
-      ),
-      navBarStyle: NavBarStyle.style1,
     );
   }
 
-  late RestaurantProfileScreen _profileScreen;
-  final _orderScreen = BlocProvider<RestaurantCurrentOrdersCubit>(
-    create: (context) => RestaurantCurrentOrdersCubit(RestaurantRepo()),
-    child: const RestaurantOrdersScreen(),
-  );
-  final _unpaid = BlocProvider<RestaurantCurrentOrdersCubit>(
-    create: (context) => RestaurantCurrentOrdersCubit(RestaurantRepo()),
-    child: UnpaiedOrdersScreen(),
-  );
-  final _recordScreen = BlocProvider<RestaurantCurrentOrdersCubit>(
-    create: (context) => RestaurantCurrentOrdersCubit(RestaurantRepo()),
-    child: const RestaurantRecordScreen(),
-  );
   List<Widget> _buildScreens() {
     return [
-      _orderScreen,
-      _unpaid,
-      _recordScreen,
-      BlocProvider<ResturantProfileCubit>(
-        create: (context) => ResturantProfileCubit(RestaurantRepo()),
-        child: _profileScreen,
+      MultiBlocProvider(
+        providers: [
+          BlocProvider<RestaurantCurrentOrdersCubit>(
+            create: (context) => RestaurantCurrentOrdersCubit(RestaurantRepo()),
+          ),
+          BlocProvider<ResturantProfileCubit>(
+            create: (context) => ResturantProfileCubit(RestaurantRepo()),
+          ),
+          BlocProvider<RefreshCubit>(create: (_) => RefreshCubit())
+        ],
+        child: const RestaurantOrdersScreen(),
+      ),
+      MultiBlocProvider(
+        providers: [
+          BlocProvider<RestaurantCurrentOrdersCubit>(
+            create: (context) => RestaurantCurrentOrdersCubit(RestaurantRepo()),
+          ),
+          BlocProvider<RefreshCubit>(create: (_) => RefreshCubit())
+        ],
+        child: UnpaiedOrdersScreen(),
+      ),
+      MultiBlocProvider(
+        providers: [
+          BlocProvider<RestaurantCurrentOrdersCubit>(
+            create: (context) => RestaurantCurrentOrdersCubit(RestaurantRepo()),
+          ),
+          BlocProvider<RefreshCubit>(create: (_) => RefreshCubit())
+        ],
+        child: const RestaurantRecordScreen(),
+      ),
+      MultiBlocProvider(
+        providers: [
+          BlocProvider<ResturantProfileCubit>(
+            create: (context) => ResturantProfileCubit(RestaurantRepo()),
+          ),
+          BlocProvider<RefreshCubit>(create: (_) => RefreshCubit())
+        ],
+        child: RestaurantProfileScreen(context: context),
       ),
     ];
   }
@@ -128,20 +193,18 @@ class _RestaurantBaseScreenState extends State<RestaurantBaseScreen> {
     ];
   }
 
-  Widget _buildFloatingActionButton(BuildContext context) {
-    return FloatingActionButton.extended(
-      onPressed: () {
-        Navigator.of(context).pushNamed(restuarntNewOrderScreenRoute);
-      },
-      label: const Text("اضف طلب جديد"),
-      icon: const Icon(Icons.restaurant_menu),
-    );
-  }
-
   @override
   void initState() {
+    var id = DeliverkSharedPreferences.getRestId();
+
+    if (id != null) {
+      Areas().getRestAreas();
+      BlocProvider.of<AreaCubit>(context).loadAreas();
+      BlocProvider.of<ResturantProfileCubit>(context).getProfileData(id);
+    } else {
+      RestaurantBaseScreen.pop(context);
+    }
     super.initState();
-    _profileScreen = RestaurantProfileScreen(context: context);
   }
 
   @override

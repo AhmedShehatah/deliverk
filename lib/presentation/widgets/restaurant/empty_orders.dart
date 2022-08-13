@@ -13,9 +13,13 @@ class EmptyOrders extends StatelessWidget {
           const SizedBox(
             height: 40,
           ),
-          Image.asset(
-            "assets/images/no_orders.png",
-            fit: BoxFit.cover,
+          SizedBox(
+            height: 150,
+            width: 150,
+            child: Image.asset(
+              "assets/images/no_order.gif",
+              fit: BoxFit.cover,
+            ),
           ),
           const Text("لا توجد طلبات بعد")
         ],

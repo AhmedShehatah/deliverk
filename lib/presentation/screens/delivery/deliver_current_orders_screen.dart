@@ -1,16 +1,21 @@
 import 'dart:async';
 
+import 'package:deliverk/business_logic/common/cubit/patch_order_cubit.dart';
+import 'package:deliverk/business_logic/common/cubit/refresh_cubit.dart';
+import 'package:deliverk/business_logic/common/state/reresh_state.dart';
 import 'package:deliverk/business_logic/delivery/cubit/delivery_zone_orders_cubit.dart';
 import 'package:deliverk/business_logic/delivery/state/delivery_zone_orders_state.dart';
 import 'package:deliverk/business_logic/restaurant/cubit/restaurant_profile_cubit.dart';
 import 'package:deliverk/data/models/delivery/zone_order.dart';
+import 'package:deliverk/presentation/widgets/restaurant/zone_order_model.dart';
+import 'package:deliverk/repos/delivery/delivery_repo.dart';
 import 'package:deliverk/repos/restaurant/resturant_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../constants/enums.dart';
 
-import '../../widgets/delivery/delivery_current_orders_model.dart';
+import '../../widgets/restaurant/empty_orders.dart';
 
 class DeliveryCurrentOrdersScreen extends StatefulWidget {
   const DeliveryCurrentOrdersScreen({Key? key}) : super(key: key);
@@ -30,7 +35,8 @@ class _DeliveryCurrentOrdersScreenState
 
     return Scaffold(
       body: SafeArea(
-        child: _buildOrders(context),
+        child: RefreshIndicator(
+            onRefresh: () => refresh(), child: _buildOrders(context)),
       ),
     );
   }
@@ -80,15 +86,27 @@ class _DeliveryCurrentOrdersScreenState
             } else if (state is ZoneOrdersLoaded) {
               orders = state.currentOrders;
             }
-
+            if (orders.isEmpty) return const EmptyOrders();
             return ListView.builder(
               padding: EdgeInsets.zero,
               itemBuilder: (BuildContext context, int index) {
                 if (index < orders.length) {
-                  return BlocProvider<ResturantProfileCubit>(
-                    create: (context) =>
-                        ResturantProfileCubit(RestaurantRepo()),
-                    child: DeliveryCurrentOrderModel(orders[index], false),
+                  return BlocListener<RefreshCubit, RefreshState>(
+                    listener: (context, state) {
+                      refresh();
+                    },
+                    child: MultiBlocProvider(
+                      providers: [
+                        BlocProvider<ResturantProfileCubit>(
+                          create: (context) =>
+                              ResturantProfileCubit(RestaurantRepo()),
+                        ),
+                        BlocProvider<PatchOrderCubit>(
+                          create: (context) => PatchOrderCubit(DeliveryRepo()),
+                        ),
+                      ],
+                      child: ZoneOrderModel(orders[index]),
+                    ),
                   );
                 } else {
                   return _loadingIndicator();

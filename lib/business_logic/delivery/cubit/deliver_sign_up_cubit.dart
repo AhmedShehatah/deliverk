@@ -9,6 +9,7 @@ class DeliverySignUpCubit extends Cubit<GenericState> {
   final DeliveryRepo repo;
   final _log = Logger();
   void signUp(Map<String, dynamic> data) {
+    emit(GenericLoadingState());
     repo.signUp(data).then((response) {
       if (response is DioError) {
         _log.d(response.message);

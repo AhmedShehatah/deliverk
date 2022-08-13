@@ -1,10 +1,12 @@
 import 'package:deliverk/business_logic/common/cubit/patch_order_cubit.dart';
 import 'package:deliverk/business_logic/common/state/generic_state.dart';
+import 'package:deliverk/constants/enums.dart';
 
 import 'package:deliverk/constants/strings.dart';
+import 'package:deliverk/data/models/delivery/zone_order.dart';
+
 import 'package:deliverk/data/models/restaurant/restaurant_model.dart';
-import 'package:deliverk/helpers/shared_preferences.dart';
-import 'package:deliverk/repos/delivery/delivery_repo.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -15,7 +17,7 @@ class DeliveryOrderDetialsDialog extends StatefulWidget {
       this.order, this.restData, this.areaName, this.isDelivering,
       {Key? key})
       : super(key: key);
-  final dynamic order;
+  final ZoneOrder order;
   final RestaurantModel restData;
   final String areaName;
   final bool isDelivering;
@@ -59,26 +61,17 @@ class _DeliveryOrderDetialsDialogState
                   rows: <DataRow>[
                     _rowData(" اسم المطعم", widget.restData.name!),
                     _rowData("مكان المطعم", widget.restData.address!),
+                    _rowData('رقم المطعم', widget.restData.phone!),
                     _mapRow("مكان المطعم", "اظهر على الخريطة"),
                     _rowData("كود الطلب", widget.order.id!.toString()),
                     _rowData(
                         "تكلفة التوصيل", widget.order.areaCost!.toString()),
                     _rowData("منطقة التوصيل", widget.areaName),
+                    if (widget.order.notes != null)
+                      _rowData('ملاحظات', widget.order.notes!),
                   ],
                 ),
-                if (!widget.isDelivering)
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          showAlertDialog(context);
-                        },
-                        style: ElevatedButton.styleFrom(primary: Colors.blue),
-                        child: const Text("قبول"),
-                      )
-                    ],
-                  )
+                _buildActionButton(),
               ],
             ),
           ),
@@ -87,70 +80,15 @@ class _DeliveryOrderDetialsDialogState
     );
   }
 
-  showAlertDialog(BuildContext context) {
-    // set up the buttons
-    Widget cancelButton = TextButton(
-      child: const Text("الغاء"),
-      onPressed: () {
-        Navigator.pop(context);
-      },
-    );
-    Widget continueButton = BlocBuilder<PatchOrderCubit, GenericState>(
-      builder: (context, state) {
-        if (state is GenericSuccessState) {
-          Navigator.pop(context);
-        } else if (state is GenericLoadingState) {
-          return const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: CircularProgressIndicator(
-              color: Colors.blue,
-            ),
-          );
-        } else if (state is GenericFailureState) {
-          Fluttertoast.showToast(msg: state.data);
-        }
-        return TextButton(
-          child: const Text("تاكيد"),
-          onPressed: () {
-            BlocProvider.of<PatchOrderCubit>(context, listen: false).patchOrder(
-                widget.order.id!,
-                {'delv_id': DeliverkSharedPreferences.getDelivId() ?? 15});
-          },
-        );
-      },
-    );
-
-    // set up the AlertDialog
-    AlertDialog alert = AlertDialog(
-      title: const Text("رسالة تأكيد"),
-      content: const Text("هل تريد تأكيد الطلب"),
-      actions: [
-        cancelButton,
-        continueButton,
-      ],
-    );
-
-    // show the dialog
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return BlocProvider<PatchOrderCubit>(
-          create: (context) => PatchOrderCubit(DeliveryRepo()),
-          child: alert,
-        );
-      },
-    );
-  }
-
   DataRow _rowData(String title, String value) {
     return DataRow(
       cells: <DataCell>[
         DataCell(
-          FittedBox(child: Text(title)),
+          FittedBox(fit: BoxFit.scaleDown, child: Text(title)),
         ),
         DataCell(
           FittedBox(
-            fit: BoxFit.cover,
+            fit: BoxFit.scaleDown,
             child: SizedBox(
               width: 150,
               child: Text(
@@ -195,6 +133,69 @@ class _DeliveryOrderDetialsDialogState
             ),
           ),
         ),
+      ],
+    );
+  }
+
+  Widget _buildActionButton() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (!widget.isDelivering)
+          BlocBuilder<PatchOrderCubit, GenericState>(
+            builder: (context, state) {
+              if (state is GenericSuccessState) {
+                Fluttertoast.showToast(msg: 'تم حجز الطلب بنجاح');
+                Navigator.of(context).pop(true);
+              } else if (state is GenericLoadingState) {
+                return const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: CircularProgressIndicator(
+                    color: Colors.blue,
+                  ),
+                );
+              } else if (state is GenericFailureState) {
+                Fluttertoast.showToast(msg: state.data);
+              }
+              return ElevatedButton(
+                onPressed: () {
+                  // showAlertDialog(context);
+                  BlocProvider.of<PatchOrderCubit>(context, listen: false)
+                      .patchOrder(widget.order.id!, {
+                    // 'delv_id': DeliverkSharedPreferences.getDelivId()!,
+                    'status': OrderType.coming.name
+                  });
+                },
+                style: ElevatedButton.styleFrom(primary: Colors.blue),
+                child: const Text("قبول"),
+              );
+            },
+          )
+        else if (widget.order.status == OrderType.delivering.name)
+          BlocBuilder<PatchOrderCubit, GenericState>(
+            builder: (context, state) {
+              if (state is GenericLoadingState) {
+                return const CircularProgressIndicator(
+                  color: Colors.blue,
+                );
+              } else if (state is GenericSuccessState) {
+                Fluttertoast.showToast(msg: 'تمت العملية بنجاح');
+                Navigator.of(context).pop(true);
+              } else if (state is GenericFailureState) {
+                Fluttertoast.showToast(msg: state.data);
+                Navigator.pop(context);
+              }
+
+              return ElevatedButton(
+                onPressed: () {
+                  BlocProvider.of<PatchOrderCubit>(context).patchOrder(
+                      widget.order.id!, {'status': OrderType.received.name});
+                },
+                child: const Text('تم التوصيل'),
+                style: ElevatedButton.styleFrom(primary: Colors.green),
+              );
+            },
+          )
       ],
     );
   }

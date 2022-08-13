@@ -1,8 +1,14 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:deliverk/business_logic/common/state/generic_state.dart';
+
 import 'package:deliverk/data/models/restaurant/restaurant_model.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../business_logic/restaurant/cubit/restaurant_profile_cubit.dart';
 import 'restaurant_base_screen.dart';
@@ -24,14 +30,18 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
   RestaurantModel _profileData = RestaurantModel();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: BlocBuilder<ResturantProfileCubit, GenericState>(
-      builder: (context, state) {
-        if (state is GenericSuccessState) {
-          _profileData = RestaurantModel.fromJson(state.data);
-          return _buildTree();
-        }
-        return _buildDownladingData();
-      },
+    return Scaffold(
+        body: RefreshIndicator(
+      onRefresh: refresh,
+      child: BlocBuilder<ResturantProfileCubit, GenericState>(
+        builder: (context, state) {
+          if (state is GenericSuccessState) {
+            _profileData = RestaurantModel.fromJson(state.data);
+            return _buildTree();
+          }
+          return _buildDownladingData();
+        },
+      ),
     ));
   }
 
@@ -86,11 +96,24 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
           children: [
             _buildInfoTexts("اسم المحل", _profileData.name!),
             const Divider(),
-            _buildInfoTexts("عنوان المحل", _profileData.address!),
+            FittedBox(
+              fit: BoxFit.cover,
+              child: _buildInfoTexts(
+                "عنوان المحل",
+                _profileData.address!,
+              ),
+            ),
             const Divider(),
             _buildInfoTexts("رقم تلفون المحل", _profileData.phone!),
             const Divider(),
-            _buildInfoTexts("العنوان على الخريطة", "اضغط للعرض"),
+            InkWell(
+                onTap: () {
+                  RestaurantBaseScreen.showMap(
+                      widget.context,
+                      LatLng(double.parse(_profileData.mapLat!),
+                          double.parse(_profileData.mapLong!)));
+                },
+                child: _buildInfoTexts("العنوان على الخريطة", "اضغط للعرض")),
             ElevatedButton(
               style: ElevatedButton.styleFrom(primary: Colors.red),
               onPressed: () {
@@ -112,9 +135,25 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
       textDirection: TextDirection.rtl,
       child: Container(
         padding: const EdgeInsets.all(10),
+        width: MediaQuery.of(context).size.width,
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [Text(title), Text(value)],
+          children: [
+            FittedBox(
+              fit: BoxFit.contain,
+              child: Text(title),
+            ),
+            const Spacer(),
+            Expanded(
+              child: SizedBox(
+                child: Text(
+                  value,
+                  textAlign: TextAlign.left,
+                  softWrap: true,
+                  maxLines: 10,
+                ),
+              ),
+            )
+          ],
         ),
       ),
     );
@@ -129,7 +168,7 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            _buildData("الملبغ المستحق", 500, Colors.red),
+            _buildData("الملبغ المستحق", _profileData.cash!, Colors.red),
             SizedBox(
               height: 60,
               child: VerticalDivider(
@@ -140,7 +179,7 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
                 width: 20,
               ),
             ),
-            _buildData("عدد الطلبات", 30, Colors.green),
+            _buildData("عدد الطلبات", 0, Colors.green),
           ],
         ),
       ),
@@ -150,17 +189,23 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
   Widget _buildData(String title, int value, Color color) {
     return Column(
       children: [
-        Text(
-          title,
-          style: TextStyle(fontSize: 18, color: color),
+        FittedBox(
+          child: Text(
+            title,
+            style: TextStyle(fontSize: 18, color: color),
+          ),
         ),
         const SizedBox(
           height: 3,
         ),
-        Text(
-          value.toString(),
-          style: TextStyle(
-            color: color,
+        FittedBox(
+          fit: BoxFit.cover,
+          child: Text(
+            value.toString(),
+            overflow: TextOverflow.fade,
+            style: TextStyle(
+              color: color,
+            ),
           ),
         )
       ],
@@ -202,20 +247,58 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
   }
 
   void logout() {
-    DeliverkSharedPreferences.deleteToken().then((value) {
+    DeliverkSharedPreferences.deleteAll().then((value) {
       RestaurantBaseScreen.pop(widget.context);
     });
+  }
+
+  Future<void> refresh() async {
+    int? id = DeliverkSharedPreferences.getRestId();
+
+    if (id != null) {
+      BlocProvider.of<ResturantProfileCubit>(context).getProfileData(id);
+    } else {
+      RestaurantBaseScreen.pop(widget.context);
+    }
   }
 
   @override
   void initState() {
     int? id = DeliverkSharedPreferences.getRestId();
-    BlocProvider.of<ResturantProfileCubit>(context).getProfileData(id ?? 1);
+
+    if (id != null) {
+      BlocProvider.of<ResturantProfileCubit>(context).getProfileData(id);
+    } else {
+      RestaurantBaseScreen.pop(widget.context);
+    }
+
     super.initState();
   }
 
   @override
   void dispose() {
     super.dispose();
+  }
+
+  openwhatsapp() async {
+    var whatsapp = "+201030773677";
+    var whatsappURlAndroid = "whatsapp://send?phone=" + whatsapp + "&text=";
+    var whatappURLIos = "https://wa.me/$whatsapp?text=${Uri.parse("")}";
+
+    if (Platform.isIOS) {
+      var url = Uri.parse(whatappURLIos);
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url);
+      } else {
+        launchUrl(Uri.parse("tel://" + whatsapp));
+      }
+    } else {
+      var url = Uri.parse(whatsappURlAndroid);
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url);
+      } else {
+        launchUrl(Uri.parse("tel://" + whatsapp));
+      }
+    }
   }
 }

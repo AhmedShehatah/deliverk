@@ -5,7 +5,7 @@ import 'package:deliverk/business_logic/common/state/generic_state.dart';
 import 'package:deliverk/business_logic/common/state/upload_image_state.dart';
 import 'package:deliverk/business_logic/delivery/cubit/deliver_sign_up_cubit.dart';
 import 'package:deliverk/data/models/delivery/delivery_model.dart';
-import 'package:deliverk/presentation/widgets/common/loading_dialog.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -23,7 +23,7 @@ class DeliverySignUpScreen extends StatefulWidget {
 }
 
 class _DeliverySignUpScreenState extends State<DeliverySignUpScreen> {
-  final _deliveryNameController = TextEditingController();
+  static final _deliveryNameController = TextEditingController();
   final _deliveryPhoneNumberContoller = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
@@ -46,26 +46,29 @@ class _DeliverySignUpScreenState extends State<DeliverySignUpScreen> {
       child: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              buildDeliveryImage(),
-              const SizedBox(
-                height: 10,
-              ),
-              buildPickIDPhoto(),
-              buildPickDrividingLicencePhoto(),
-              buildPickMotorLicencePhoto(),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 100),
-                child: Divider(
-                  color: Colors.black45,
-                  height: 1,
-                  thickness: 1,
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                buildDeliveryImage(),
+                const SizedBox(
+                  height: 10,
                 ),
-              ),
-              Form(key: _formKey, child: _buildFields()),
-              buildSignUpButton(),
-            ],
+                buildPickIDPhoto(),
+                buildPickDrividingLicencePhoto(),
+                buildPickMotorLicencePhoto(),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 100),
+                  child: Divider(
+                    color: Colors.black45,
+                    height: 1,
+                    thickness: 1,
+                  ),
+                ),
+                _buildFields(),
+                buildSignUpButton(),
+              ],
+            ),
           ),
         ),
       ),
@@ -82,8 +85,9 @@ class _DeliverySignUpScreenState extends State<DeliverySignUpScreen> {
             hint: "الاسم",
             inputType: TextInputType.name,
             action: TextInputAction.next,
-            validator:
-                (_deliveryNameController.text.isEmpty) ? 'ادخل الاسم' : null,
+            validator: (_deliveryNameController.value.text.isEmpty)
+                ? 'ادخل الاسم'
+                : null,
           ),
         ),
         Container(
@@ -93,7 +97,7 @@ class _DeliverySignUpScreenState extends State<DeliverySignUpScreen> {
             hint: "رقم التلفون",
             inputType: TextInputType.phone,
             action: TextInputAction.next,
-            validator: (_deliveryPhoneNumberContoller.text.isEmpty)
+            validator: (_deliveryPhoneNumberContoller.value.text.isEmpty)
                 ? 'ادخل رقم التلفون'
                 : null,
           ),
@@ -103,10 +107,9 @@ class _DeliverySignUpScreenState extends State<DeliverySignUpScreen> {
           child: CustomTextField(
             controller: _passwordController,
             hint: "الرقم السري",
-            inputType: TextInputType.phone,
+            inputType: TextInputType.text,
             secure: true,
-            validator: (_passwordController.text.isEmpty ||
-                    _passwordController.text.length < 8)
+            validator: (_passwordController.value.text.length < 8)
                 ? 'الرقم السري 8 حروف على الاقل'
                 : null,
           ),
@@ -328,15 +331,25 @@ class _DeliverySignUpScreenState extends State<DeliverySignUpScreen> {
     );
   }
 
+  bool _checker() {
+    if (_deliveryNameController.text.isEmpty ||
+        _passwordController.text.isEmpty ||
+        _deliveryPhoneNumberContoller.text.isEmpty) return false;
+    return true;
+  }
+
   Widget buildSignUpButton() {
     return BlocBuilder<DeliverySignUpCubit, GenericState>(
       builder: (context, state) {
         if (state is GenericSuccessState) {
           Fluttertoast.showToast(msg: 'انتظر حتى يتم تفعيل حسابك');
           Navigator.of(context).popAndPushNamed(deliveryLoginRoute);
-        } else if (state is LoadingState) {
-          showDialog(
-              context: context, builder: (context) => const LoadingDialog());
+        } else if (state is GenericLoadingState) {
+          return const CircularProgressIndicator(
+            color: Colors.blue,
+          );
+        } else if (state is GenericFailureState) {
+          Fluttertoast.showToast(msg: state.data);
         }
         return Container(
           margin:
@@ -344,21 +357,21 @@ class _DeliverySignUpScreenState extends State<DeliverySignUpScreen> {
           width: double.infinity,
           child: ElevatedButton(
             onPressed: () {
+              setState(() {});
               var log = Logger();
-              log.d(_data['avatar']);
-              log.d(_data['nat_img']);
-              log.d(_data['delv_lic_img']);
-              log.d(_data['veh_lic_img']);
-              log.d(_formKey.currentState);
-              log.d(_formKey.currentState!.validate());
-              if (_data['avatar'] != null &&
+              log.d(_deliveryNameController.text);
+              log.d(_deliveryPhoneNumberContoller.text);
+              log.d(_passwordController.text);
+
+              if (_checker() &&
+                  _data['avatar'] != null &&
                   _data['nat_img'] != null &&
                   _data['delv_lic_img'] != null &&
                   _data['veh_lic_img'] != null) {
                 _data['name'] = _deliveryNameController.text;
                 _data['phone'] = _deliveryPhoneNumberContoller.text;
                 _data['password'] = _passwordController.text;
-                _data['zone_id'] = 1;
+                _data['zone_id'] = null;
                 _data['online'] = false;
                 Logger().d(_data);
 

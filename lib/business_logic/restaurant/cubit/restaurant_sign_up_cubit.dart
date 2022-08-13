@@ -8,6 +8,7 @@ class RestaurantSignUpCubit extends Cubit<RestaurantSignUpState> {
   RestaurantSignUpCubit(this.repo) : super(RestaurantSignUpInitial());
   final RestaurantRepo repo;
   void signUp(Map<String, dynamic> data) {
+    emit(LoadingState());
     repo.signUp(data).then((response) {
       if (response is DioError) {
         emit(ErrorState());

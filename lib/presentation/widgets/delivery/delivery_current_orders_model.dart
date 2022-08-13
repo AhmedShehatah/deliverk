@@ -1,7 +1,9 @@
 import 'package:deliverk/business_logic/common/cubit/patch_order_cubit.dart';
+import 'package:deliverk/business_logic/common/cubit/refresh_cubit.dart';
 import 'package:deliverk/business_logic/common/state/generic_state.dart';
 import 'package:deliverk/business_logic/restaurant/cubit/restaurant_profile_cubit.dart';
 import 'package:deliverk/data/models/restaurant/restaurant_model.dart';
+import 'package:deliverk/helpers/trans.dart';
 import 'package:deliverk/presentation/widgets/common/shimmer_widget.dart';
 import 'package:deliverk/repos/delivery/delivery_repo.dart';
 import 'package:flutter/material.dart';
@@ -41,6 +43,10 @@ class _DeliveryCurrentOrderModelState extends State<DeliveryCurrentOrderModel> {
                       child: DeliveryOrderDetialsDialog(
                           widget.order, model, areaName, widget.isDelivering),
                     ));
+          }).then((value) {
+            if (value == true) {
+              BlocProvider.of<RefreshCubit>(context).refresh();
+            }
           });
         }
       },
@@ -123,15 +129,23 @@ class _DeliveryCurrentOrderModelState extends State<DeliveryCurrentOrderModel> {
           style: const TextStyle(fontSize: 13),
         ),
         Text(
-          widget.order.status == "cooked" ? 'جاهز' : 'جاري التجهيز',
+          Trans.status[widget.order.status!] as String,
           style: TextStyle(
             fontSize: 12,
             color: Colors.grey.shade600,
           ),
         ),
-        Text(
-          address,
-          style: const TextStyle(fontSize: 13),
+        SizedBox(
+          width: 200,
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerRight,
+            child: Text(
+              address,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 13),
+            ),
+          ),
         ),
       ],
     );

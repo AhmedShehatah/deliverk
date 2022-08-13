@@ -1,11 +1,12 @@
+import 'package:deliverk/data/models/common/order_model.dart';
 import 'package:flutter/material.dart';
 
 class RecordItemModel extends StatelessWidget {
-  const RecordItemModel({Key? key}) : super(key: key);
-
+  const RecordItemModel(this.order, {Key? key}) : super(key: key);
+  final OrderModel order;
   @override
   Widget build(BuildContext context) {
-    return const Directionality(
+    return Directionality(
       textDirection: TextDirection.rtl,
       child: Card(
         child: ListTile(
@@ -14,14 +15,14 @@ class RecordItemModel extends StatelessWidget {
             child: FittedBox(
               fit: BoxFit.cover,
               child: Text(
-                "123",
-                style: TextStyle(color: Colors.white),
+                order.id.toString(),
+                style: const TextStyle(color: Colors.white),
               ),
             ),
           ),
-          title: Text("احمد شحاته"),
-          trailing: Text("120ج.م"),
-          subtitle: Text("المنيب شارع احمد فيصل"),
+          title: Text(order.delvId.toString()),
+          trailing: Text(order.areaCost.toString()),
+          subtitle: Text(order.resId.toString()),
         ),
       ),
     );

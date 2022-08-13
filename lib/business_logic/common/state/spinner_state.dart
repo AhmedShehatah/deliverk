@@ -8,3 +8,8 @@ class SpinnerInitial extends SpinnerState {
   final String? preparationState;
   SpinnerInitial({this.paymentState, this.preparationState});
 }
+
+class SpinnerZoneState extends SpinnerState {
+  final String zoneName;
+  SpinnerZoneState(this.zoneName);
+}

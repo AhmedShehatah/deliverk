@@ -1,13 +1,19 @@
+import 'package:deliverk/business_logic/common/cubit/patch_order_cubit.dart';
+import 'package:deliverk/business_logic/common/cubit/refresh_cubit.dart';
+import 'package:deliverk/business_logic/common/state/reresh_state.dart';
 import 'package:deliverk/data/models/common/order_model.dart';
+import 'package:deliverk/presentation/widgets/restaurant/empty_orders.dart';
+import 'package:deliverk/repos/delivery/delivery_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:logger/logger.dart';
 
 import '../../../business_logic/restaurant/cubit/restaurants_current_orders_cubit.dart';
 import '../../../business_logic/restaurant/state/restaurant_current_orders_state.dart';
-import '../../widgets/restaurant/order_details_dialog.dart';
+
+import '../../../constants/enums.dart';
 import '../../widgets/restaurant/unpaied_orders_model.dart';
 
+// ignore: must_be_immutable
 class UnpaiedOrdersScreen extends StatelessWidget {
   UnpaiedOrdersScreen({Key? key}) : super(key: key);
 
@@ -15,10 +21,22 @@ class UnpaiedOrdersScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     setupScrollController(context);
     BlocProvider.of<RestaurantCurrentOrdersCubit>(context)
-        .loadOrders(isPaid: false);
+        .loadOrders(isPaid: false, status: OrderType.received.name);
     return Scaffold(
-      body: SafeArea(child: _buildOrders(context)),
+      body: SafeArea(
+        child: RefreshIndicator(
+          onRefresh: () => refresh(context),
+          child: _buildOrders(context),
+        ),
+      ),
     );
+  }
+
+  Future<void> refresh(BuildContext context) async {
+    final provider = BlocProvider.of<RestaurantCurrentOrdersCubit>(context);
+    provider.page = 1;
+    orders.clear();
+    provider.loadOrders(status: OrderType.received.name, isPaid: false);
   }
 
   Widget _buildOrders(BuildContext context) {
@@ -31,58 +49,60 @@ class UnpaiedOrdersScreen extends StatelessWidget {
           expandedHeight: 200.0,
           flexibleSpace: FlexibleSpaceBar(
             centerTitle: true,
-            title: Text('الطلبات الحالية'),
+            title: Text('طلبات لم يتم تسليم حسابها'),
           ),
         ),
       ],
-      body: _buildOrdersList(),
+      body: _buildOrdersList(context),
     );
   }
 
-  final _log = Logger();
-  Widget _buildOrdersList() {
-    return BlocBuilder<RestaurantCurrentOrdersCubit, CurrentOrdersState>(
-      builder: ((_, state) {
-        if (state is CurrentOrdersLoading && state.isFirstFetch) {
-          _log.d('first fetch');
-          return _loadingIndicator();
-        }
+  List<OrderModel> orders = [];
+  Widget _buildOrdersList(BuildContext context) {
+    return RefreshIndicator(
+      onRefresh: () => refresh(context),
+      child: BlocBuilder<RestaurantCurrentOrdersCubit, CurrentOrdersState>(
+        builder: ((_, state) {
+          if (state is CurrentOrdersLoading && state.isFirstFetch) {
+            return _loadingIndicator();
+          }
 
-        List<OrderModel> orders = [];
-        bool isLoading = false;
-        if (state is CurrentOrdersLoading) {
-          _log.d(state.oldOrders);
-          orders = state.oldOrders;
-          isLoading = true;
-        } else if (state is CurrentOrdersLoaded) {
-          _log.d(state.currentOrders);
-          orders = state.currentOrders;
-        }
+          bool isLoading = false;
+          if (state is CurrentOrdersLoading) {
+            orders = state.oldOrders;
+            isLoading = true;
+          } else if (state is CurrentOrdersLoaded) {
+            orders = state.currentOrders;
+          }
+          if (orders.isEmpty) return const EmptyOrders();
 
-        return GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              childAspectRatio: 3 / 2),
-          controller: _scrollController,
-          padding: EdgeInsets.zero,
-          itemBuilder: (context, index) {
-            if (index < orders.length) {
-              return InkWell(
-                  onTap: () {
-                    showDialog(
-                        context: context,
-                        builder: (c) => OrderDetailsDialog(orders[index]));
+          return GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: 3 / 2),
+            controller: _scrollController,
+            padding: EdgeInsets.zero,
+            itemBuilder: (context, index) {
+              if (index < orders.length) {
+                return BlocListener<RefreshCubit, RefreshState>(
+                  listener: (_, state) {
+                    refresh(context);
                   },
-                  child: const UnpaiedOrdersModel());
-            } else {
-              return _loadingIndicator();
-            }
-          },
-          itemCount: orders.length + (isLoading ? 1 : 0),
-        );
-      }),
+                  child: BlocProvider<PatchOrderCubit>(
+                    create: (context) => PatchOrderCubit(DeliveryRepo()),
+                    child: UnpaiedOrdersModel(orders[index]),
+                  ),
+                );
+              } else {
+                return _loadingIndicator();
+              }
+            },
+            itemCount: orders.length + (isLoading ? 1 : 0),
+          );
+        }),
+      ),
     );
   }
 
@@ -100,7 +120,7 @@ class UnpaiedOrdersScreen extends StatelessWidget {
       if (_scrollController.position.atEdge) {
         if (_scrollController.position.pixels != 0) {
           BlocProvider.of<RestaurantCurrentOrdersCubit>(context)
-              .loadOrders(isPaid: false);
+              .loadOrders(status: OrderType.received.name, isPaid: false);
         }
       }
     });

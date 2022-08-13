@@ -1,5 +1,5 @@
 import 'package:deliverk/data/models/delivery/zone_order.dart';
-import 'package:logger/logger.dart';
+// import 'package:logger/logger.dart';
 
 abstract class ZoneOrdersState {}
 
@@ -14,9 +14,7 @@ class ZoneOrdersLoading extends ZoneOrdersState {
   final List<ZoneOrder> oldOrders;
   final bool isFirstFetch;
 
-  ZoneOrdersLoading(this.oldOrders, {this.isFirstFetch = false}) {
-    Logger().d(oldOrders.isEmpty);
-  }
+  ZoneOrdersLoading(this.oldOrders, {this.isFirstFetch = false});
 }
 
 class ZoneOrdersFailed extends ZoneOrdersState {

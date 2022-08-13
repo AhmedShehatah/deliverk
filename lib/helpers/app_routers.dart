@@ -1,4 +1,6 @@
+import 'package:deliverk/business_logic/common/cubit/area_cubit.dart';
 import 'package:deliverk/business_logic/delivery/cubit/deliver_sign_up_cubit.dart';
+import 'package:deliverk/business_logic/delivery/cubit/delivery_profile_cubit.dart';
 import 'package:deliverk/business_logic/restaurant/cubit/new_order_cubit.dart';
 import 'package:deliverk/presentation/screens/common/map_show_screen.dart';
 
@@ -42,10 +44,30 @@ class AppRouter {
           if (DeliverkSharedPreferences.getUserType() ==
               UserType.restaurant.name) {
             return MaterialPageRoute(
-                builder: (_) => const RestaurantBaseScreen());
+              builder: (_) => MultiBlocProvider(
+                providers: [
+                  BlocProvider<ResturantProfileCubit>(
+                    create: (context) => ResturantProfileCubit(_restaurantRepo),
+                  ),
+                  BlocProvider<AreaCubit>(create: (_) => AreaCubit()),
+                ],
+                child: const RestaurantBaseScreen(),
+              ),
+            );
           } else {
             return MaterialPageRoute(
-                builder: (_) => const DeliveryBaseScreen());
+                builder: (_) => MultiBlocProvider(
+                      providers: [
+                        BlocProvider<DeliveryProfileCubit>(
+                          create: (context) =>
+                              DeliveryProfileCubit(_deliveryRepo),
+                        ),
+                        BlocProvider<AreaCubit>(
+                          create: (context) => AreaCubit(),
+                        ),
+                      ],
+                      child: const DeliveryBaseScreen(),
+                    ));
           }
         }
 
@@ -57,7 +79,7 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const MapScreen());
       case mapShowScreen:
         return MaterialPageRoute(
-            builder: (_) => const MapShowScreen(), settings: settings);
+            builder: (_) => MapShowScreen(), settings: settings);
 
       // returant routes
       case resturantSignUpRoute:
@@ -123,7 +145,11 @@ class AppRouter {
                   child: const DeliverySignUpScreen(),
                 ));
       case deliveryBaseScreen:
-        return MaterialPageRoute(builder: (_) => const DeliveryBaseScreen());
+        return MaterialPageRoute(
+            builder: (_) => BlocProvider<DeliveryProfileCubit>(
+                  create: (context) => DeliveryProfileCubit(_deliveryRepo),
+                  child: const DeliveryBaseScreen(),
+                ));
       case deliveryLoginRoute:
         return MaterialPageRoute(
             builder: (_) => BlocProvider<DeliveryLoginCubit>(

@@ -6,7 +6,9 @@ class LoadingState extends RestaurantLoginState {}
 
 class SuccessState extends RestaurantLoginState {
   final String token;
-  SuccessState(this.token);
+  final int id;
+  final int zoneId;
+  SuccessState(this.token, this.id, this.zoneId);
 }
 
 class FailedState extends RestaurantLoginState {

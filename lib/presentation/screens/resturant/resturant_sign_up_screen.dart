@@ -1,11 +1,13 @@
+import 'dart:async';
 import 'dart:io';
 
-import 'package:deliverk/helpers/shared_preferences.dart';
+import 'package:deliverk/business_logic/common/cubit/spinner_cubit.dart';
+import 'package:deliverk/zones.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../../business_logic/common/cubit/upload_image_cubit.dart';
 import '../../../business_logic/restaurant/cubit/restaurant_sign_up_cubit.dart';
-import '../../../data/models/restaurant/restaurant_model.dart';
+
 import '../../../data/models/restaurant/restaurant_sign_up_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -52,14 +54,23 @@ class _ResturantSignUpScreenState extends State<ResturantSignUpScreen> {
                   Container(
                     margin: const EdgeInsets.all(10),
                     child: CustomTextField(
-                        controller: _restName,
-                        hint: "اسم المطعم",
-                        inputType: TextInputType.name),
+                      controller: _restName,
+                      hint: "اسم المحل",
+                      inputType: TextInputType.name,
+                      action: TextInputAction.next,
+                    ),
                   ),
-                  const Spinner(
-                    "المنطقة",
-                    ["المنيب", "الجيزة", "رمسيس"],
-                    SpinnerEnum.zone,
+                  BlocBuilder<SpinnerCubit, SpinnerState>(
+                    builder: (context, state) {
+                      if (state is SpinnerZoneState) {
+                        _zoneId = zones[state.zoneName];
+                      }
+                      return Spinner(
+                        "المنطقة",
+                        _zonesList,
+                        SpinnerEnum.zone,
+                      );
+                    },
                   ),
                   Container(
                     width: double.infinity,
@@ -95,6 +106,7 @@ class _ResturantSignUpScreenState extends State<ResturantSignUpScreen> {
                       controller: _restPlaceInDetials,
                       hint: "المكان بالتفصيل",
                       inputType: TextInputType.multiline,
+                      action: TextInputAction.next,
                     ),
                   ),
                   const SizedBox(
@@ -114,6 +126,7 @@ class _ResturantSignUpScreenState extends State<ResturantSignUpScreen> {
                       controller: _restPhoneNumber,
                       hint: "رقم التلفون",
                       inputType: TextInputType.phone,
+                      action: TextInputAction.next,
                     ),
                   ),
                   Container(
@@ -121,27 +134,33 @@ class _ResturantSignUpScreenState extends State<ResturantSignUpScreen> {
                     child: CustomTextField(
                       controller: _passwordController,
                       hint: "الرقم السري",
-                      inputType: TextInputType.phone,
+                      inputType: TextInputType.text,
                       secure: true,
                     ),
                   ),
                   BlocBuilder<RestaurantSignUpCubit, RestaurantSignUpState>(
                     builder: (context, state) {
-                      if (state is RestaurantSignUpInitial) {
-                        return buildSignUpButton();
+                      if (state is LoadingState) {
+                        return const CircularProgressIndicator(
+                          color: Colors.blue,
+                        );
                       } else if (state is SuccessState) {
-                        Hive.box<RestaurantModel>('restaurant')
-                            .add(state.restaurantModel);
-                        DeliverkSharedPreferences.setRestId(
-                                state.restaurantModel.id!)
-                            .then((value) => Navigator.of(context)
-                                .popAndPushNamed(restaurantBaseScreenRoute));
-                        // Navigator.of(context)
-                        //     .popAndPushNamed(restaurantBaseScreenRoute);
+                        WidgetsBinding.instance
+                            ?.addPostFrameCallback((timeStamp) {
+                          Fluttertoast.showToast(
+                              msg:
+                                  'تم تسجيل الدخول بنجاح انتظر حتى يتم تفعيلك');
+                          Navigator.of(context)
+                              .pushReplacementNamed(restaurantLoginRoute);
+                        });
+                        return buildSignUpButton();
                       } else if (state is FailedState) {
                         Logger().d(state.message);
+                        Fluttertoast.showToast(msg: 'فشل سجيل الدخول');
+                        return buildSignUpButton();
+                      } else {
+                        return buildSignUpButton();
                       }
-                      return buildSignUpButton();
                     },
                   ),
                 ],
@@ -180,7 +199,7 @@ class _ResturantSignUpScreenState extends State<ResturantSignUpScreen> {
                         Image.asset(
                           "assets/images/camera.png",
                         ),
-                        const Text("لوجو المطعم")
+                        const Text("لوجو المحل")
                       ],
                     )
                   : CircleAvatar(
@@ -223,6 +242,7 @@ class _ResturantSignUpScreenState extends State<ResturantSignUpScreen> {
         _restName.text.isEmpty ||
         _restPhoneNumber.text.isEmpty ||
         _location == null ||
+        _zoneId == null ||
         _restPlaceInDetials.text.isEmpty ||
         _passwordController.text.isEmpty) return false;
     return true;
@@ -245,20 +265,33 @@ class _ResturantSignUpScreenState extends State<ResturantSignUpScreen> {
     model.mapLong = _location?.longitude.toString();
     model.password = _passwordController.text;
     model.phone = _restPhoneNumber.text;
-    model.zoneId = 1;
+    model.zoneId = _zoneId;
 
     signUpProvider.signUp(model.toJson());
   }
 
   @override
   void initState() {
-    Hive.openBox<RestaurantModel>('restaurant');
+    getZones();
     super.initState();
+  }
+
+  Map<String, int> zones = {};
+  final List<String> _zonesList = [];
+  int? _zoneId;
+  void getZones() async {
+    Zones().getZones().then((value) async {
+      var box = await Hive.openBox<Map<String, int>>('zones');
+      zones = box.get('zone')!;
+      zones.forEach((key, value) {
+        _zonesList.add(key);
+      });
+      setState(() {});
+    });
   }
 
   @override
   void dispose() {
-    Hive.box('restaurant').close();
     super.dispose();
   }
 }

@@ -14,7 +14,8 @@ class RestaurantLoginCubit extends Cubit<RestaurantLoginState> {
         return;
       }
       if (response['success']) {
-        emit(SuccessState(response['token']));
+        emit(SuccessState(
+            response['token'], response['res_id'], response['zone_id']));
       } else {
         emit(FailedState(response['message']));
       }

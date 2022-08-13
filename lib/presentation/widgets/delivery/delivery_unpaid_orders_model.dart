@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
 
-import '../../../data/models/common/order_model.dart';
+import '../../../data/models/delivery/zone_order.dart';
 import '../../../data/models/restaurant/restaurant_model.dart';
 
 class DeliveryUnpaidOrdersModel extends StatelessWidget {
   const DeliveryUnpaidOrdersModel(this.order, {Key? key}) : super(key: key);
-  final OrderModel order;
+  final ZoneOrder order;
   @override
   Widget build(BuildContext context) {
     BlocProvider.of<ResturantProfileCubit>(context)

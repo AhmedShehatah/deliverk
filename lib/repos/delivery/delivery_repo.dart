@@ -16,5 +16,7 @@ class DeliveryRepo {
       _api.getOrders(delivId, querys);
   Future<dynamic> patchOrder(int orderId, Map<String, dynamic> data) async =>
       _api.patchOrder(orderId, data);
+
+  Future<dynamic> deleteOrder(int orderId) async => _api.deleteOrder(orderId);
   Future<dynamic> getProflieData(int id) async => _api.getDeliveryProfile(id);
 }

@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 
 import 'package:deliverk/data/models/delivery/zone_order.dart';
 import 'package:deliverk/helpers/shared_preferences.dart';
+// import 'package:deliverk/helpers/shared_preferences.dart';
 import 'package:deliverk/repos/delivery/delivery_repo.dart';
 import 'package:dio/dio.dart';
 import 'package:logger/logger.dart';
@@ -13,7 +14,6 @@ class DeliveryZoneOrdersCubit extends Cubit<ZoneOrdersState> {
 
   int page = 1;
   final DeliveryRepo _repo;
-  final _log = Logger();
 
   void loadOrders({String? status, bool? isPaid}) {
     if (state is ZoneOrdersLoading) return;
@@ -21,19 +21,17 @@ class DeliveryZoneOrdersCubit extends Cubit<ZoneOrdersState> {
     var oldOrders = <ZoneOrder>[];
 
     if (currentState is ZoneOrdersLoaded) {
-      _log.d('loaded bro');
       oldOrders = currentState.currentOrders;
     }
     emit(ZoneOrdersLoading(oldOrders, isFirstFetch: page == 1));
 
-    var id = DeliverkSharedPreferences.getRestId();
-    _log.d(id);
     Map<String, dynamic> querys = {};
     querys['page'] = '$page';
     querys['status'] = status;
 
-    _repo.getZoneOrders(1, querys).then((response) {
-      _log.d("I Got Here");
+    _repo
+        .getZoneOrders(DeliverkSharedPreferences.getZoneId()!, querys)
+        .then((response) {
       if (response is DioError) {
         Logger().d(response);
         return;

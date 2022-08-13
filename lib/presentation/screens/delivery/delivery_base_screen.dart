@@ -1,8 +1,14 @@
+import 'package:deliverk/business_logic/common/cubit/area_cubit.dart';
+import 'package:deliverk/business_logic/common/cubit/refresh_cubit.dart';
+import 'package:deliverk/business_logic/common/state/generic_state.dart';
 import 'package:deliverk/business_logic/delivery/cubit/delivery_orders_cubit.dart';
 import 'package:deliverk/business_logic/delivery/cubit/delivery_profile_cubit.dart';
 import 'package:deliverk/business_logic/delivery/cubit/delivery_zone_orders_cubit.dart';
+
+import 'package:deliverk/helpers/shared_preferences.dart';
 import 'package:deliverk/repos/delivery/delivery_repo.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import '../common/splash_screen.dart';
 import 'delivery_unpaid_orders_screen.dart';
@@ -36,60 +42,112 @@ class _DeliveryBaseScreenState extends State<DeliveryBaseScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return PersistentTabView(
-      context,
-      controller: _controller,
-      screens: _buildScreens(context),
-      items: _navBarsItems(),
-      confineInSafeArea: true,
-      backgroundColor: Colors.white,
-      onItemSelected: (idx) {},
-      handleAndroidBackButtonPress: true,
-      resizeToAvoidBottomInset: true,
-      stateManagement: true,
-      hideNavigationBarWhenKeyboardShows: true,
-      decoration: NavBarDecoration(
-        borderRadius: BorderRadius.circular(10.0),
-        colorBehindNavBar: Colors.white,
+    return BlocListener<DeliveryProfileCubit, GenericState>(
+      listener: (context, state) {
+        if (state is GenericFailureState) {
+          Fluttertoast.showToast(
+              msg: 'حدث خطأ ما من فضلك قم باعادة تسجيل الدخول');
+
+          DeliverkSharedPreferences.deleteAll().then((value) {
+            DeliveryBaseScreen.pop(context);
+          });
+        } else if (state is GenericSuccessState) {
+          DeliverkSharedPreferences.setZoneId(state.data['zone_id']);
+        }
+      },
+      child: BlocBuilder<AreaCubit, GenericState>(
+        builder: (context, state) {
+          if (state is GenericSuccessState) {
+            return PersistentTabView(
+              context,
+              controller: _controller,
+              screens: _buildScreens(context),
+              items: _navBarsItems(),
+              confineInSafeArea: true,
+              backgroundColor: Colors.white,
+              onItemSelected: (idx) {},
+              handleAndroidBackButtonPress: true,
+              resizeToAvoidBottomInset: true,
+              stateManagement: true,
+              hideNavigationBarWhenKeyboardShows: true,
+              decoration: NavBarDecoration(
+                borderRadius: BorderRadius.circular(10.0),
+                colorBehindNavBar: Colors.white,
+              ),
+              popAllScreensOnTapOfSelectedTab: true,
+              popActionScreens: PopActionScreensType.all,
+              itemAnimationProperties: const ItemAnimationProperties(
+                duration: Duration(milliseconds: 200),
+                curve: Curves.ease,
+              ),
+              screenTransitionAnimation: const ScreenTransitionAnimation(
+                animateTabTransition: true,
+                curve: Curves.ease,
+                duration: Duration(milliseconds: 200),
+              ),
+              navBarStyle: NavBarStyle.style1,
+            );
+          } else if (state is GenericLoadingState) {
+            return const Scaffold(
+              body: Center(
+                  child: CircularProgressIndicator(
+                color: Colors.blue,
+              )),
+            );
+          } else if (state is GenericFailureState) {
+            return const Scaffold(
+              body: Center(child: Text('حدث خطا قم باعادة تشغيل التطيبق')),
+            );
+          } else {
+            return const Text('');
+          }
+        },
       ),
-      popAllScreensOnTapOfSelectedTab: true,
-      popActionScreens: PopActionScreensType.all,
-      itemAnimationProperties: const ItemAnimationProperties(
-        duration: Duration(milliseconds: 200),
-        curve: Curves.ease,
-      ),
-      screenTransitionAnimation: const ScreenTransitionAnimation(
-        animateTabTransition: true,
-        curve: Curves.ease,
-        duration: Duration(milliseconds: 200),
-      ),
-      navBarStyle: NavBarStyle.style1,
     );
   }
 
-  final _currentScreen = BlocProvider<DeliveryZoneOrdersCubit>(
-    create: (context) => DeliveryZoneOrdersCubit(DeliveryRepo()),
-    child: const DeliveryCurrentOrdersScreen(),
-  );
-
-  final _doingScreen = BlocProvider<DeliveryOrdersCubit>(
-    create: (context) => DeliveryOrdersCubit(DeliveryRepo()),
-    child: const DeliveryDoingOrderScreen(),
-  );
-
-  final _unpaid = BlocProvider<DeliveryOrdersCubit>(
-    create: (context) => DeliveryOrdersCubit(DeliveryRepo()),
-    child: const DeliveryUnpaidOrdersScreen(),
-  );
-
-  late BlocProvider<DeliveryProfileCubit> _profileScreen;
-
   List<Widget> _buildScreens(BuildContext context) {
     return [
-      _currentScreen,
-      _doingScreen,
-      _unpaid,
-      _profileScreen,
+      MultiBlocProvider(
+        providers: [
+          BlocProvider<DeliveryZoneOrdersCubit>(
+            create: (context) => DeliveryZoneOrdersCubit(DeliveryRepo()),
+          ),
+          BlocProvider<RefreshCubit>(
+            create: (context) => RefreshCubit(),
+          ),
+        ],
+        child: const DeliveryCurrentOrdersScreen(),
+      ),
+      MultiBlocProvider(
+        providers: [
+          BlocProvider<DeliveryOrdersCubit>(
+            create: (context) => DeliveryOrdersCubit(DeliveryRepo()),
+          ),
+          BlocProvider<RefreshCubit>(create: (_) => RefreshCubit()),
+        ],
+        child: const DeliveryDoingOrderScreen(),
+      ),
+      MultiBlocProvider(
+        providers: [
+          BlocProvider<DeliveryOrdersCubit>(
+            create: (context) => DeliveryOrdersCubit(DeliveryRepo()),
+          ),
+          BlocProvider<RefreshCubit>(create: (_) => RefreshCubit())
+        ],
+        child: const DeliveryUnpaidOrdersScreen(),
+      ),
+      MultiBlocProvider(
+        providers: [
+          BlocProvider<DeliveryProfileCubit>(
+            create: (context) => DeliveryProfileCubit(DeliveryRepo()),
+          ),
+          BlocProvider<RefreshCubit>(create: (_) => RefreshCubit())
+        ],
+        child: DeliveryProfileScreen(
+          context: context,
+        ),
+      ),
     ];
   }
 
@@ -124,12 +182,13 @@ class _DeliveryBaseScreenState extends State<DeliveryBaseScreen> {
 
   @override
   void initState() {
-    _profileScreen = BlocProvider<DeliveryProfileCubit>(
-      create: (context) => DeliveryProfileCubit(DeliveryRepo()),
-      child: DeliveryProfileScreen(
-        context: context,
-      ),
-    );
+    BlocProvider.of<AreaCubit>(context).loadAreas();
+    var id = DeliverkSharedPreferences.getDelivId();
+    if (id != null) {
+      BlocProvider.of<DeliveryProfileCubit>(context).getProfileData(id);
+    } else {
+      DeliveryBaseScreen.pop(context);
+    }
     super.initState();
   }
 }

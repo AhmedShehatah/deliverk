@@ -1,5 +1,7 @@
 import 'package:deliverk/business_logic/common/state/generic_state.dart';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:logger/logger.dart';
 
 import '../../../repos/delivery/delivery_repo.dart';
 
@@ -9,10 +11,23 @@ class PatchOrderCubit extends Cubit<GenericState> {
 
   void patchOrder(int orderId, Map<String, dynamic> data) {
     emit(GenericLoadingState());
-
+    Logger().d(orderId, data);
     _repo.patchOrder(orderId, data).then((response) {
       if (response['success']) {
         emit(GenericSuccessState(response['data']));
+      } else {
+        emit(GenericFailureState(response['message']));
+        Logger().d(response['message']);
+      }
+    });
+  }
+
+  void deleteOrder(int orderId) {
+    emit(GenericLoadingState());
+
+    _repo.deleteOrder(orderId).then((response) {
+      if (response['success']) {
+        emit(GenericSuccessState(''));
       } else {
         emit(GenericFailureState(response['message']));
       }

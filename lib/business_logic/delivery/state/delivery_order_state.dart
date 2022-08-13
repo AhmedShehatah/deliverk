@@ -1,4 +1,4 @@
-import 'package:deliverk/data/models/common/order_model.dart';
+import 'package:deliverk/data/models/delivery/zone_order.dart';
 import 'package:logger/logger.dart';
 
 abstract class DeliveryOrdersState {}
@@ -6,12 +6,12 @@ abstract class DeliveryOrdersState {}
 class DeliveryOrdersInit extends DeliveryOrdersState {}
 
 class DeliveryOrdersLoaded extends DeliveryOrdersState {
-  final List<OrderModel> currentOrders;
+  final List<ZoneOrder> currentOrders;
   DeliveryOrdersLoaded(this.currentOrders);
 }
 
 class DeliveryOrdersLoading extends DeliveryOrdersState {
-  final List<OrderModel> oldOrders;
+  final List<ZoneOrder> oldOrders;
   final bool isFirstFetch;
 
   DeliveryOrdersLoading(this.oldOrders, {this.isFirstFetch = false}) {

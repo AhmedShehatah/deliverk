@@ -39,6 +39,9 @@ class Spinner extends StatelessWidget {
               case SpinnerEnum.preparationTime:
                 state.changePreparationState(value);
                 break;
+              case SpinnerEnum.zone:
+                state.getZoneName(value);
+                break;
               default:
                 break;
             }

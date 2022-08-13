@@ -1,3 +1,4 @@
+import 'package:deliverk/presentation/widgets/restaurant/empty_orders.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logger/logger.dart';
 
@@ -20,55 +21,62 @@ class _RestaurantRecordScreenState extends State<RestaurantRecordScreen> {
   Widget build(BuildContext context) {
     setupScrollController(context);
     BlocProvider.of<RestaurantCurrentOrdersCubit>(context)
-        .loadOrders(status: OrderType.received.name);
+        .loadOrders(status: OrderType.received.name, isPaid: true);
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("سجل الطلبات المسلمة"),
-        centerTitle: true,
-      ),
       body: SafeArea(
-        child: _buildOrdersList(),
+        child: RefreshIndicator(
+            onRefresh: () => refresh(context), child: _buildOrdersList()),
       ),
     );
   }
 
   final _log = Logger();
-
+  List<OrderModel> orders = [];
   Widget _buildOrdersList() {
-    return BlocBuilder<RestaurantCurrentOrdersCubit, CurrentOrdersState>(
-      builder: ((_, state) {
-        if (state is CurrentOrdersLoading && state.isFirstFetch) {
-          _log.d('first fetch');
-          return _loadingIndicator();
-        }
+    return NestedScrollView(
+      floatHeaderSlivers: false,
+      headerSliverBuilder: (_, innerBoxIsScrolled) => [
+        const SliverAppBar(
+          pinned: true,
+          centerTitle: true,
+          expandedHeight: 200.0,
+          flexibleSpace: FlexibleSpaceBar(
+            centerTitle: true,
+            title: Text('سجل الطلبات المسلمة'),
+          ),
+        ),
+      ],
+      body: BlocBuilder<RestaurantCurrentOrdersCubit, CurrentOrdersState>(
+        builder: ((_, state) {
+          if (state is CurrentOrdersLoading && state.isFirstFetch) {
+            return _loadingIndicator();
+          }
 
-        List<OrderModel> orders = [];
-        bool isLoading = false;
-        if (state is CurrentOrdersLoading) {
-          _log.d(state.oldOrders);
-          orders = state.oldOrders;
-          isLoading = true;
-        } else if (state is CurrentOrdersLoaded) {
-          _log.d(state.currentOrders);
-          orders = state.currentOrders;
-        }
+          bool isLoading = false;
+          if (state is CurrentOrdersLoading) {
+            _log.d(state.oldOrders);
+            orders = state.oldOrders;
+            isLoading = true;
+          } else if (state is CurrentOrdersLoaded) {
+            _log.d(state.currentOrders);
+            orders = state.currentOrders;
+          }
+          if (orders.isEmpty) return const EmptyOrders();
 
-        return RefreshIndicator(
-          onRefresh: () => refresh(context),
-          child: ListView.builder(
+          return ListView.builder(
             controller: _scrollController,
             padding: EdgeInsets.zero,
             itemBuilder: (context, index) {
               if (index < orders.length) {
-                return const RecordItemModel();
+                return RecordItemModel(orders[index]);
               } else {
                 return _loadingIndicator();
               }
             },
             itemCount: orders.length + (isLoading ? 1 : 0),
-          ),
-        );
-      }),
+          );
+        }),
+      ),
     );
   }
 
@@ -86,13 +94,14 @@ class _RestaurantRecordScreenState extends State<RestaurantRecordScreen> {
       if (_scrollController.position.atEdge) {
         if (_scrollController.position.pixels != 0) {
           BlocProvider.of<RestaurantCurrentOrdersCubit>(context)
-              .loadOrders(status: OrderType.received.name);
+              .loadOrders(status: OrderType.received.name, isPaid: true);
         }
       }
     });
   }
 
   Future<void> refresh(BuildContext context) async {
-    BlocProvider.of<RestaurantCurrentOrdersCubit>(context).loadOrders();
+    BlocProvider.of<RestaurantCurrentOrdersCubit>(context)
+        .loadOrders(status: OrderType.received.name, isPaid: true);
   }
 }

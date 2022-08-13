@@ -1,11 +1,9 @@
-import 'package:deliverk/areas.dart';
 import 'package:deliverk/data/models/common/area_model.dart';
 
 import 'data/models/restaurant/restaurant_model.dart';
 import 'helpers/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:logger/logger.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'constants/strings.dart';
 import 'helpers/app_routers.dart';
@@ -18,6 +16,7 @@ Future main() async {
   await Hive.initFlutter();
   try {
     await Hive.box('areas').clear();
+    await Hive.box('area_price').clear();
     // ignore: empty_catches
   } catch (e) {}
   await SystemChrome.setPreferredOrientations([
@@ -56,7 +55,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance!.addObserver(this);
-    Areas().fetchAreas();
+    // if (DeliverkSharedPreferences.getToken() != null) Areas().fetchAreas();
   }
 
   @override
@@ -66,8 +65,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   }
 
   @override
+  // ignore: unnecessary_overrides
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    Logger().d("closed baby");
   }
 }

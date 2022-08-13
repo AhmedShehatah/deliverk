@@ -20,4 +20,8 @@ class SpinnerCubit extends Cubit<SpinnerState> {
     emit(SpinnerInitial(preparationState: text, paymentState: payment));
     preparation = text;
   }
+
+  void getZoneName(String text) {
+    emit(SpinnerZoneState(text));
+  }
 }

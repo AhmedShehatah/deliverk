@@ -11,28 +11,28 @@ class RestaurantCurrentOrdersCubit extends Cubit<CurrentOrdersState> {
 
   int page = 1;
   final RestaurantRepo _repo;
-  final _log = Logger();
 
   void loadOrders({String? status, bool? isPaid}) {
     if (state is CurrentOrdersLoading) return;
-    _log.d('we are here');
+
     final currentState = state;
     var oldOrders = <OrderModel>[];
 
     if (currentState is CurrentOrdersLoaded) {
-      _log.d('loaded bro');
       oldOrders = currentState.currentOrders;
     }
     emit(CurrentOrdersLoading(oldOrders, isFirstFetch: page == 1));
 
     var id = DeliverkSharedPreferences.getRestId();
-    _log.d(id);
+    if (id == null) {
+      emit(CurrentOrdersFailed('الرجاء اعادة تسجيل الدخول'));
+      return;
+    }
     Map<String, dynamic> querys = {};
     querys['page'] = '$page';
     querys['status'] = status;
     querys['isPaid'] = isPaid;
-    _repo.getOrders(querys, 8).then((response) {
-      _log.d("I Got Here");
+    _repo.getOrders(querys, id).then((response) {
       if (response is DioError) {
         Logger().d(response);
         return;
