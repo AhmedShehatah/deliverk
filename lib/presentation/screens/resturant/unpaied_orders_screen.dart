@@ -1,6 +1,7 @@
 import 'package:deliverk/business_logic/common/cubit/patch_order_cubit.dart';
 import 'package:deliverk/business_logic/common/cubit/refresh_cubit.dart';
 import 'package:deliverk/business_logic/common/state/reresh_state.dart';
+import 'package:deliverk/business_logic/delivery/cubit/delivery_profile_cubit.dart';
 import 'package:deliverk/data/models/common/order_model.dart';
 import 'package:deliverk/presentation/widgets/restaurant/empty_orders.dart';
 import 'package:deliverk/repos/delivery/delivery_repo.dart';
@@ -90,8 +91,16 @@ class UnpaiedOrdersScreen extends StatelessWidget {
                   listener: (_, state) {
                     refresh(context);
                   },
-                  child: BlocProvider<PatchOrderCubit>(
-                    create: (context) => PatchOrderCubit(DeliveryRepo()),
+                  child: MultiBlocProvider(
+                    providers: [
+                      BlocProvider<PatchOrderCubit>(
+                        create: (context) => PatchOrderCubit(DeliveryRepo()),
+                      ),
+                      BlocProvider<DeliveryProfileCubit>(
+                        create: (context) =>
+                            DeliveryProfileCubit(DeliveryRepo()),
+                      ),
+                    ],
                     child: UnpaiedOrdersModel(orders[index]),
                   ),
                 );

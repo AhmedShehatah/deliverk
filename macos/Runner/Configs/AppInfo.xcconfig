@@ -8,7 +8,7 @@
 PRODUCT_NAME = deliverk
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.example.deliverk
+PRODUCT_BUNDLE_IDENTIFIER = com.shehatah.deliverk
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2022 com.example. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2022 com.shehatah. All rights reserved.

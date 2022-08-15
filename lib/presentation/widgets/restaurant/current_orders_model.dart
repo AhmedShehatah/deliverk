@@ -1,5 +1,6 @@
 import 'package:deliverk/business_logic/common/cubit/patch_order_cubit.dart';
 import 'package:deliverk/business_logic/common/cubit/refresh_cubit.dart';
+import 'package:deliverk/business_logic/delivery/cubit/delivery_profile_cubit.dart';
 import 'package:deliverk/data/models/common/order_model.dart';
 import 'package:deliverk/data/models/restaurant/restaurant_model.dart';
 import 'package:deliverk/helpers/trans.dart';
@@ -42,8 +43,16 @@ class _CurrentOrdersModelState extends State<CurrentOrdersModel> {
         if (_isLoaded) {
           showDialog(
               context: context,
-              builder: (c) => BlocProvider<PatchOrderCubit>(
-                    create: (context) => PatchOrderCubit(DeliveryRepo()),
+              builder: (c) => MultiBlocProvider(
+                    providers: [
+                      BlocProvider<PatchOrderCubit>(
+                        create: (context) => PatchOrderCubit(DeliveryRepo()),
+                      ),
+                      BlocProvider<DeliveryProfileCubit>(
+                        create: (context) =>
+                            DeliveryProfileCubit(DeliveryRepo()),
+                      ),
+                    ],
                     child: OrderDetailsDialog(
                         widget.orderModel, widget.model, areaName!),
                   )).then((value) {

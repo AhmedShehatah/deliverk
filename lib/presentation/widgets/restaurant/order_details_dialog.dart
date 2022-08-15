@@ -1,12 +1,16 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:deliverk/business_logic/common/state/generic_state.dart';
+import 'package:deliverk/business_logic/delivery/cubit/delivery_profile_cubit.dart';
 
 import 'package:deliverk/constants/enums.dart';
 import 'package:deliverk/data/models/common/order_model.dart';
+import 'package:deliverk/data/models/delivery/delivery_model.dart';
 import 'package:deliverk/data/models/restaurant/restaurant_model.dart';
 import 'package:deliverk/helpers/trans.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../../../business_logic/common/cubit/patch_order_cubit.dart';
 
@@ -18,6 +22,10 @@ class OrderDetailsDialog extends StatelessWidget {
   final String areaName;
   @override
   Widget build(BuildContext context) {
+    if (order.delvId != null) {
+      BlocProvider.of<DeliveryProfileCubit>(context)
+          .getProfileData(order.delvId);
+    }
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Dialog(
@@ -29,6 +37,7 @@ class OrderDetailsDialog extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                if (order.delvId != null) _buildDeliveryInfo(),
                 DataTable(
                   horizontalMargin: 10,
                   columns: const [
@@ -68,9 +77,18 @@ class OrderDetailsDialog extends StatelessWidget {
                       cells: <DataCell>[
                         const DataCell(Text('منطقة التوصيل')),
                         DataCell(FittedBox(
-                            fit: BoxFit.cover, child: Text(areaName))),
+                            fit: BoxFit.scaleDown, child: Text(areaName))),
                       ],
                     ),
+                    if (order.notes != null)
+                      DataRow(
+                        cells: <DataCell>[
+                          const DataCell(Text('ملاحظات')),
+                          DataCell(FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(order.notes!))),
+                        ],
+                      ),
                   ],
                 ),
                 BlocBuilder<PatchOrderCubit, GenericState>(
@@ -120,6 +138,69 @@ class OrderDetailsDialog extends StatelessWidget {
             child: const Text("تأكيد الوصول"),
           )
       ],
+    );
+  }
+
+  Widget _buildDeliveryInfo() {
+    return BlocBuilder<DeliveryProfileCubit, GenericState>(
+      builder: (context, state) {
+        if (state is GenericSuccessState) {
+          final data = DeliveryModel.fromJson(state.data);
+          return ListTile(
+            leading: CachedNetworkImage(
+              imageUrl: data.avatar!,
+              imageBuilder: (context, imageProvider) => Container(
+                width: 80.0,
+                height: 80.0,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  image:
+                      DecorationImage(image: imageProvider, fit: BoxFit.cover),
+                ),
+              ),
+              progressIndicatorBuilder: (context, url, downloadProgress) =>
+                  Shimmer.fromColors(
+                baseColor: Colors.grey,
+                highlightColor: Colors.white,
+                child: CircleAvatar(
+                  radius: 70,
+                  backgroundColor: Colors.grey.shade600,
+                ),
+              ),
+              errorWidget: (context, url, error) => const Icon(Icons.error),
+            ),
+            title: Text(data.name!),
+            subtitle: Text(data.phone!),
+          );
+        } else if (state is GenericLoadingState) {
+          return Shimmer.fromColors(
+            child: ListTile(
+              leading: Container(
+                width: 80.0,
+                height: 80.0,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.black,
+                ),
+              ),
+              title: Container(
+                width: 40,
+                height: 15,
+                color: Colors.grey,
+              ),
+              subtitle: Container(
+                width: 60,
+                height: 15,
+                color: Colors.grey,
+              ),
+            ),
+            baseColor: Colors.grey,
+            highlightColor: Colors.white,
+          );
+        } else {
+          return const Text('خطا في تحميل بيانات الديلفري');
+        }
+      },
     );
   }
 }

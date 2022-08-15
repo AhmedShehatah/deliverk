@@ -3,6 +3,7 @@ class ZoneOrder {
   int? areaId;
   int? cost;
   String? createdAt;
+  int? delvCash;
   dynamic delvId;
   int? duration;
   dynamic fnTime;
@@ -22,6 +23,7 @@ class ZoneOrder {
     this.delvId,
     this.duration,
     this.fnTime,
+    this.delvCash,
     this.id,
     this.isPaid,
     this.notes,
@@ -36,6 +38,7 @@ class ZoneOrder {
         areaId: json['area_id'] as int?,
         cost: json['cost'] as int?,
         createdAt: json['created_at'] as String?,
+        delvCash: json['delv_cash'] as int?,
         delvId: json['delv_id'] as dynamic,
         duration: json['duration'] as int?,
         fnTime: json['fn_time'] as dynamic,
@@ -53,6 +56,7 @@ class ZoneOrder {
         'area_id': areaId,
         'cost': cost,
         'created_at': createdAt,
+        'delv_cash': delvCash,
         'delv_id': delvId,
         'duration': duration,
         'fn_time': fnTime,

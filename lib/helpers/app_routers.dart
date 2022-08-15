@@ -106,6 +106,7 @@ class AppRouter {
                       create: (context) =>
                           ResturantProfileCubit(_restaurantRepo),
                     ),
+                    BlocProvider<AreaCubit>(create: (_) => AreaCubit()),
                   ],
                   child: const RestaurantBaseScreen(),
                 ));
@@ -146,8 +147,15 @@ class AppRouter {
                 ));
       case deliveryBaseScreen:
         return MaterialPageRoute(
-            builder: (_) => BlocProvider<DeliveryProfileCubit>(
-                  create: (context) => DeliveryProfileCubit(_deliveryRepo),
+            builder: (_) => MultiBlocProvider(
+                  providers: [
+                    BlocProvider<DeliveryProfileCubit>(
+                      create: (context) => DeliveryProfileCubit(_deliveryRepo),
+                    ),
+                    BlocProvider<AreaCubit>(
+                      create: (context) => AreaCubit(),
+                    ),
+                  ],
                   child: const DeliveryBaseScreen(),
                 ));
       case deliveryLoginRoute:

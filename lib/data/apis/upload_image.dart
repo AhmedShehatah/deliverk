@@ -18,9 +18,8 @@ class UploadImage {
       response = await _dio.post('/upload', data: formData);
       _log.d(response);
       return response.data;
-    } catch (e) {
-      _log.d(e);
-      return e;
+    } on DioError catch (e) {
+      return e.response!.data;
     }
   }
 }

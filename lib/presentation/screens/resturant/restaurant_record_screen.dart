@@ -1,4 +1,6 @@
+import 'package:deliverk/business_logic/delivery/cubit/delivery_profile_cubit.dart';
 import 'package:deliverk/presentation/widgets/restaurant/empty_orders.dart';
+import 'package:deliverk/repos/delivery/delivery_repo.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logger/logger.dart';
 
@@ -68,7 +70,10 @@ class _RestaurantRecordScreenState extends State<RestaurantRecordScreen> {
             padding: EdgeInsets.zero,
             itemBuilder: (context, index) {
               if (index < orders.length) {
-                return RecordItemModel(orders[index]);
+                return BlocProvider<DeliveryProfileCubit>(
+                  create: (context) => DeliveryProfileCubit(DeliveryRepo()),
+                  child: RecordItemModel(orders[index]),
+                );
               } else {
                 return _loadingIndicator();
               }
@@ -101,7 +106,9 @@ class _RestaurantRecordScreenState extends State<RestaurantRecordScreen> {
   }
 
   Future<void> refresh(BuildContext context) async {
-    BlocProvider.of<RestaurantCurrentOrdersCubit>(context)
-        .loadOrders(status: OrderType.received.name, isPaid: true);
+    var provider = BlocProvider.of<RestaurantCurrentOrdersCubit>(context);
+    provider.page = 1;
+    orders.clear();
+    provider.loadOrders(status: OrderType.received.name, isPaid: true);
   }
 }

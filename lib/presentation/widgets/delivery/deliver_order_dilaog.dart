@@ -65,7 +65,7 @@ class _DeliveryOrderDetialsDialogState
                     _mapRow("مكان المطعم", "اظهر على الخريطة"),
                     _rowData("كود الطلب", widget.order.id!.toString()),
                     _rowData(
-                        "تكلفة التوصيل", widget.order.areaCost!.toString()),
+                        "تكلفة التوصيل", widget.order.delvCash!.toString()),
                     _rowData("منطقة التوصيل", widget.areaName),
                     if (widget.order.notes != null)
                       _rowData('ملاحظات', widget.order.notes!),

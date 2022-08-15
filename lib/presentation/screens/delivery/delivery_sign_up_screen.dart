@@ -148,10 +148,8 @@ class _DeliverySignUpScreenState extends State<DeliverySignUpScreen> {
         if (state is SuccessState) {
           _data['nat_img'] = state.imageUrl;
         } else if (state is FailedState) {
-          setState(() {
-            _deliveryId = null;
-            Logger().d('id');
-          });
+          _deliveryId = null;
+
           Fluttertoast.showToast(msg: 'اعد اخيار الصورة');
         }
         return Directionality(
@@ -170,7 +168,7 @@ class _DeliverySignUpScreenState extends State<DeliverySignUpScreen> {
             },
             child: (!_isUploadedId && _deliveryId == null)
                 ? const Text("ارفق صورة البطاقة")
-                : _isUploadedId
+                : _isUploadedId && _deliveryId != null
                     ? buildUploadedState("تم ارفاق صورة البطاقة بنجاح",
                         Colors.green, Icons.check)
                     : buildUploadedState(
@@ -188,10 +186,8 @@ class _DeliverySignUpScreenState extends State<DeliverySignUpScreen> {
         if (state is SuccessState) {
           _data['delv_lic_img'] = state.imageUrl;
         } else if (state is FailedState) {
-          setState(() {
-            _deliveryDrivingLicene = null;
-            Logger().d('driving licence');
-          });
+          _deliveryDrivingLicene = null;
+
           Fluttertoast.showToast(msg: 'اعد اخيار الصورة');
         }
         return Directionality(
@@ -229,10 +225,8 @@ class _DeliverySignUpScreenState extends State<DeliverySignUpScreen> {
         if (state is SuccessState) {
           _data['veh_lic_img'] = state.imageUrl;
         } else if (state is FailedState) {
-          setState(() {
-            _drivierMotorLicence = null;
-            Logger().d('photo');
-          });
+          _drivierMotorLicence = null;
+
           Fluttertoast.showToast(msg: 'اعد اخيار الصورة');
         }
         return SizedBox(
@@ -284,10 +278,8 @@ class _DeliverySignUpScreenState extends State<DeliverySignUpScreen> {
         if (state is SuccessState) {
           _data['avatar'] = state.imageUrl;
         } else if (state is FailedState) {
-          setState(() {
-            _deliveryPhoto = null;
-            Logger().d('photo');
-          });
+          _deliveryPhoto = null;
+
           Fluttertoast.showToast(msg: 'اعد اخيار الصورة');
         }
         return Container(
@@ -298,6 +290,7 @@ class _DeliverySignUpScreenState extends State<DeliverySignUpScreen> {
                 setState(() {
                   if (file == null) return;
                   _deliveryPhoto = File(file.path);
+                  Logger().d(_deliveryPhoto);
                   _imageProvider.uploadImage(_deliveryPhoto!);
                 });
               });
@@ -362,7 +355,8 @@ class _DeliverySignUpScreenState extends State<DeliverySignUpScreen> {
               log.d(_deliveryNameController.text);
               log.d(_deliveryPhoneNumberContoller.text);
               log.d(_passwordController.text);
-
+              log.d(_checker());
+              log.d(_data);
               if (_checker() &&
                   _data['avatar'] != null &&
                   _data['nat_img'] != null &&

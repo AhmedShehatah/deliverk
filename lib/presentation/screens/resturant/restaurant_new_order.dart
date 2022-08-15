@@ -285,6 +285,7 @@ class _RestaurantNewOrderState extends State<RestaurantNewOrder> {
         areas[key] = {'cost': value['cost']!, 'id': value['id']!};
         _places.add(key);
       });
+
       setState(() {});
 
       Logger().d(areas);

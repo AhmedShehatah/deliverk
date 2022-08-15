@@ -156,7 +156,7 @@ class _ResturantSignUpScreenState extends State<ResturantSignUpScreen> {
                         return buildSignUpButton();
                       } else if (state is FailedState) {
                         Logger().d(state.message);
-                        Fluttertoast.showToast(msg: 'فشل سجيل الدخول');
+                        Fluttertoast.showToast(msg: state.message);
                         return buildSignUpButton();
                       } else {
                         return buildSignUpButton();
