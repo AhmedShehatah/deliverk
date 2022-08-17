@@ -90,4 +90,18 @@ class DeliveryApis {
       return e.response!.data;
     }
   }
+
+  Future<dynamic> online(bool status) async {
+    try {
+      Response response;
+      response = await _dio.patch('/deliveries/online',
+          data: {'online': status},
+          options: Options(headers: {
+            'Authorization': "Bearer ${DeliverkSharedPreferences.getToken()}"
+          }));
+      return response.data;
+    } on DioError catch (e) {
+      return e.response!.data;
+    }
+  }
 }

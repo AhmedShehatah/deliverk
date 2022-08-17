@@ -1,4 +1,6 @@
+import 'package:deliverk/data/apis/delivery_apis.dart';
 import 'package:deliverk/data/models/common/area_model.dart';
+import 'package:logger/logger.dart';
 
 import 'data/models/restaurant/restaurant_model.dart';
 import 'helpers/shared_preferences.dart';
@@ -14,6 +16,7 @@ Future main() async {
   Hive.registerAdapter(RestaurantModelAdapter());
   Hive.registerAdapter(AreaModelAdapter());
   await Hive.initFlutter();
+
   try {
     await Hive.box('areas').clear();
     await Hive.box('area_price').clear();
@@ -55,6 +58,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance!.addObserver(this);
+    if (DeliverkSharedPreferences.getDelivId() != null) {
+      DeliveryApis().online(true);
+    }
   }
 
   @override
@@ -67,5 +73,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   // ignore: unnecessary_overrides
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.detached) {
+      Logger().d('message');
+    }
   }
 }

@@ -2,9 +2,12 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:deliverk/business_logic/common/state/generic_state.dart';
+import 'package:deliverk/business_logic/delivery/cubit/delivery_online_cubit.dart';
 import 'package:deliverk/business_logic/delivery/cubit/delivery_profile_cubit.dart';
 import 'package:deliverk/data/models/delivery/delivery_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:logger/logger.dart';
 
 import 'package:url_launcher/url_launcher.dart';
 
@@ -22,6 +25,7 @@ class DeliveryProfileScreen extends StatefulWidget {
 }
 
 class _DeliveryProfileScreenState extends State<DeliveryProfileScreen> {
+  DeliveryModel info = DeliveryModel();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,7 +36,8 @@ class _DeliveryProfileScreenState extends State<DeliveryProfileScreen> {
             child: BlocBuilder<DeliveryProfileCubit, GenericState>(
               builder: (context, state) {
                 if (state is GenericSuccessState) {
-                  var info = DeliveryModel.fromJson(state.data);
+                  info = DeliveryModel.fromJson(state.data);
+                  _isActive = info.online!;
                   return Column(
                     children: [
                       _buildHeader(info.avatar!),
@@ -70,6 +75,7 @@ class _DeliveryProfileScreenState extends State<DeliveryProfileScreen> {
     }
   }
 
+  bool? _isActive;
   Widget _buildProfileInfo(BuildContext context, String name, String phone) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 30),
@@ -79,6 +85,31 @@ class _DeliveryProfileScreenState extends State<DeliveryProfileScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                BlocBuilder<DeliveryOnlineCubit, GenericState>(
+                    builder: ((context, state) {
+                  if (state is GenericSuccessState) {
+                    Logger().d(state.data);
+                    _isActive = state.data;
+                  } else if (state is GenericLoadingState) {
+                    return const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: CircularProgressIndicator(color: Colors.blue),
+                    );
+                  }
+                  return Switch(
+                    value: _isActive!,
+                    onChanged: (value) {
+                      BlocProvider.of<DeliveryOnlineCubit>(context)
+                          .online(value);
+                    },
+                  );
+                })),
+                const Text('نشط'),
+              ],
+            ),
             _buildInfoTexts("الاسم", name),
             const Divider(),
             _buildInfoTexts("رقم التلفون", phone),

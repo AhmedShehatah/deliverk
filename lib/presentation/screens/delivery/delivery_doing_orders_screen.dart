@@ -6,6 +6,7 @@ import 'package:deliverk/presentation/widgets/restaurant/empty_orders.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:logger/logger.dart';
 
 import '../../../business_logic/delivery/cubit/delivery_orders_cubit.dart';
 
@@ -92,15 +93,17 @@ class _DeliveryDoingOrderScreenState extends State<DeliveryDoingOrderScreen> {
               itemBuilder: (BuildContext context, int index) {
                 if (index < orders.length) {
                   return BlocListener<RefreshCubit, RefreshState>(
-                    listener: (context, state) {
-                      refresh();
-                    },
-                    child: BlocProvider<ResturantProfileCubit>(
-                      create: (context) =>
-                          ResturantProfileCubit(RestaurantRepo()),
-                      child: DeliveryCurrentOrderModel(orders[index], true),
-                    ),
-                  );
+                      listener: (_, state) {
+                        if (state is Refresh) {
+                          Logger().d('refreshed');
+                          refresh();
+                        }
+                      },
+                      child: BlocProvider<ResturantProfileCubit>(
+                        create: (context) =>
+                            ResturantProfileCubit(RestaurantRepo()),
+                        child: DeliveryCurrentOrderModel(orders[index], true),
+                      ));
                 } else {
                   return _loadingIndicator();
                 }

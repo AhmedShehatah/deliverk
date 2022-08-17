@@ -9,6 +9,7 @@ import 'package:deliverk/repos/delivery/delivery_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
+import 'package:logger/logger.dart';
 
 import 'deliver_order_dilaog.dart';
 
@@ -42,11 +43,12 @@ class _DeliveryCurrentOrderModelState extends State<DeliveryCurrentOrderModel> {
                       create: (context) => PatchOrderCubit(DeliveryRepo()),
                       child: DeliveryOrderDetialsDialog(
                           widget.order, model, areaName, widget.isDelivering),
-                    ));
-          }).then((value) {
-            if (value == true) {
-              BlocProvider.of<RefreshCubit>(context).refresh();
-            }
+                    )).then((value) {
+              Logger().d("this is value: $value");
+              if (value == true) {
+                BlocProvider.of<RefreshCubit>(context, listen: false).refresh();
+              }
+            });
           });
         }
       },

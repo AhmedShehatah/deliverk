@@ -137,7 +137,7 @@ class _RestaurantNewOrderState extends State<RestaurantNewOrder> {
                   builder: (context, state) {
                     if (state is GenericSuccessState) {
                       Fluttertoast.showToast(msg: 'تم اضافة الطلب بنجاح');
-                      Navigator.pop(context);
+                      Navigator.of(context).maybePop();
                     } else if (state is GenericLoadingState) {
                       return const CircularProgressIndicator(
                         color: Colors.blue,

@@ -6,10 +6,12 @@ import 'package:deliverk/constants/enums.dart';
 import 'package:deliverk/data/models/common/order_model.dart';
 import 'package:deliverk/data/models/delivery/delivery_model.dart';
 import 'package:deliverk/data/models/restaurant/restaurant_model.dart';
+import 'package:deliverk/helpers/time_cal.dart';
 import 'package:deliverk/helpers/trans.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+
 import 'package:shimmer/shimmer.dart';
 
 import '../../../business_logic/common/cubit/patch_order_cubit.dart';
@@ -26,6 +28,7 @@ class OrderDetailsDialog extends StatelessWidget {
       BlocProvider.of<DeliveryProfileCubit>(context)
           .getProfileData(order.delvId);
     }
+
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Dialog(
@@ -59,6 +62,14 @@ class OrderDetailsDialog extends StatelessWidget {
                       cells: <DataCell>[
                         const DataCell(Text('كود الطلب')),
                         DataCell(Text(order.id.toString())),
+                      ],
+                    ),
+                    DataRow(
+                      cells: <DataCell>[
+                        const DataCell(Text('تاريخ الطلب')),
+                        DataCell(Text("منذ " +
+                            TimeCalc().calcTime(order.createdAt!).toString() +
+                            " دقيقة")),
                       ],
                     ),
                     DataRow(

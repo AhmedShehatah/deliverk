@@ -47,7 +47,7 @@ class _RestaurantOrdersScreenState extends State<RestaurantOrdersScreen> {
 
   Widget _buildOrders(BuildContext context) {
     return NestedScrollView(
-      floatHeaderSlivers: false,
+      floatHeaderSlivers: true,
       headerSliverBuilder: (_, innerBoxIsScrolled) => [
         const SliverAppBar(
           pinned: true,
@@ -173,28 +173,31 @@ class _RestaurantOrdersScreenState extends State<RestaurantOrdersScreen> {
             ),
           ),
           onPressed: () {
-            Navigator.pushAndRemoveUntil<dynamic>(
-              context,
-              MaterialPageRoute<dynamic>(
-                builder: (BuildContext context) => MultiBlocProvider(
-                  providers: [
-                    BlocProvider<SpinnerCubit>(
-                      create: (context) => SpinnerCubit(),
-                    ),
-                    BlocProvider<NewOrderCubit>(
-                      create: (context) => NewOrderCubit(RestaurantRepo()),
-                    ),
-                  ],
-                  child: const RestaurantNewOrder(),
-                ),
-              ),
-              (route) =>
-                  true, //if you want to disable back feature set to false
-            ).then((value) => refresh(context));
+            navigate();
           },
         ),
       ),
     );
+  }
+
+  void navigate() {
+    Navigator.pushAndRemoveUntil<dynamic>(
+      context,
+      MaterialPageRoute<dynamic>(
+        builder: (BuildContext context) => MultiBlocProvider(
+          providers: [
+            BlocProvider<SpinnerCubit>(
+              create: (context) => SpinnerCubit(),
+            ),
+            BlocProvider<NewOrderCubit>(
+              create: (context) => NewOrderCubit(RestaurantRepo()),
+            ),
+          ],
+          child: const RestaurantNewOrder(),
+        ),
+      ),
+      (route) => true,
+    ).then((value) => refresh(context));
   }
 
   @override

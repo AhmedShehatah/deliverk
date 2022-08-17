@@ -114,15 +114,30 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
                           double.parse(_profileData.mapLong!)));
                 },
                 child: _buildInfoTexts("العنوان على الخريطة", "اضغط للعرض")),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(primary: Colors.red),
-              onPressed: () {
-                logout();
-              },
-              child: const Text(
-                "تسجيل خروج",
-                style: TextStyle(color: Colors.white),
-              ),
+            Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(primary: Colors.red),
+                  onPressed: () {
+                    logout();
+                  },
+                  child: const Text(
+                    "تسجيل خروج",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    openwhatsapp();
+                  },
+                  child: const Text(
+                    "تواصل معنا",
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

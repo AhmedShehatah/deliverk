@@ -1,6 +1,7 @@
 import 'package:deliverk/business_logic/common/cubit/area_cubit.dart';
 import 'package:deliverk/business_logic/common/cubit/refresh_cubit.dart';
 import 'package:deliverk/business_logic/common/state/generic_state.dart';
+import 'package:deliverk/business_logic/delivery/cubit/delivery_online_cubit.dart';
 import 'package:deliverk/business_logic/delivery/cubit/delivery_orders_cubit.dart';
 import 'package:deliverk/business_logic/delivery/cubit/delivery_profile_cubit.dart';
 import 'package:deliverk/business_logic/delivery/cubit/delivery_zone_orders_cubit.dart';
@@ -142,7 +143,10 @@ class _DeliveryBaseScreenState extends State<DeliveryBaseScreen> {
           BlocProvider<DeliveryProfileCubit>(
             create: (context) => DeliveryProfileCubit(DeliveryRepo()),
           ),
-          BlocProvider<RefreshCubit>(create: (_) => RefreshCubit())
+          BlocProvider<RefreshCubit>(create: (_) => RefreshCubit()),
+          BlocProvider<DeliveryOnlineCubit>(
+            create: (_) => DeliveryOnlineCubit(DeliveryRepo()),
+          )
         ],
         child: DeliveryProfileScreen(
           context: context,

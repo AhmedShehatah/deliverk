@@ -19,4 +19,6 @@ class DeliveryRepo {
 
   Future<dynamic> deleteOrder(int orderId) async => _api.deleteOrder(orderId);
   Future<dynamic> getProflieData(int id) async => _api.getDeliveryProfile(id);
+
+  Future<dynamic> online(bool status) async => _api.online(status);
 }
