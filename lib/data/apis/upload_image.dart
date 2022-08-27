@@ -1,8 +1,9 @@
 import 'dart:io';
 
-import 'api_settings.dart';
 import 'package:dio/dio.dart';
 import 'package:logger/logger.dart';
+
+import 'api_settings.dart';
 
 class UploadImage {
   final Dio _dio = ApiSettings().dio;

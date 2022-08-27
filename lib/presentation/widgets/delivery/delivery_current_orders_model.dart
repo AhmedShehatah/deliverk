@@ -1,23 +1,25 @@
-import 'package:deliverk/business_logic/common/cubit/patch_order_cubit.dart';
-import 'package:deliverk/business_logic/common/cubit/refresh_cubit.dart';
-import 'package:deliverk/business_logic/common/state/generic_state.dart';
-import 'package:deliverk/business_logic/restaurant/cubit/restaurant_profile_cubit.dart';
-import 'package:deliverk/data/models/restaurant/restaurant_model.dart';
-import 'package:deliverk/helpers/trans.dart';
-import 'package:deliverk/presentation/widgets/common/shimmer_widget.dart';
-import 'package:deliverk/repos/delivery/delivery_repo.dart';
+import '../../../business_logic/common/cubit/patch_order_cubit.dart';
+import '../../../business_logic/common/cubit/refresh_cubit.dart';
+import '../../../business_logic/common/state/generic_state.dart';
+import '../../../business_logic/restaurant/cubit/restaurant_profile_cubit.dart';
+import '../../../data/models/restaurant/restaurant_model.dart';
+import '../../../helpers/trans.dart';
+import '../common/shimmer_widget.dart';
+import '../../../repos/delivery/delivery_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
-import 'package:logger/logger.dart';
 
 import 'deliver_order_dilaog.dart';
 
 class DeliveryCurrentOrderModel extends StatefulWidget {
-  const DeliveryCurrentOrderModel(this.order, this.isDelivering, {Key? key})
+  const DeliveryCurrentOrderModel(
+      this.order, this.isDelivering, this.firstFetch,
+      {Key? key})
       : super(key: key);
   final dynamic order;
   final bool isDelivering;
+  final bool firstFetch;
   @override
   State<DeliveryCurrentOrderModel> createState() =>
       _DeliveryCurrentOrderModelState();
@@ -44,7 +46,6 @@ class _DeliveryCurrentOrderModelState extends State<DeliveryCurrentOrderModel> {
                       child: DeliveryOrderDetialsDialog(
                           widget.order, model, areaName, widget.isDelivering),
                     )).then((value) {
-              Logger().d("this is value: $value");
               if (value == true) {
                 BlocProvider.of<RefreshCubit>(context, listen: false).refresh();
               }
@@ -81,14 +82,12 @@ class _DeliveryCurrentOrderModelState extends State<DeliveryCurrentOrderModel> {
                         width: 10,
                       ),
                       _buildDetials(restData.address!, restData.name!),
-                      const Spacer(),
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        height: double.infinity,
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
                         child: Text(widget.order.cost == null
                             ? 'مدفوع'
                             : widget.order.cost.toString() + "ج.م"),
-                      )
+                      ),
                     ],
                   ),
                 ),
@@ -138,7 +137,7 @@ class _DeliveryCurrentOrderModelState extends State<DeliveryCurrentOrderModel> {
           ),
         ),
         SizedBox(
-          width: 200,
+          width: 150,
           child: FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerRight,

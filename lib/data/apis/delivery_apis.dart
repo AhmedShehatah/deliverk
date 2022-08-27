@@ -1,4 +1,6 @@
-import 'package:deliverk/helpers/shared_preferences.dart';
+import '../../constants/enums.dart';
+import '../../helpers/shared_preferences.dart';
+import 'package:logger/logger.dart';
 
 import 'api_settings.dart';
 import '../models/common/login_model.dart';
@@ -12,7 +14,7 @@ class DeliveryApis {
     try {
       var data = LoginModel(phone: phone, password: password).toJson();
 
-      response = await _dio.post('/deliveries/login', data: data);
+      response = await _dio.post('/delivery/login', data: data);
       return response.data;
     } on DioError catch (e) {
       return e.response!.data;
@@ -22,7 +24,7 @@ class DeliveryApis {
   Future<dynamic> signUp(Map<String, dynamic> data) async {
     Response response;
     try {
-      response = await _dio.post('/deliveries/register', data: data);
+      response = await _dio.post('/delivery/register', data: data);
       return response.data;
     } on DioError catch (e) {
       return e.response!.data;
@@ -30,11 +32,13 @@ class DeliveryApis {
   }
 
   Future<dynamic> getZonesOrders(
-      int zoneId, Map<String, dynamic> querys) async {
+    int zoneId,
+  ) async {
     Response response;
     try {
-      response =
-          await _dio.get('/zones/$zoneId/orders?', queryParameters: querys);
+      response = await _dio.get('/zones/$zoneId/orders/all?', queryParameters: {
+        'status': OrderType.pending.name,
+      });
       return response.data;
     } on DioError catch (e) {
       return e.response!.data;
@@ -45,8 +49,13 @@ class DeliveryApis {
     Response response;
     try {
       response = await _dio.get(
-        '/deliveries/$delivId/orders?',
+        '/delivery/orders?',
         queryParameters: querys,
+        options: Options(
+          headers: {
+            'Authorization': "Bearer ${DeliverkSharedPreferences.getToken()}"
+          },
+        ),
       );
       return response.data;
     } on DioError catch (e) {
@@ -54,16 +63,21 @@ class DeliveryApis {
     }
   }
 
-  Future<dynamic> patchOrder(int orderId, Map<String, dynamic> data) async {
+// delivery /order/orderId/booking
+
+// restaurant
+  Future<dynamic> patchOrder(int orderId, Map<String, dynamic> data,
+      {String? booking}) async {
     Response response;
     try {
-      response = await _dio.patch('/orders/$orderId',
+      response = await _dio.patch('/order/$orderId' + (booking ?? ""),
           data: data,
           options: Options(headers: {
             'Authorization': "Bearer ${DeliverkSharedPreferences.getToken()}"
           }));
       return response.data;
     } on DioError catch (e) {
+      Logger().d(e.response!.data);
       return e.response!.data;
     }
   }
@@ -71,7 +85,7 @@ class DeliveryApis {
   Future<dynamic> deleteOrder(int orderId) async {
     Response response;
     try {
-      response = await _dio.delete('/orders/$orderId',
+      response = await _dio.delete('/order/$orderId',
           options: Options(headers: {
             'Authorization': "Bearer ${DeliverkSharedPreferences.getToken()}"
           }));
@@ -84,7 +98,14 @@ class DeliveryApis {
   Future<dynamic> getDeliveryProfile(int id) async {
     Response response;
     try {
-      response = await _dio.get('/deliveries/$id');
+      response = await _dio.get(
+        '/delivery/$id',
+        options: Options(
+          headers: {
+            'Authorization': "Bearer ${DeliverkSharedPreferences.getToken()}"
+          },
+        ),
+      );
       return response.data;
     } on DioError catch (e) {
       return e.response!.data;
@@ -94,7 +115,7 @@ class DeliveryApis {
   Future<dynamic> online(bool status) async {
     try {
       Response response;
-      response = await _dio.patch('/deliveries/online',
+      response = await _dio.patch('/delivery/online',
           data: {'online': status},
           options: Options(headers: {
             'Authorization': "Bearer ${DeliverkSharedPreferences.getToken()}"

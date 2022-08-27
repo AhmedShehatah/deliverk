@@ -1,5 +1,5 @@
-import 'package:deliverk/business_logic/common/state/generic_state.dart';
-import 'package:deliverk/business_logic/restaurant/cubit/restaurant_profile_cubit.dart';
+import '../../../business_logic/common/state/generic_state.dart';
+import '../../../business_logic/restaurant/cubit/restaurant_profile_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
@@ -53,7 +53,7 @@ class DeliveryUnpaidOrdersModel extends StatelessWidget {
               ),
             ),
             title: Text(restData.name!),
-            subtitle: Text(order.cost.toString()),
+            subtitle: Text(order.cost.toString() + "ج.م"),
           ),
         ),
       ),

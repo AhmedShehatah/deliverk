@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
-import 'package:deliverk/business_logic/common/state/generic_state.dart';
-import 'package:deliverk/repos/delivery/delivery_repo.dart';
+import '../../common/state/generic_state.dart';
+import '../../../repos/delivery/delivery_repo.dart';
 import 'package:dio/dio.dart';
 import 'package:logger/logger.dart';
 

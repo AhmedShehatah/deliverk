@@ -1,4 +1,4 @@
-import 'package:deliverk/business_logic/common/state/generic_state.dart';
+import '../state/generic_state.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logger/logger.dart';
@@ -9,10 +9,10 @@ class PatchOrderCubit extends Cubit<GenericState> {
   PatchOrderCubit(this._repo) : super(GenericStateInit());
   final DeliveryRepo _repo;
 
-  void patchOrder(int orderId, Map<String, dynamic> data) {
+  void patchOrder(int orderId, Map<String, dynamic> data, {String? booking}) {
     emit(GenericLoadingState());
     Logger().d(orderId, data);
-    _repo.patchOrder(orderId, data).then((response) {
+    _repo.patchOrder(orderId, data, booking: booking).then((response) {
       if (response['success']) {
         emit(GenericSuccessState(response['data']));
       } else {

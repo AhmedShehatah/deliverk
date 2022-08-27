@@ -1,9 +1,9 @@
-import 'package:deliverk/business_logic/restaurant/state/restaurant_current_orders_state.dart';
+import '../state/restaurant_current_orders_state.dart';
 import 'package:bloc/bloc.dart';
-import 'package:deliverk/data/models/common/order_model.dart';
-import 'package:deliverk/helpers/shared_preferences.dart';
-import 'package:deliverk/repos/restaurant/resturant_repo.dart';
-import 'package:dio/dio.dart';
+import '../../../data/models/common/order_model.dart';
+import '../../../helpers/shared_preferences.dart';
+import '../../../repos/restaurant/resturant_repo.dart';
+
 import 'package:logger/logger.dart';
 
 class RestaurantCurrentOrdersCubit extends Cubit<CurrentOrdersState> {
@@ -17,7 +17,6 @@ class RestaurantCurrentOrdersCubit extends Cubit<CurrentOrdersState> {
 
     final currentState = state;
     var oldOrders = <OrderModel>[];
-
     if (currentState is CurrentOrdersLoaded) {
       oldOrders = currentState.currentOrders;
     }
@@ -32,17 +31,17 @@ class RestaurantCurrentOrdersCubit extends Cubit<CurrentOrdersState> {
     querys['page'] = '$page';
     querys['status'] = status;
     querys['isPaid'] = isPaid;
+    Logger().d(querys);
+
     _repo.getOrders(querys, id).then((response) {
-      if (response is DioError) {
-        Logger().d(response);
-        return;
-      }
       if (response['success']) {
         page++;
         var x = response['data'] as List<dynamic>;
         final orders = (state as CurrentOrdersLoading).oldOrders;
         var list = x.map((e) => OrderModel.fromJson(e)).toList();
+
         orders.addAll(list);
+
         emit(CurrentOrdersLoaded(orders));
       } else {
         emit(CurrentOrdersFailed(response['message']));

@@ -1,6 +1,6 @@
-import 'package:deliverk/business_logic/delivery/cubit/delivery_profile_cubit.dart';
-import 'package:deliverk/presentation/widgets/restaurant/empty_orders.dart';
-import 'package:deliverk/repos/delivery/delivery_repo.dart';
+import '../../../business_logic/delivery/cubit/delivery_profile_cubit.dart';
+import '../../widgets/restaurant/empty_orders.dart';
+import '../../../repos/delivery/delivery_repo.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logger/logger.dart';
 
@@ -56,11 +56,9 @@ class _RestaurantRecordScreenState extends State<RestaurantRecordScreen> {
 
           bool isLoading = false;
           if (state is CurrentOrdersLoading) {
-            _log.d(state.oldOrders);
             orders = state.oldOrders;
             isLoading = true;
           } else if (state is CurrentOrdersLoaded) {
-            _log.d(state.currentOrders);
             orders = state.currentOrders;
           }
           if (orders.isEmpty) return const EmptyOrders();

@@ -1,13 +1,12 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:deliverk/business_logic/common/state/generic_state.dart';
-import 'package:deliverk/business_logic/delivery/cubit/delivery_online_cubit.dart';
-import 'package:deliverk/business_logic/delivery/cubit/delivery_profile_cubit.dart';
-import 'package:deliverk/data/models/delivery/delivery_model.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:logger/logger.dart';
+import '../../../business_logic/common/state/generic_state.dart';
+import '../../../business_logic/delivery/cubit/delivery_online_cubit.dart';
+import '../../../business_logic/delivery/cubit/delivery_profile_cubit.dart';
+import '../../../data/models/delivery/delivery_model.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:url_launcher/url_launcher.dart';
 
@@ -28,15 +27,23 @@ class _DeliveryProfileScreenState extends State<DeliveryProfileScreen> {
   DeliveryModel info = DeliveryModel();
   @override
   Widget build(BuildContext context) {
+    Logger().d('this builds again bro');
+    int? id = DeliverkSharedPreferences.getDelivId();
+    if (id != null) {
+      BlocProvider.of<DeliveryProfileCubit>(context).getProfileData(id);
+    } else {
+      DeliveryBaseScreen.pop(widget.context);
+    }
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: RefreshIndicator(
-            onRefresh: refresh,
+        child: RefreshIndicator(
+          onRefresh: refresh,
+          child: SingleChildScrollView(
             child: BlocBuilder<DeliveryProfileCubit, GenericState>(
               builder: (context, state) {
                 if (state is GenericSuccessState) {
                   info = DeliveryModel.fromJson(state.data);
+
                   _isActive = info.online!;
                   return Column(
                     children: [
@@ -46,7 +53,10 @@ class _DeliveryProfileScreenState extends State<DeliveryProfileScreen> {
                             const EdgeInsets.only(top: 80, right: 30, left: 30),
                         child: const PopupMenuDivider(),
                       ),
-                      _buildMoneyInfo(info.cash),
+                      _buildMoneyInfo(
+                        info.cash,
+                        BlocProvider.of<DeliveryProfileCubit>(context).total,
+                      ),
                       const SizedBox(
                         height: 10,
                       ),
@@ -91,7 +101,6 @@ class _DeliveryProfileScreenState extends State<DeliveryProfileScreen> {
                 BlocBuilder<DeliveryOnlineCubit, GenericState>(
                     builder: ((context, state) {
                   if (state is GenericSuccessState) {
-                    Logger().d(state.data);
                     _isActive = state.data;
                   } else if (state is GenericLoadingState) {
                     return const Padding(
@@ -157,7 +166,7 @@ class _DeliveryProfileScreenState extends State<DeliveryProfileScreen> {
     );
   }
 
-  Widget _buildMoneyInfo(int cost) {
+  Widget _buildMoneyInfo(int cost, int total) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 30),
       elevation: 5,
@@ -177,7 +186,7 @@ class _DeliveryProfileScreenState extends State<DeliveryProfileScreen> {
                 width: 20,
               ),
             ),
-            _buildData("عدد الطلبات", 0, Colors.green),
+            _buildData("عدد الطلبات", total, Colors.green),
           ],
         ),
       ),
@@ -264,34 +273,30 @@ class _DeliveryProfileScreenState extends State<DeliveryProfileScreen> {
 
   @override
   void initState() {
-    int? id = DeliverkSharedPreferences.getDelivId();
-    if (id != null) {
-      BlocProvider.of<DeliveryProfileCubit>(context).getProfileData(id);
-    } else {
-      DeliveryBaseScreen.pop(widget.context);
-    }
     super.initState();
   }
 
   openwhatsapp() async {
     var whatsapp = "+201030773677";
-    var whatsappURlAndroid = "whatsapp://send?phone=" + whatsapp + "&text=";
-    var whatappURLIos = "https://wa.me/$whatsapp?text=${Uri.parse("")}";
+    var whatsappURlAndroid = "whatsapp://send?phone=" + whatsapp;
+    var whatappURLIos = "https://wa.me/$whatsapp";
 
     if (Platform.isIOS) {
       var url = Uri.parse(whatappURLIos);
-      if (await canLaunchUrl(url)) {
-        await launchUrl(url);
-      } else {
-        launchUrl(Uri.parse("tel://" + whatsapp));
-      }
+      await launchUrl(url);
+      // if (await canLaunchUrl(url)) {
+      // } else {
+      //   // launchUrl(Uri.parse("tel://" + whatsapp));
+      // }
     } else {
       var url = Uri.parse(whatsappURlAndroid);
-      if (await canLaunchUrl(url)) {
-        await launchUrl(url);
-      } else {
-        launchUrl(Uri.parse("tel://" + whatsapp));
-      }
+
+      await launchUrl(url);
+      // Logger().d(await canLaunchUrl(url));
+      // if (await canLaunch(whatsappURlAndroid)) {
+      // } else {
+      //   // launchUrl(Uri.parse("tel://" + whatsapp));
+      // }
     }
   }
 }

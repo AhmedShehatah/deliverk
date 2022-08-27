@@ -10,10 +10,12 @@ class DeliveryModel {
   bool? online;
   int? zoneId;
   int? delivId;
+  String? firebase;
 
   DeliveryModel({
     this.name,
     this.phone,
+    this.firebase,
     this.password,
     this.avatar,
     this.natImg,
@@ -37,6 +39,7 @@ class DeliveryModel {
         online: json['online'] as bool?,
         zoneId: json['zone_id'] as int?,
         delivId: json['deliv_id'] as int?,
+        firebase: json['firebase'] as String?,
       );
 
   Map<String, dynamic> toJson() => {
@@ -51,5 +54,6 @@ class DeliveryModel {
         'online': online,
         'zone_id': zoneId,
         'deliv_id': delivId,
+        'firebase': firebase,
       };
 }

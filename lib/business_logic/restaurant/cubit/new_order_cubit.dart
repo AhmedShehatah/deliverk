@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logger/logger.dart';
 
@@ -13,12 +12,6 @@ class NewOrderCubit extends Cubit<GenericState> {
     emit(GenericLoadingState());
 
     repo.addOrder(data, token).then((response) {
-      if (response is DioError) {
-        emit(GenericErrorState());
-        _log.d(response.message);
-        return;
-      }
-
       if (response['success']) {
         emit(GenericSuccessState(response['data']));
         _log.d('success');

@@ -1,9 +1,10 @@
-import 'package:deliverk/business_logic/common/cubit/refresh_cubit.dart';
-import 'package:deliverk/business_logic/common/state/generic_state.dart';
-import 'package:deliverk/business_logic/delivery/cubit/delivery_profile_cubit.dart';
+import '../../../business_logic/common/cubit/refresh_cubit.dart';
+import '../../../business_logic/common/state/generic_state.dart';
+import '../../../business_logic/delivery/cubit/delivery_profile_cubit.dart';
 
-import 'package:deliverk/data/models/common/order_model.dart';
-import 'package:deliverk/data/models/delivery/delivery_model.dart';
+import '../../../data/models/common/order_model.dart';
+import '../../../data/models/delivery/delivery_model.dart';
+import '../../../repos/delivery/delivery_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -70,34 +71,14 @@ class UnpaiedOrdersModel extends StatelessWidget {
                     SizedBox(
                       width: 40,
                       height: 40,
-                      child: BlocBuilder<PatchOrderCubit, GenericState>(
-                        builder: (context, state) {
-                          if (state is GenericSuccessState) {
-                            Fluttertoast.showToast(msg: 'تمت العملية بنجاح');
-                            BlocProvider.of<RefreshCubit>(context,
-                                    listen: false)
-                                .refresh();
-                          } else if (state is GenericLoadingState) {
-                            return const Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: CircularProgressIndicator(
-                                color: Colors.blue,
-                              ),
-                            );
-                          } else if (state is GenericFailureState) {
-                            Fluttertoast.showToast(msg: state.data);
-                          }
-                          return FloatingActionButton(
-                            backgroundColor: Colors.green,
-                            onPressed: () {
-                              BlocProvider.of<PatchOrderCubit>(context)
-                                  .patchOrder(order.id!, {'isPaid': true});
-                            },
-                            child: const Icon(Icons.check),
-                          );
+                      child: FloatingActionButton(
+                        backgroundColor: Colors.green,
+                        onPressed: () {
+                          showAlertDialog(context);
                         },
+                        child: const Icon(Icons.check),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ],
@@ -106,5 +87,64 @@ class UnpaiedOrdersModel extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  showAlertDialog(BuildContext context) {
+    Widget cancelButton = TextButton(
+      child: const Text("لا"),
+      onPressed: () {
+        Navigator.of(context).maybePop();
+      },
+    );
+    Widget continueButton = BlocBuilder<PatchOrderCubit, GenericState>(
+      builder: (context, state) {
+        if (state is GenericSuccessState) {
+          Fluttertoast.showToast(msg: 'تمت العملية بنجاح');
+
+          Navigator.of(context).maybePop(true);
+        } else if (state is GenericLoadingState) {
+          return const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: CircularProgressIndicator(
+              color: Colors.blue,
+            ),
+          );
+        } else if (state is GenericFailureState) {
+          Fluttertoast.showToast(msg: state.data);
+        }
+        return TextButton(
+          child: const Text("نعم"),
+          onPressed: () {
+            BlocProvider.of<PatchOrderCubit>(context)
+                .patchOrder(order.id!, {'isPaid': true});
+          },
+        );
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: const Text("طلب تاكيد"),
+      content: const Text('هل تريد تاكيد الدفع؟'),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return BlocProvider<PatchOrderCubit>(
+          create: (context) => PatchOrderCubit(DeliveryRepo()),
+          child: alert,
+        );
+      },
+    ).then((value) {
+      if (value == true) {
+        BlocProvider.of<RefreshCubit>(context, listen: false).refresh();
+      }
+    });
   }
 }

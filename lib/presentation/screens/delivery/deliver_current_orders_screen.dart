@@ -1,19 +1,18 @@
 import 'dart:async';
 
-import 'package:deliverk/business_logic/common/cubit/patch_order_cubit.dart';
-import 'package:deliverk/business_logic/common/cubit/refresh_cubit.dart';
-import 'package:deliverk/business_logic/common/state/reresh_state.dart';
-import 'package:deliverk/business_logic/delivery/cubit/delivery_zone_orders_cubit.dart';
-import 'package:deliverk/business_logic/delivery/state/delivery_zone_orders_state.dart';
-import 'package:deliverk/business_logic/restaurant/cubit/restaurant_profile_cubit.dart';
-import 'package:deliverk/data/models/delivery/zone_order.dart';
-import 'package:deliverk/presentation/widgets/restaurant/zone_order_model.dart';
-import 'package:deliverk/repos/delivery/delivery_repo.dart';
-import 'package:deliverk/repos/restaurant/resturant_repo.dart';
+import '../../../business_logic/common/cubit/patch_order_cubit.dart';
+import '../../../business_logic/common/cubit/refresh_cubit.dart';
+import '../../../business_logic/common/state/generic_state.dart';
+import '../../../business_logic/common/state/reresh_state.dart';
+import '../../../business_logic/delivery/cubit/delivery_zone_orders_cubit.dart';
+
+import '../../../business_logic/restaurant/cubit/restaurant_profile_cubit.dart';
+import '../../../data/models/delivery/zone_order.dart';
+import '../../widgets/restaurant/zone_order_model.dart';
+import '../../../repos/delivery/delivery_repo.dart';
+import '../../../repos/restaurant/resturant_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../../constants/enums.dart';
 
 import '../../widgets/restaurant/empty_orders.dart';
 
@@ -29,9 +28,11 @@ class _DeliveryCurrentOrdersScreenState
     extends State<DeliveryCurrentOrdersScreen> {
   @override
   Widget build(BuildContext context) {
-    setupScrollController(context);
-    BlocProvider.of<DeliveryZoneOrdersCubit>(context)
-        .loadOrders(status: OrderType.pending.name);
+    // setupScrollController(context);
+    var provider = BlocProvider.of<DeliveryZoneOrdersCubit>(context);
+
+    provider.loadOrders();
+    provider.checkNewOrders();
 
     return Scaffold(
       body: SafeArea(
@@ -45,9 +46,9 @@ class _DeliveryCurrentOrdersScreenState
 
   Future<void> refresh() async {
     final provider = BlocProvider.of<DeliveryZoneOrdersCubit>(context);
-    provider.page = 1;
+
     orders.clear();
-    provider.loadOrders(status: OrderType.pending.name);
+    provider.loadOrders();
   }
 
   Widget _loadingIndicator() {
@@ -73,63 +74,65 @@ class _DeliveryCurrentOrdersScreenState
       ],
       body: RefreshIndicator(
         onRefresh: refresh,
-        child: BlocBuilder<DeliveryZoneOrdersCubit, ZoneOrdersState>(
+        child: BlocBuilder<DeliveryZoneOrdersCubit, GenericState>(
           builder: (context, state) {
-            if (state is ZoneOrdersLoading && state.isFirstFetch) {
+            if (state is GenericLoadingState) {
               return _loadingIndicator();
+            } else if (state is GenericSuccessState) {
+              orders.clear();
+              orders = state.data;
+              if (orders.isEmpty) return const EmptyOrders();
+              return _buildListItem();
+            } else {
+              return const Center(
+                child: Text('حدث خطا ما من فضلك اعد المحاولة'),
+              );
             }
-
-            bool isLoading = false;
-            if (state is ZoneOrdersLoading) {
-              orders = state.oldOrders;
-              isLoading = true;
-            } else if (state is ZoneOrdersLoaded) {
-              orders = state.currentOrders;
-            }
-            if (orders.isEmpty) return const EmptyOrders();
-            return ListView.builder(
-              padding: EdgeInsets.zero,
-              itemBuilder: (BuildContext context, int index) {
-                if (index < orders.length) {
-                  return BlocListener<RefreshCubit, RefreshState>(
-                    listener: (context, state) {
-                      refresh();
-                    },
-                    child: MultiBlocProvider(
-                      providers: [
-                        BlocProvider<ResturantProfileCubit>(
-                          create: (context) =>
-                              ResturantProfileCubit(RestaurantRepo()),
-                        ),
-                        BlocProvider<PatchOrderCubit>(
-                          create: (context) => PatchOrderCubit(DeliveryRepo()),
-                        ),
-                      ],
-                      child: ZoneOrderModel(orders[index]),
-                    ),
-                  );
-                } else {
-                  return _loadingIndicator();
-                }
-              },
-              itemCount: orders.length + (isLoading ? 1 : 0),
-            );
           },
         ),
       ),
     );
   }
 
-  final _scrollController = ScrollController();
-
-  void setupScrollController(context) {
-    _scrollController.addListener(() {
-      if (_scrollController.position.atEdge) {
-        if (_scrollController.position.pixels != 0) {
-          BlocProvider.of<DeliveryZoneOrdersCubit>(context)
-              .loadOrders(status: OrderType.pending.name);
+  Widget _buildListItem() {
+    return ListView.builder(
+      padding: EdgeInsets.zero,
+      itemBuilder: (BuildContext context, int index) {
+        if (index < orders.length) {
+          return BlocListener<RefreshCubit, RefreshState>(
+            listener: (context, state) {
+              refresh();
+            },
+            child: MultiBlocProvider(
+              providers: [
+                BlocProvider<ResturantProfileCubit>(
+                  create: (context) => ResturantProfileCubit(RestaurantRepo()),
+                ),
+                BlocProvider<PatchOrderCubit>(
+                  create: (context) => PatchOrderCubit(DeliveryRepo()),
+                ),
+              ],
+              child: ZoneOrderModel(orders[index]),
+            ),
+          );
+        } else {
+          return _loadingIndicator();
         }
-      }
-    });
+      },
+      itemCount: orders.length,
+    );
   }
+
+  // final _scrollController = ScrollController();
+
+  // void setupScrollController(context) {
+  //   _scrollController.addListener(() {
+  //     if (_scrollController.position.atEdge) {
+  //       if (_scrollController.position.pixels != 0) {
+  //         BlocProvider.of<DeliveryZoneOrdersCubit>(context)
+  //             .loadOrders(status: OrderType.pending.name);
+  //       }
+  //     }
+  //   });
+  // }
 }

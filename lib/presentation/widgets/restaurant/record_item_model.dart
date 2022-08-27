@@ -1,6 +1,7 @@
-import 'package:deliverk/business_logic/common/state/generic_state.dart';
-import 'package:deliverk/data/models/common/order_model.dart';
-import 'package:deliverk/data/models/delivery/delivery_model.dart';
+import '../../../business_logic/common/state/generic_state.dart';
+import '../../../data/models/common/order_model.dart';
+import '../../../data/models/delivery/delivery_model.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
@@ -21,13 +22,13 @@ class _RecordItemModelState extends State<RecordItemModel> {
   @override
   void initState() {
     getAreaName();
+    BlocProvider.of<DeliveryProfileCubit>(context)
+        .getProfileData(widget.order.delvId);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    BlocProvider.of<DeliveryProfileCubit>(context)
-        .getProfileData(widget.order.delvId);
     return BlocBuilder<DeliveryProfileCubit, GenericState>(
       builder: (context, state) {
         if (state is GenericSuccessState) {
@@ -53,12 +54,12 @@ class _RecordItemModelState extends State<RecordItemModel> {
             ),
           );
         } else if (state is GenericLoadingState) {
-          return Directionality(
-            textDirection: TextDirection.rtl,
-            child: Card(
-              child: Shimmer.fromColors(
-                baseColor: Colors.grey,
-                highlightColor: Colors.white,
+          return Shimmer.fromColors(
+            baseColor: Colors.grey,
+            highlightColor: Colors.white,
+            child: Directionality(
+              textDirection: TextDirection.rtl,
+              child: Card(
                 child: ListTile(
                   leading: Container(
                     width: 40.0,

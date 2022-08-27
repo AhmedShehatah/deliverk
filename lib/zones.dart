@@ -1,4 +1,4 @@
-import 'package:deliverk/data/apis/zones_apis.dart';
+import 'data/apis/zones_apis.dart';
 import 'package:hive/hive.dart';
 
 class Zones {

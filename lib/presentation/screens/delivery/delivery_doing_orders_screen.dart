@@ -1,16 +1,14 @@
-import 'package:deliverk/business_logic/common/cubit/refresh_cubit.dart';
-import 'package:deliverk/business_logic/common/state/reresh_state.dart';
+import '../../../business_logic/common/cubit/refresh_cubit.dart';
+import '../../../business_logic/common/state/generic_state.dart';
+import '../../../business_logic/common/state/reresh_state.dart';
+import '../../../business_logic/delivery/cubit/delivery_all_orders_cubit.dart';
 
-import 'package:deliverk/data/models/delivery/zone_order.dart';
-import 'package:deliverk/presentation/widgets/restaurant/empty_orders.dart';
+import '../../../data/models/delivery/zone_order.dart';
+import '../../widgets/restaurant/empty_orders.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logger/logger.dart';
-
-import '../../../business_logic/delivery/cubit/delivery_orders_cubit.dart';
-
-import '../../../business_logic/delivery/state/delivery_order_state.dart';
 
 import '../../../business_logic/restaurant/cubit/restaurant_profile_cubit.dart';
 import '../../../constants/enums.dart';
@@ -30,8 +28,8 @@ class _DeliveryDoingOrderScreenState extends State<DeliveryDoingOrderScreen> {
   @override
   Widget build(BuildContext context) {
     setupScrollController(context);
-    BlocProvider.of<DeliveryOrdersCubit>(context)
-        .loadOrders(status: OrderType.pending.name);
+    var provider = BlocProvider.of<DeliveryAllOrdersCubit>(context);
+    provider.loadOrders(status: OrderType.pending.name);
 
     return Scaffold(
       body: SafeArea(
@@ -44,7 +42,7 @@ class _DeliveryDoingOrderScreenState extends State<DeliveryDoingOrderScreen> {
   List<ZoneOrder> orders = [];
 
   Future<void> refresh() async {
-    final provider = BlocProvider.of<DeliveryOrdersCubit>(context);
+    final provider = BlocProvider.of<DeliveryAllOrdersCubit>(context);
     provider.page = 1;
     orders.clear();
     provider.loadOrders(status: OrderType.pending.name);
@@ -57,6 +55,7 @@ class _DeliveryDoingOrderScreenState extends State<DeliveryDoingOrderScreen> {
     );
   }
 
+  int firstFetch = 0;
   Widget _buildOrders(BuildContext context) {
     return NestedScrollView(
       floatHeaderSlivers: false,
@@ -73,47 +72,55 @@ class _DeliveryDoingOrderScreenState extends State<DeliveryDoingOrderScreen> {
       ],
       body: RefreshIndicator(
         onRefresh: refresh,
-        child: BlocBuilder<DeliveryOrdersCubit, DeliveryOrdersState>(
+        child: BlocBuilder<DeliveryAllOrdersCubit, GenericState>(
           builder: (context, state) {
-            if (state is DeliveryOrdersLoading && state.isFirstFetch) {
+            firstFetch++;
+            if (state is GenericLoadingState) {
               return _loadingIndicator();
+            } else if (state is GenericSuccessState) {
+              orders = state.data;
+              if (orders.isEmpty) return const EmptyOrders();
+              return _buildListItem();
+            } else {
+              return const Center(
+                child: Text('حدث خطأ كما'),
+              );
             }
-
-            bool isLoading = false;
-            if (state is DeliveryOrdersLoading) {
-              orders = state.oldOrders;
-              isLoading = true;
-            } else if (state is DeliveryOrdersLoaded) {
-              orders = state.currentOrders;
-            }
-
-            if (orders.isEmpty) return const EmptyOrders();
-            return ListView.builder(
-              padding: EdgeInsets.zero,
-              itemBuilder: (BuildContext context, int index) {
-                if (index < orders.length) {
-                  return BlocListener<RefreshCubit, RefreshState>(
-                      listener: (_, state) {
-                        if (state is Refresh) {
-                          Logger().d('refreshed');
-                          refresh();
-                        }
-                      },
-                      child: BlocProvider<ResturantProfileCubit>(
-                        create: (context) =>
-                            ResturantProfileCubit(RestaurantRepo()),
-                        child: DeliveryCurrentOrderModel(orders[index], true),
-                      ));
-                } else {
-                  return _loadingIndicator();
-                }
-              },
-              itemCount: orders.length + (isLoading ? 1 : 0),
-            );
           },
         ),
       ),
     );
+  }
+
+  Widget _buildListItem() {
+    return ListView.builder(
+      padding: EdgeInsets.zero,
+      itemBuilder: (BuildContext context, int index) {
+        if (index < orders.length) {
+          return BlocListener<RefreshCubit, RefreshState>(
+              listener: (_, state) {
+                if (state is Refresh) {
+                  Logger().d('refreshed');
+                  refresh();
+                }
+              },
+              child: BlocProvider<ResturantProfileCubit>(
+                create: (context) => ResturantProfileCubit(RestaurantRepo()),
+                child: DeliveryCurrentOrderModel(
+                    orders[index], true, firstFetch == 1),
+              ));
+        } else {
+          return _loadingIndicator();
+        }
+      },
+      itemCount: orders.length,
+    );
+  }
+
+  @override
+  void initState() {
+    BlocProvider.of<DeliveryAllOrdersCubit>(context).update();
+    super.initState();
   }
 
   final _scrollController = ScrollController();
@@ -122,7 +129,7 @@ class _DeliveryDoingOrderScreenState extends State<DeliveryDoingOrderScreen> {
     _scrollController.addListener(() {
       if (_scrollController.position.atEdge) {
         if (_scrollController.position.pixels != 0) {
-          BlocProvider.of<DeliveryOrdersCubit>(context)
+          BlocProvider.of<DeliveryAllOrdersCubit>(context)
               .loadOrders(status: OrderType.pending.name);
         }
       }

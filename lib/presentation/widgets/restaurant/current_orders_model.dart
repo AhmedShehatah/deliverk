@@ -1,11 +1,11 @@
-import 'package:deliverk/business_logic/common/cubit/patch_order_cubit.dart';
-import 'package:deliverk/business_logic/common/cubit/refresh_cubit.dart';
-import 'package:deliverk/business_logic/delivery/cubit/delivery_profile_cubit.dart';
-import 'package:deliverk/data/models/common/order_model.dart';
-import 'package:deliverk/data/models/restaurant/restaurant_model.dart';
-import 'package:deliverk/helpers/trans.dart';
-import 'package:deliverk/presentation/widgets/restaurant/order_details_dialog.dart';
-import 'package:deliverk/repos/delivery/delivery_repo.dart';
+import '../../../business_logic/common/cubit/patch_order_cubit.dart';
+import '../../../business_logic/common/cubit/refresh_cubit.dart';
+import '../../../business_logic/delivery/cubit/delivery_profile_cubit.dart';
+import '../../../data/models/common/order_model.dart';
+import '../../../data/models/restaurant/restaurant_model.dart';
+import '../../../helpers/trans.dart';
+import 'order_details_dialog.dart';
+import '../../../repos/delivery/delivery_repo.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

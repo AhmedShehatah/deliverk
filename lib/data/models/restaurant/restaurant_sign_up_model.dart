@@ -6,6 +6,7 @@ class RestaurantSignUpModel {
   String? mapLong;
   String? name;
   String? phone;
+
   int? zoneId;
   bool? isActive;
 

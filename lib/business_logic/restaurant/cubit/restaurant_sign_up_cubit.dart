@@ -1,8 +1,9 @@
 import 'package:bloc/bloc.dart';
-import '../state/restaurant_sign_up_state.dart';
+import 'package:dio/dio.dart';
+
 import '../../../data/models/restaurant/restaurant_model.dart';
 import '../../../repos/restaurant/resturant_repo.dart';
-import 'package:dio/dio.dart';
+import '../state/restaurant_sign_up_state.dart';
 
 class RestaurantSignUpCubit extends Cubit<RestaurantSignUpState> {
   RestaurantSignUpCubit(this.repo) : super(RestaurantSignUpInitial());

@@ -1,13 +1,14 @@
-import 'package:deliverk/business_logic/common/cubit/area_cubit.dart';
-import 'package:deliverk/business_logic/common/cubit/refresh_cubit.dart';
-import 'package:deliverk/business_logic/common/state/generic_state.dart';
-import 'package:deliverk/business_logic/delivery/cubit/delivery_online_cubit.dart';
-import 'package:deliverk/business_logic/delivery/cubit/delivery_orders_cubit.dart';
-import 'package:deliverk/business_logic/delivery/cubit/delivery_profile_cubit.dart';
-import 'package:deliverk/business_logic/delivery/cubit/delivery_zone_orders_cubit.dart';
+import '../../../business_logic/common/cubit/area_cubit.dart';
+import '../../../business_logic/common/cubit/refresh_cubit.dart';
+import '../../../business_logic/common/state/generic_state.dart';
+import '../../../business_logic/delivery/cubit/delivery_all_orders_cubit.dart';
+import '../../../business_logic/delivery/cubit/delivery_online_cubit.dart';
+import '../../../business_logic/delivery/cubit/delivery_orders_cubit.dart';
+import '../../../business_logic/delivery/cubit/delivery_profile_cubit.dart';
+import '../../../business_logic/delivery/cubit/delivery_zone_orders_cubit.dart';
 
-import 'package:deliverk/helpers/shared_preferences.dart';
-import 'package:deliverk/repos/delivery/delivery_repo.dart';
+import '../../../helpers/shared_preferences.dart';
+import '../../../repos/delivery/delivery_repo.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -69,7 +70,7 @@ class _DeliveryBaseScreenState extends State<DeliveryBaseScreen> {
               onItemSelected: (idx) {},
               handleAndroidBackButtonPress: true,
               resizeToAvoidBottomInset: true,
-              stateManagement: true,
+              stateManagement: false,
               hideNavigationBarWhenKeyboardShows: true,
               decoration: NavBarDecoration(
                 borderRadius: BorderRadius.circular(10.0),
@@ -122,8 +123,8 @@ class _DeliveryBaseScreenState extends State<DeliveryBaseScreen> {
       ),
       MultiBlocProvider(
         providers: [
-          BlocProvider<DeliveryOrdersCubit>(
-            create: (context) => DeliveryOrdersCubit(DeliveryRepo()),
+          BlocProvider<DeliveryAllOrdersCubit>(
+            create: (context) => DeliveryAllOrdersCubit(DeliveryRepo()),
           ),
           BlocProvider<RefreshCubit>(create: (_) => RefreshCubit()),
         ],

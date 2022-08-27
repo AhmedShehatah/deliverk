@@ -1,13 +1,13 @@
-import '../../../business_logic/delivery/cubit/delivery_login_cubit.dart';
-import '../../../business_logic/delivery/state/delivery_login_state.dart';
-import '../../../constants/enums.dart';
-import '../../../constants/strings.dart';
-import '../../widgets/common/text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
+import '../../../business_logic/delivery/cubit/delivery_login_cubit.dart';
+import '../../../business_logic/delivery/state/delivery_login_state.dart';
+import '../../../constants/enums.dart';
+import '../../../constants/strings.dart';
 import '../../../helpers/shared_preferences.dart';
+import '../../widgets/common/text_field.dart';
 
 class DeliveryLoginScreen extends StatelessWidget {
   DeliveryLoginScreen({Key? key}) : super(key: key);
@@ -67,9 +67,11 @@ class DeliveryLoginScreen extends StatelessWidget {
                       });
 
                       return const Text('');
-                    } else {
-                      Fluttertoast.showToast(msg: "فشل تسجيل الدخول");
+                    } else if (state is FailedState) {
+                      Fluttertoast.showToast(msg: state.message);
                       return _buildLoginButton(context);
+                    } else {
+                      return const Text('');
                     }
                   },
                 ),

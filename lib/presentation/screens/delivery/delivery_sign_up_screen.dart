@@ -1,10 +1,16 @@
 import 'dart:io';
 
-import 'package:deliverk/business_logic/common/cubit/upload_image_cubit.dart';
-import 'package:deliverk/business_logic/common/state/generic_state.dart';
-import 'package:deliverk/business_logic/common/state/upload_image_state.dart';
-import 'package:deliverk/business_logic/delivery/cubit/deliver_sign_up_cubit.dart';
-import 'package:deliverk/data/models/delivery/delivery_model.dart';
+import 'package:deliverk/data/apis/upload_image.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:http/http.dart';
+import 'package:progress_dialog/progress_dialog.dart';
+
+import '../../../business_logic/common/cubit/upload_image_cubit.dart';
+import '../../../business_logic/common/state/generic_state.dart';
+import '../../../business_logic/common/state/upload_image_state.dart';
+import '../../../business_logic/delivery/cubit/deliver_sign_up_cubit.dart';
+import '../../../data/models/delivery/delivery_model.dart';
+import '../../../helpers/shared_preferences.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -32,11 +38,11 @@ class _DeliverySignUpScreenState extends State<DeliverySignUpScreen> {
   File? _deliveryDrivingLicene;
   File? _drivierMotorLicence;
   final Map<String, dynamic> _data = {};
-  late UploadImageCubit _imageProvider;
+  // late UploadImageCubit _imageProvider;
   @override
   void initState() {
     super.initState();
-    _imageProvider = BlocProvider.of<UploadImageCubit>(context);
+    // _imageProvider = BlocProvider.of<UploadImageCubit>(context);
   }
 
   @override
@@ -160,7 +166,7 @@ class _DeliverySignUpScreenState extends State<DeliverySignUpScreen> {
                 setState(() {
                   if (file != null) {
                     _deliveryId = File(file.path);
-                    _imageProvider.uploadImage(_deliveryId!);
+                    // _imageProvider.uploadImage(_deliveryId!);
                   }
                   _isUploadedId = true;
                 });
@@ -198,7 +204,7 @@ class _DeliverySignUpScreenState extends State<DeliverySignUpScreen> {
                 setState(() {
                   if (file != null) {
                     _deliveryDrivingLicene = File(file.path);
-                    _imageProvider.uploadImage(_deliveryDrivingLicene!);
+                    // _imageProvider.uploadImage(_deliveryDrivingLicene!);
                   }
                   _isUploadingDrivingLicence = true;
                 });
@@ -239,7 +245,7 @@ class _DeliverySignUpScreenState extends State<DeliverySignUpScreen> {
                   setState(() {
                     if (file != null) {
                       _drivierMotorLicence = File(file.path);
-                      _imageProvider.uploadImage(_drivierMotorLicence!);
+                      // _imageProvider.uploadImage(_drivierMotorLicence!);
                     }
                     _isMotorLicenceUploaded = true;
                   });
@@ -290,8 +296,8 @@ class _DeliverySignUpScreenState extends State<DeliverySignUpScreen> {
                 setState(() {
                   if (file == null) return;
                   _deliveryPhoto = File(file.path);
-                  Logger().d(_deliveryPhoto);
-                  _imageProvider.uploadImage(_deliveryPhoto!);
+                  // Logger().d(_deliveryPhoto);
+                  // _imageProvider.uploadImage(_deliveryPhoto!);
                 });
               });
             },
@@ -349,36 +355,92 @@ class _DeliverySignUpScreenState extends State<DeliverySignUpScreen> {
               const EdgeInsets.only(top: 10, left: 50, right: 50, bottom: 40),
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: () {
-              setState(() {});
-              var log = Logger();
-              log.d(_deliveryNameController.text);
-              log.d(_deliveryPhoneNumberContoller.text);
-              log.d(_passwordController.text);
-              log.d(_checker());
-              log.d(_data);
-              if (_checker() &&
-                  _data['avatar'] != null &&
-                  _data['nat_img'] != null &&
-                  _data['delv_lic_img'] != null &&
-                  _data['veh_lic_img'] != null) {
-                _data['name'] = _deliveryNameController.text;
-                _data['phone'] = _deliveryPhoneNumberContoller.text;
-                _data['password'] = _passwordController.text;
-                _data['zone_id'] = null;
-                _data['online'] = false;
-                Logger().d(_data);
-
-                BlocProvider.of<DeliverySignUpCubit>(context)
-                    .signUp(DeliveryModel.fromJson(_data).toJson());
-              } else {
-                Fluttertoast.showToast(msg: 'ادخل كامل البيانات والصور صحيحة');
-              }
+            onPressed: () async {
+              await doSignUp();
             },
             child: const Text("تسجيل"),
           ),
         );
       },
     );
+  }
+
+  Future<void> doSignUp() async {
+    // if (_checker() &&
+    //     _data['avatar'] != null &&
+    //     _data['nat_img'] != null &&
+    //     _data['delv_lic_img'] != null &&
+    //     _data['veh_lic_img'] != null) {
+    //   _data['name'] = _deliveryNameController.text;
+    //   _data['phone'] = _deliveryPhoneNumberContoller.text;
+    //   _data['password'] = _passwordController.text;
+    //   _data['zone_id'] = null;
+    //   _data['online'] = false;
+    //   _data['firebase'] = DeliverkSharedPreferences.getFirebaseToken();
+    //   Logger().d(_data);
+
+    //   BlocProvider.of<DeliverySignUpCubit>(context)
+    //       .signUp(DeliveryModel.fromJson(_data).toJson());
+    // } else {
+    //   Fluttertoast.showToast(msg: 'ادخل كامل البيانات والصور صحيحة');
+    // }
+
+    final ProgressDialog pr = ProgressDialog(context, isDismissible: false);
+    if (_checker()) {
+      pr.show();
+      // Fluttertoast.showToast(msg: 'من فضلك انتظر قليلا يتم تحميل الصور');
+      await uploadImages();
+      pr.hide();
+      if (allPhotosOk) {
+        Fluttertoast.showToast(msg: 'تم تحميل الصور بنجاح');
+        _data['name'] = _deliveryNameController.text;
+        _data['phone'] = _deliveryPhoneNumberContoller.text;
+        _data['password'] = _passwordController.text;
+        _data['zone_id'] = null;
+        _data['online'] = false;
+        if (DeliverkSharedPreferences.getFirebaseToken() == null) {
+          var token = await FirebaseMessaging.instance.getToken();
+          DeliverkSharedPreferences.setFirebaseToken(token!);
+          _data['firebase'] = DeliverkSharedPreferences.getFirebaseToken();
+        } else {
+          _data['firebase'] = DeliverkSharedPreferences.getFirebaseToken();
+        }
+        Logger().d(_data);
+
+        BlocProvider.of<DeliverySignUpCubit>(context)
+            .signUp(DeliveryModel.fromJson(_data).toJson());
+      } else {
+        Fluttertoast.showToast(msg: 'تعذر تحميل الصور');
+      }
+    } else {
+      Fluttertoast.showToast(msg: 'ادخل كامل البيانات والصور صحيحة');
+    }
+  }
+
+  bool allPhotosOk = true;
+  Future<void> uploadImages() async {
+    if (_deliveryPhoto != null &&
+        _deliveryDrivingLicene != null &&
+        _deliveryId != null &&
+        _drivierMotorLicence != null) {
+      await imageTemp(_deliveryPhoto!, 'avatar');
+
+      await imageTemp(_deliveryDrivingLicene!, 'delv_lic_img');
+      await imageTemp(_deliveryId!, 'nat_img');
+      await imageTemp(_drivierMotorLicence!, 'veh_lic_img');
+    } else {
+      Fluttertoast.showToast(msg: 'من فضلك ارفق جميع الصور');
+    }
+  }
+
+  Future<void> imageTemp(File image, String path) async {
+    await UploadImage().uploadImage(image).then((response) {
+      if (response['success']) {
+        _data[path] = response['url'] as String;
+      } else {
+        Fluttertoast.showToast(msg: 'فشل تحميل الصور');
+        allPhotosOk = false;
+      }
+    });
   }
 }

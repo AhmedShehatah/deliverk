@@ -1,5 +1,6 @@
-import 'package:deliverk/data/models/restaurant/restaurant_model.dart';
 import 'package:hive/hive.dart';
+
+import '../data/models/restaurant/restaurant_model.dart';
 
 class Boxes {
   static Box<RestaurantModel> getRestData() =>

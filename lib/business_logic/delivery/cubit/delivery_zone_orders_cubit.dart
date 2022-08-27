@@ -1,51 +1,47 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
+import '../../common/state/generic_state.dart';
+import '../../../data/models/delivery/zone_order.dart';
+import '../../../helpers/shared_preferences.dart';
+import '../../../repos/delivery/delivery_repo.dart';
+import 'package:flutter/widgets.dart';
 
-import 'package:deliverk/data/models/delivery/zone_order.dart';
-import 'package:deliverk/helpers/shared_preferences.dart';
-// import 'package:deliverk/helpers/shared_preferences.dart';
-import 'package:deliverk/repos/delivery/delivery_repo.dart';
-import 'package:dio/dio.dart';
-import 'package:logger/logger.dart';
+class DeliveryZoneOrdersCubit extends Cubit<GenericState> {
+  DeliveryZoneOrdersCubit(this._repo) : super(GenericStateInit());
 
-import '../state/delivery_zone_orders_state.dart';
-
-class DeliveryZoneOrdersCubit extends Cubit<ZoneOrdersState> {
-  DeliveryZoneOrdersCubit(this._repo) : super(ZoneOrdersInit());
-
-  int page = 1;
   final DeliveryRepo _repo;
 
-  void loadOrders({String? status, bool? isPaid}) {
-    if (state is ZoneOrdersLoading) return;
-    final currentState = state;
-    var oldOrders = <ZoneOrder>[];
-
-    if (currentState is ZoneOrdersLoaded) {
-      oldOrders = currentState.currentOrders;
-    }
-    emit(ZoneOrdersLoading(oldOrders, isFirstFetch: page == 1));
-
-    Map<String, dynamic> querys = {};
-    querys['page'] = '$page';
-    querys['status'] = status;
-
+  void loadOrders() {
+    emit(GenericLoadingState());
     _repo
-        .getZoneOrders(DeliverkSharedPreferences.getZoneId()!, querys)
+        .getZoneOrders(DeliverkSharedPreferences.getZoneId()!)
         .then((response) {
-      if (response is DioError) {
-        Logger().d(response);
-        return;
-      }
       if (response['success']) {
-        page++;
-        var x = response['data'] as List<dynamic>;
-        final orders = (state as ZoneOrdersLoading).oldOrders;
-        var list = x.map((e) => ZoneOrder.fromJson(e)).toList();
-        orders.addAll(list);
-        emit(ZoneOrdersLoaded(orders));
+        var data = (response['data'] as List<dynamic>)
+            .map((e) => ZoneOrder.fromJson(e))
+            .toList();
+
+        emit(GenericSuccessState(data));
       } else {
-        emit(ZoneOrdersFailed(response['message']));
+        emit(GenericFailureState(response['message']));
       }
+    });
+  }
+
+  void checkNewOrders() {
+    Timer.periodic(const Duration(seconds: 5), (timer) {
+      _repo
+          .getZoneOrders(DeliverkSharedPreferences.getZoneId()!)
+          .then((response) {
+        if (response['success']) {
+          var data = (response['data'] as List<dynamic>)
+              .map((e) => ZoneOrder.fromJson(e))
+              .toList();
+
+          emit(GenericSuccessState(data));
+        }
+      });
     });
   }
 }

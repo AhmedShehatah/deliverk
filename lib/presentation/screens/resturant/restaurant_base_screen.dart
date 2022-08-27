@@ -1,10 +1,12 @@
-import 'package:deliverk/areas.dart';
-import 'package:deliverk/business_logic/common/cubit/area_cubit.dart';
-import 'package:deliverk/business_logic/common/cubit/refresh_cubit.dart';
-import 'package:deliverk/business_logic/common/state/generic_state.dart';
-import 'package:deliverk/business_logic/restaurant/cubit/restaurants_current_orders_cubit.dart';
-import 'package:deliverk/presentation/screens/common/map_show_screen.dart';
-import 'package:deliverk/repos/restaurant/resturant_repo.dart';
+import '../../../areas.dart';
+import '../../../business_logic/common/cubit/area_cubit.dart';
+import '../../../business_logic/common/cubit/refresh_cubit.dart';
+import '../../../business_logic/common/state/generic_state.dart';
+import '../../../business_logic/restaurant/cubit/all_orders_cubit.dart';
+import '../../../business_logic/restaurant/cubit/restaurants_current_orders_cubit.dart';
+import '../common/map_show_screen.dart';
+
+import '../../../repos/restaurant/resturant_repo.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -82,13 +84,15 @@ class _RestaurantBaseScreenState extends State<RestaurantBaseScreen> {
               backgroundColor: Colors.white,
               handleAndroidBackButtonPress: true,
               resizeToAvoidBottomInset: true,
-              stateManagement: true,
+              stateManagement: false,
               hideNavigationBarWhenKeyboardShows: true,
               decoration: NavBarDecoration(
                 borderRadius: BorderRadius.circular(10.0),
                 colorBehindNavBar: Colors.white,
               ),
-              popAllScreensOnTapOfSelectedTab: false,
+              onItemSelected: (index) {
+                setState(() {});
+              },
               itemAnimationProperties: const ItemAnimationProperties(
                 duration: Duration(milliseconds: 200),
                 curve: Curves.ease,
@@ -124,8 +128,8 @@ class _RestaurantBaseScreenState extends State<RestaurantBaseScreen> {
     return [
       MultiBlocProvider(
         providers: [
-          BlocProvider<RestaurantCurrentOrdersCubit>(
-            create: (context) => RestaurantCurrentOrdersCubit(RestaurantRepo()),
+          BlocProvider<AllOrdersCubit>(
+            create: (context) => AllOrdersCubit(RestaurantRepo()),
           ),
           BlocProvider<ResturantProfileCubit>(
             create: (context) => ResturantProfileCubit(RestaurantRepo()),

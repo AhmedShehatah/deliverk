@@ -1,13 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:deliverk/business_logic/common/state/generic_state.dart';
-import 'package:deliverk/business_logic/delivery/cubit/delivery_profile_cubit.dart';
+import '../../../business_logic/common/state/generic_state.dart';
+import '../../../business_logic/delivery/cubit/delivery_profile_cubit.dart';
 
-import 'package:deliverk/constants/enums.dart';
-import 'package:deliverk/data/models/common/order_model.dart';
-import 'package:deliverk/data/models/delivery/delivery_model.dart';
-import 'package:deliverk/data/models/restaurant/restaurant_model.dart';
-import 'package:deliverk/helpers/time_cal.dart';
-import 'package:deliverk/helpers/trans.dart';
+import '../../../constants/enums.dart';
+import '../../../data/models/common/order_model.dart';
+import '../../../data/models/delivery/delivery_model.dart';
+import '../../../data/models/restaurant/restaurant_model.dart';
+import '../../../helpers/time_cal.dart';
+import '../../../helpers/trans.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -68,7 +68,7 @@ class OrderDetailsDialog extends StatelessWidget {
                       cells: <DataCell>[
                         const DataCell(Text('تاريخ الطلب')),
                         DataCell(Text("منذ " +
-                            TimeCalc().calcTime(order.createdAt!).toString() +
+                            TimeCalc.calcTime(order.createdAt!).toString() +
                             " دقيقة")),
                       ],
                     ),

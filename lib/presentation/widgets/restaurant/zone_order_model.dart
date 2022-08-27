@@ -1,7 +1,7 @@
-import 'package:deliverk/business_logic/common/cubit/patch_order_cubit.dart';
-import 'package:deliverk/business_logic/common/state/generic_state.dart';
-import 'package:deliverk/constants/enums.dart';
-import 'package:deliverk/data/models/delivery/zone_order.dart';
+import '../../../business_logic/common/cubit/patch_order_cubit.dart';
+import '../../../business_logic/common/state/generic_state.dart';
+import '../../../constants/enums.dart';
+import '../../../data/models/delivery/zone_order.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -68,7 +68,11 @@ class _ZoneOrderModelState extends State<ZoneOrderModel> {
                 child: const Text('قبول'),
                 onPressed: () {
                   BlocProvider.of<PatchOrderCubit>(context).patchOrder(
-                      widget.order.id!, {'status': OrderType.coming.name});
+                      widget.order.id!,
+                      {
+                        'status': OrderType.coming.name,
+                      },
+                      booking: "/booking");
                 },
               );
             },

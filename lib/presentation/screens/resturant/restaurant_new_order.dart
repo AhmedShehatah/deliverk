@@ -1,7 +1,7 @@
-import 'package:deliverk/business_logic/common/state/generic_state.dart';
-import 'package:deliverk/business_logic/restaurant/cubit/new_order_cubit.dart';
-import 'package:deliverk/data/models/common/order_model.dart';
-import 'package:deliverk/helpers/shared_preferences.dart';
+import '../../../business_logic/common/state/generic_state.dart';
+import '../../../business_logic/restaurant/cubit/new_order_cubit.dart';
+import '../../../data/models/common/order_model.dart';
+import '../../../helpers/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:hive/hive.dart';
@@ -80,7 +80,7 @@ class _RestaurantNewOrderState extends State<RestaurantNewOrder> {
               children: [
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: Text('طلب للمطعم'),
+                  child: Text('طلب للمحل'),
                 ),
                 Switch(
                     value: _isForRest,
@@ -315,6 +315,9 @@ class _RestaurantNewOrderState extends State<RestaurantNewOrder> {
             ? int.parse(_priceController.text)
             : null;
       Logger().d(order.toJson());
+      Logger().d(
+        DeliverkSharedPreferences.getToken()!,
+      );
       BlocProvider.of<NewOrderCubit>(context).addOrder(
         order.toJson(),
         DeliverkSharedPreferences.getToken()!,

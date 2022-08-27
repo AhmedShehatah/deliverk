@@ -1,3 +1,7 @@
+import '../../constants/enums.dart';
+import '../../helpers/shared_preferences.dart';
+import 'package:logger/logger.dart';
+
 import 'api_settings.dart';
 import '../models/common/login_model.dart';
 
@@ -10,7 +14,7 @@ class RestaurantApis {
     Response response;
     try {
       var data = LoginModel(phone: phone, password: password).toJson();
-      response = await _dio.post('/restaurants/login', data: data);
+      response = await _dio.post('/restaurant/login', data: data);
       return response.data;
     } on DioError catch (e) {
       return e.response!.data;
@@ -20,7 +24,7 @@ class RestaurantApis {
   Future<dynamic> signUp(Map<String, dynamic> data) async {
     Response response;
     try {
-      response = await _dio.post('/restaurants/register', data: data);
+      response = await _dio.post('/restaurant/register', data: data);
       return response.data;
     } on DioError catch (e) {
       return e.response!.data;
@@ -30,7 +34,14 @@ class RestaurantApis {
   Future<dynamic> getProfileData(int id) async {
     Response response;
     try {
-      response = await _dio.get('/restaurants/$id');
+      response = await _dio.get(
+        '/restaurant/$id',
+        options: Options(
+          headers: {
+            'Authorization': "Bearer ${DeliverkSharedPreferences.getToken()}"
+          },
+        ),
+      );
 
       return response.data;
     } on DioError catch (e) {
@@ -42,8 +53,15 @@ class RestaurantApis {
     Response response;
 
     try {
-      response =
-          await _dio.get('/restaurants/$id/orders?', queryParameters: querys);
+      response = await _dio.get(
+        '/restaurant/orders?',
+        queryParameters: querys,
+        options: Options(
+          headers: {
+            'Authorization': "Bearer ${DeliverkSharedPreferences.getToken()}"
+          },
+        ),
+      );
 
       return response.data;
     } on DioError catch (e) {
@@ -51,17 +69,38 @@ class RestaurantApis {
     }
   }
 
+  Future<dynamic> getOrdersAll() async {
+    Response response;
+
+    try {
+      response = await _dio.get(
+        '/restaurant/orders/all?',
+        queryParameters: {'status': OrderType.pending.name},
+        options: Options(
+          headers: {
+            'Authorization': "Bearer ${DeliverkSharedPreferences.getToken()}"
+          },
+        ),
+      );
+
+      return response.data;
+    } on DioError catch (e) {
+      Logger().d(e.error);
+      return e.response!.data;
+    }
+  }
+
   Future<dynamic> addOrder(Map<String, dynamic> data, String token) async {
     Response response;
     try {
-      _dio.options.headers['authorization'] = "Bearer $token";
       response = await _dio.post(
-        '/orders',
+        '/order/',
         data: data,
         options: Options(headers: {'Authorization': "Bearer $token"}),
       );
       return response.data;
     } on DioError catch (e) {
+      Logger().d(e.response!.data);
       return e.response!.data;
     }
   }

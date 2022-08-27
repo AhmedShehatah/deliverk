@@ -1,5 +1,5 @@
-import 'package:deliverk/data/apis/area_api.dart';
-import 'package:deliverk/helpers/shared_preferences.dart';
+import 'data/apis/area_api.dart';
+import 'helpers/shared_preferences.dart';
 
 import 'package:hive/hive.dart';
 import 'package:logger/logger.dart';

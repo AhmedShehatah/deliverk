@@ -1,12 +1,10 @@
-import 'package:deliverk/business_logic/common/cubit/refresh_cubit.dart';
-import 'package:deliverk/business_logic/common/state/reresh_state.dart';
-import 'package:deliverk/business_logic/restaurant/cubit/restaurant_profile_cubit.dart';
-import 'package:deliverk/presentation/widgets/restaurant/empty_orders.dart';
-import 'package:deliverk/repos/restaurant/resturant_repo.dart';
+import '../../../business_logic/common/cubit/refresh_cubit.dart';
+import '../../../business_logic/common/state/reresh_state.dart';
+import '../../../business_logic/restaurant/cubit/restaurant_profile_cubit.dart';
+import '../../widgets/restaurant/empty_orders.dart';
+import '../../../repos/restaurant/resturant_repo.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import '../../../business_logic/delivery/cubit/delivery_orders_cubit.dart';
-import '../../../business_logic/delivery/cubit/delivery_zone_orders_cubit.dart';
 import '../../../business_logic/delivery/state/delivery_order_state.dart';
 import '../../../constants/enums.dart';
 
@@ -27,8 +25,7 @@ class _DeliveryUnpaidOrdersScreenState
   @override
   Widget build(BuildContext context) {
     setupScrollController(context);
-    BlocProvider.of<DeliveryOrdersCubit>(context)
-        .loadOrders(status: OrderType.received.name, isPaid: false);
+    BlocProvider.of<DeliveryOrdersCubit>(context).loadOrders(isPaid: false);
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: refresh,
@@ -101,7 +98,7 @@ class _DeliveryUnpaidOrdersScreenState
     final provider = BlocProvider.of<DeliveryOrdersCubit>(context);
     provider.page = 1;
     orders.clear();
-    provider.loadOrders(status: OrderType.received.name, isPaid: false);
+    provider.loadOrders(isPaid: false);
   }
 
   Widget _loadingIndicator() {
@@ -117,8 +114,8 @@ class _DeliveryUnpaidOrdersScreenState
     _scrollController.addListener(() {
       if (_scrollController.position.atEdge) {
         if (_scrollController.position.pixels != 0) {
-          BlocProvider.of<DeliveryZoneOrdersCubit>(context)
-              .loadOrders(status: OrderType.received.name, isPaid: false);
+          BlocProvider.of<DeliveryOrdersCubit>(context)
+              .loadOrders(isPaid: false);
         }
       }
     });

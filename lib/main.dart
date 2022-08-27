@@ -1,6 +1,7 @@
-import 'package:deliverk/data/apis/delivery_apis.dart';
-import 'package:deliverk/data/models/common/area_model.dart';
-import 'package:logger/logger.dart';
+import 'data/models/common/area_model.dart';
+import 'helpers/firebase_notification_handler.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'data/models/restaurant/restaurant_model.dart';
 import 'helpers/shared_preferences.dart';
@@ -13,6 +14,8 @@ import 'helpers/app_routers.dart';
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await DeliverkSharedPreferences.init();
+  await Firebase.initializeApp();
+  FirebaseMessaging.onBackgroundMessage(_backgroundHandler);
   Hive.registerAdapter(RestaurantModelAdapter());
   Hive.registerAdapter(AreaModelAdapter());
   await Hive.initFlutter();
@@ -28,6 +31,12 @@ Future main() async {
   ]).then((value) => runApp(const MyApp()));
 
   runApp(const MyApp());
+}
+
+Future<void> _backgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  dynamic data = message.data['data'];
+  FirebaseNotifications.showNotification(data['title'], data['body']);
 }
 
 class MyApp extends StatefulWidget {
@@ -57,12 +66,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance!.addObserver(this);
-    if (DeliverkSharedPreferences.getDelivId() != null) {
-      DeliveryApis().online(true);
-    }
+    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+      firebaseNotifications.setUp(context);
+    });
   }
 
+  FirebaseNotifications firebaseNotifications = FirebaseNotifications();
   @override
   void dispose() {
     super.dispose();
@@ -73,9 +84,5 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   // ignore: unnecessary_overrides
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-
-    if (state == AppLifecycleState.detached) {
-      Logger().d('message');
-    }
   }
 }

@@ -1,11 +1,12 @@
-import 'package:deliverk/business_logic/common/cubit/patch_order_cubit.dart';
-import 'package:deliverk/business_logic/common/state/generic_state.dart';
-import 'package:deliverk/constants/enums.dart';
+import '../../../business_logic/common/cubit/patch_order_cubit.dart';
+import '../../../business_logic/common/state/generic_state.dart';
+import '../../../constants/enums.dart';
 
-import 'package:deliverk/constants/strings.dart';
-import 'package:deliverk/data/models/delivery/zone_order.dart';
+import '../../../constants/strings.dart';
+import '../../../data/models/delivery/zone_order.dart';
 
-import 'package:deliverk/data/models/restaurant/restaurant_model.dart';
+import '../../../data/models/restaurant/restaurant_model.dart';
+import '../../../helpers/time_cal.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -62,6 +63,8 @@ class _DeliveryOrderDetialsDialogState
                     _rowData(" اسم المطعم", widget.restData.name!),
                     _rowData("مكان المطعم", widget.restData.address!),
                     _rowData('رقم المطعم', widget.restData.phone!),
+                    _rowData('تاريخ الطلب',
+                        TimeCalc.calcTime(widget.order.createdAt!).toString()),
                     _mapRow("مكان المطعم", "اظهر على الخريطة"),
                     _rowData("كود الطلب", widget.order.id!.toString()),
                     _rowData(
@@ -189,7 +192,8 @@ class _DeliveryOrderDetialsDialogState
               return ElevatedButton(
                 onPressed: () {
                   BlocProvider.of<PatchOrderCubit>(context).patchOrder(
-                      widget.order.id!, {'status': OrderType.received.name});
+                      widget.order.id!, {'status': OrderType.received.name},
+                      booking: "/booking");
                 },
                 child: const Text('تم التوصيل'),
                 style: ElevatedButton.styleFrom(primary: Colors.green),

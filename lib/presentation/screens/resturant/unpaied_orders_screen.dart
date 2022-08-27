@@ -1,17 +1,16 @@
-import 'package:deliverk/business_logic/common/cubit/patch_order_cubit.dart';
-import 'package:deliverk/business_logic/common/cubit/refresh_cubit.dart';
-import 'package:deliverk/business_logic/common/state/reresh_state.dart';
-import 'package:deliverk/business_logic/delivery/cubit/delivery_profile_cubit.dart';
-import 'package:deliverk/data/models/common/order_model.dart';
-import 'package:deliverk/presentation/widgets/restaurant/empty_orders.dart';
-import 'package:deliverk/repos/delivery/delivery_repo.dart';
+import '../../../business_logic/common/cubit/patch_order_cubit.dart';
+import '../../../business_logic/common/cubit/refresh_cubit.dart';
+import '../../../business_logic/common/state/reresh_state.dart';
+import '../../../business_logic/delivery/cubit/delivery_profile_cubit.dart';
+import '../../../data/models/common/order_model.dart';
+import '../../widgets/restaurant/empty_orders.dart';
+import '../../../repos/delivery/delivery_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../business_logic/restaurant/cubit/restaurants_current_orders_cubit.dart';
 import '../../../business_logic/restaurant/state/restaurant_current_orders_state.dart';
 
-import '../../../constants/enums.dart';
 import '../../widgets/restaurant/unpaied_orders_model.dart';
 
 // ignore: must_be_immutable
@@ -22,7 +21,7 @@ class UnpaiedOrdersScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     setupScrollController(context);
     BlocProvider.of<RestaurantCurrentOrdersCubit>(context)
-        .loadOrders(isPaid: false, status: OrderType.received.name);
+        .loadOrders(isPaid: false);
     return Scaffold(
       body: SafeArea(
         child: RefreshIndicator(
@@ -37,7 +36,7 @@ class UnpaiedOrdersScreen extends StatelessWidget {
     final provider = BlocProvider.of<RestaurantCurrentOrdersCubit>(context);
     provider.page = 1;
     orders.clear();
-    provider.loadOrders(status: OrderType.received.name, isPaid: false);
+    provider.loadOrders(isPaid: false);
   }
 
   Widget _buildOrders(BuildContext context) {
@@ -69,12 +68,17 @@ class UnpaiedOrdersScreen extends StatelessWidget {
           }
 
           bool isLoading = false;
+          orders.clear();
           if (state is CurrentOrdersLoading) {
             orders = state.oldOrders;
             isLoading = true;
           } else if (state is CurrentOrdersLoaded) {
             orders = state.currentOrders;
           }
+
+          orders
+              .where((element) => (element.delvId != null && !element.isPaid!))
+              .toList();
           if (orders.isEmpty) return const EmptyOrders();
 
           return GridView.builder(
@@ -129,7 +133,7 @@ class UnpaiedOrdersScreen extends StatelessWidget {
       if (_scrollController.position.atEdge) {
         if (_scrollController.position.pixels != 0) {
           BlocProvider.of<RestaurantCurrentOrdersCubit>(context)
-              .loadOrders(status: OrderType.received.name, isPaid: false);
+              .loadOrders(isPaid: false);
         }
       }
     });

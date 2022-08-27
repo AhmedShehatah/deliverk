@@ -1,4 +1,4 @@
-import 'package:deliverk/data/models/delivery/zone_order.dart';
+import '../../../data/models/delivery/zone_order.dart';
 // import 'package:logger/logger.dart';
 
 abstract class ZoneOrdersState {}

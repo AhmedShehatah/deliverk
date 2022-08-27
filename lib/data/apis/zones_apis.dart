@@ -1,4 +1,4 @@
-import 'package:deliverk/data/apis/api_settings.dart';
+import 'api_settings.dart';
 import 'package:dio/dio.dart';
 
 class ZoneApi {

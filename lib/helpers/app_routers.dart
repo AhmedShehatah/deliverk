@@ -1,8 +1,8 @@
-import 'package:deliverk/business_logic/common/cubit/area_cubit.dart';
-import 'package:deliverk/business_logic/delivery/cubit/deliver_sign_up_cubit.dart';
-import 'package:deliverk/business_logic/delivery/cubit/delivery_profile_cubit.dart';
-import 'package:deliverk/business_logic/restaurant/cubit/new_order_cubit.dart';
-import 'package:deliverk/presentation/screens/common/map_show_screen.dart';
+import '../business_logic/common/cubit/area_cubit.dart';
+import '../business_logic/delivery/cubit/deliver_sign_up_cubit.dart';
+import '../business_logic/delivery/cubit/delivery_profile_cubit.dart';
+import '../business_logic/restaurant/cubit/new_order_cubit.dart';
+import '../presentation/screens/common/map_show_screen.dart';
 
 import '../business_logic/common/cubit/spinner_cubit.dart';
 import '../business_logic/common/cubit/upload_image_cubit.dart';

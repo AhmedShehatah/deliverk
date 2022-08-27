@@ -7,6 +7,7 @@ class DeliverkSharedPreferences {
   static const String _resId = "restId";
   static const String _delivId = "delivId";
   static const String _zoneId = "zoneId";
+  static const String _firebaseToken = "firebaseToken";
 
   static Future init() async =>
       _preferences = await SharedPreferences.getInstance();
@@ -36,4 +37,7 @@ class DeliverkSharedPreferences {
   static Future setDeliveryId(int delivId) async =>
       _preferences.setInt(_delivId, delivId);
   static int? getDelivId() => _preferences.getInt(_delivId);
+  static Future setFirebaseToken(String token) async =>
+      _preferences.setString(_firebaseToken, token);
+  static String? getFirebaseToken() => _preferences.getString(_firebaseToken);
 }

@@ -1,4 +1,4 @@
-import 'package:deliverk/data/models/common/order_model.dart';
+import '../../../data/models/common/order_model.dart';
 
 abstract class CurrentOrdersState {}
 

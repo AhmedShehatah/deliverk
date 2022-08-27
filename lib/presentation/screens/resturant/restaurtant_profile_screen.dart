@@ -1,13 +1,14 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:deliverk/business_logic/common/state/generic_state.dart';
+import '../../../business_logic/common/state/generic_state.dart';
 
-import 'package:deliverk/data/models/restaurant/restaurant_model.dart';
+import '../../../data/models/restaurant/restaurant_model.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:logger/logger.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../business_logic/restaurant/cubit/restaurant_profile_cubit.dart';
@@ -30,6 +31,14 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
   RestaurantModel _profileData = RestaurantModel();
   @override
   Widget build(BuildContext context) {
+    int? id = DeliverkSharedPreferences.getRestId();
+    Logger().d('build from proifle');
+    if (id != null) {
+      BlocProvider.of<ResturantProfileCubit>(context).getProfileData(id);
+    } else {
+      RestaurantBaseScreen.pop(widget.context);
+    }
+
     return Scaffold(
         body: RefreshIndicator(
       onRefresh: refresh,
@@ -194,7 +203,10 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
                 width: 20,
               ),
             ),
-            _buildData("عدد الطلبات", 0, Colors.green),
+            _buildData(
+                "عدد الطلبات",
+                BlocProvider.of<ResturantProfileCubit>(context).total,
+                Colors.green),
           ],
         ),
       ),
@@ -279,14 +291,6 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
 
   @override
   void initState() {
-    int? id = DeliverkSharedPreferences.getRestId();
-
-    if (id != null) {
-      BlocProvider.of<ResturantProfileCubit>(context).getProfileData(id);
-    } else {
-      RestaurantBaseScreen.pop(widget.context);
-    }
-
     super.initState();
   }
 
@@ -302,18 +306,18 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
 
     if (Platform.isIOS) {
       var url = Uri.parse(whatappURLIos);
-      if (await canLaunchUrl(url)) {
-        await launchUrl(url);
-      } else {
-        launchUrl(Uri.parse("tel://" + whatsapp));
-      }
+      await launchUrl(url);
+      // if (await canLaunchUrl(url)) {
+      // } else {
+      //   launchUrl(Uri.parse("tel://" + whatsapp));
+      // }
     } else {
       var url = Uri.parse(whatsappURlAndroid);
-      if (await canLaunchUrl(url)) {
-        await launchUrl(url);
-      } else {
-        launchUrl(Uri.parse("tel://" + whatsapp));
-      }
+      await launchUrl(url);
+      // if (await canLaunchUrl(url)) {
+      // } else {
+      //   launchUrl(Uri.parse("tel://" + whatsapp));
+      // }
     }
   }
 }

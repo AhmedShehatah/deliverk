@@ -1,5 +1,7 @@
-import 'package:deliverk/data/apis/api_settings.dart';
+import 'api_settings.dart';
 import 'package:dio/dio.dart';
+
+import '../../helpers/shared_preferences.dart';
 
 class AreaApi {
   final Dio _dio = ApiSettings().dio;
@@ -18,7 +20,14 @@ class AreaApi {
   Future<dynamic> getRestAreas(int restId) async {
     Response response;
     try {
-      response = await _dio.get('/restaurants/$restId/areas');
+      response = await _dio.get(
+        '/restaurant/areas',
+        options: Options(
+          headers: {
+            'Authorization': "Bearer ${DeliverkSharedPreferences.getToken()}"
+          },
+        ),
+      );
       return response.data;
     } on DioError catch (e) {
       return e.response!.data;

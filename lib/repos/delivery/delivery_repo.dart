@@ -8,14 +8,14 @@ class DeliveryRepo {
 
   Future<dynamic> signUp(Map<String, dynamic> data) async => _api.signUp(data);
 
-  Future<dynamic> getZoneOrders(
-          int zoneId, Map<String, dynamic> querys) async =>
-      _api.getZonesOrders(zoneId, querys);
+  Future<dynamic> getZoneOrders(int zoneId) async =>
+      _api.getZonesOrders(zoneId);
 
   Future<dynamic> getOrders(int delivId, Map<String, dynamic> querys) async =>
       _api.getOrders(delivId, querys);
-  Future<dynamic> patchOrder(int orderId, Map<String, dynamic> data) async =>
-      _api.patchOrder(orderId, data);
+  Future<dynamic> patchOrder(int orderId, Map<String, dynamic> data,
+          {String? booking}) async =>
+      _api.patchOrder(orderId, data, booking: booking);
 
   Future<dynamic> deleteOrder(int orderId) async => _api.deleteOrder(orderId);
   Future<dynamic> getProflieData(int id) async => _api.getDeliveryProfile(id);

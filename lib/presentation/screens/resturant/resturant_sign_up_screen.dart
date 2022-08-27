@@ -1,13 +1,10 @@
 import 'dart:async';
 import 'dart:io';
-
-import 'package:deliverk/business_logic/common/cubit/spinner_cubit.dart';
-import 'package:deliverk/zones.dart';
+import '../../../business_logic/common/cubit/spinner_cubit.dart';
+import '../../../zones.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-
 import '../../../business_logic/common/cubit/upload_image_cubit.dart';
 import '../../../business_logic/restaurant/cubit/restaurant_sign_up_cubit.dart';
-
 import '../../../data/models/restaurant/restaurant_sign_up_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -261,6 +258,7 @@ class _ResturantSignUpScreenState extends State<ResturantSignUpScreen> {
     model.name = _restName.text;
     model.address = _restPlaceInDetials.text;
     model.isActive = true;
+
     model.mapLat = _location?.latitude.toString();
     model.mapLong = _location?.longitude.toString();
     model.password = _passwordController.text;
