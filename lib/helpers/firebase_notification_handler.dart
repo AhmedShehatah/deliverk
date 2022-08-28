@@ -32,7 +32,8 @@ class FirebaseNotifications {
 
     _messaging!.getToken().then((token) {
       DeliverkSharedPreferences.setFirebaseToken(token!);
-      Logger().d("Show me Token $token");
+      Logger()
+          .d("Show me Token ${DeliverkSharedPreferences.getFirebaseToken()}");
     });
     _messaging!
         .subscribeToTopic('message')

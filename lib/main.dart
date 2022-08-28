@@ -2,7 +2,6 @@ import 'data/models/common/area_model.dart';
 import 'helpers/firebase_notification_handler.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-
 import 'data/models/restaurant/restaurant_model.dart';
 import 'helpers/shared_preferences.dart';
 import 'package:flutter/material.dart';
@@ -66,7 +65,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-
     WidgetsBinding.instance!.addObserver(this);
     WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
       firebaseNotifications.setUp(context);
