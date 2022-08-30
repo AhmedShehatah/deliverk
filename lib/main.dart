@@ -66,12 +66,12 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance!.addObserver(this);
-    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
-      firebaseNotifications.setUp(context);
-    });
+    // WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+    //   firebaseNotifications.setUp(context);
+    // });
   }
 
-  FirebaseNotifications firebaseNotifications = FirebaseNotifications();
+  // FirebaseNotifications firebaseNotifications = FirebaseNotifications();
   @override
   void dispose() {
     super.dispose();

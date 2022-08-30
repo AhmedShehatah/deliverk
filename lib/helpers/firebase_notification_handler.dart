@@ -15,6 +15,7 @@ class FirebaseNotifications {
   void setUp(BuildContext context) {
     _messaging = FirebaseMessaging.instance;
     NotificationHandler.initNotification(context);
+    Logger().d('here');
     firebaseCloudMessagingListener(context);
     myContext = context;
   }
@@ -32,12 +33,18 @@ class FirebaseNotifications {
 
     _messaging!.getToken().then((token) {
       DeliverkSharedPreferences.setFirebaseToken(token!);
-      Logger()
-          .d("Show me Token ${DeliverkSharedPreferences.getFirebaseToken()}");
     });
-    _messaging!
-        .subscribeToTopic('message')
-        .whenComplete(() => Logger().d('subcirbe ok'));
+    if (DeliverkSharedPreferences.getDelivId() != null &&
+        DeliverkSharedPreferences.getZoneId() != null) {
+      _messaging!
+          .subscribeToTopic(DeliverkSharedPreferences.getZoneId().toString());
+
+      _messaging!.subscribeToTopic(
+          'deliv_id_${DeliverkSharedPreferences.getDelivId()}');
+    } else if (DeliverkSharedPreferences.getRestId() != null) {
+      _messaging!
+          .subscribeToTopic('rest_id_${DeliverkSharedPreferences.getRestId()}');
+    }
 
     FirebaseMessaging.onMessage.listen((remoteMessage) {
       Logger().d('received this message: $remoteMessage');
@@ -75,12 +82,12 @@ class FirebaseNotifications {
 
   static void showNotification(title, body) async {
     const androidChannel = AndroidNotificationDetails(
-      'com.shehatah.deliverk',
+      'com.ahmed.shehatah.deliverk',
       'new order',
-      autoCancel: false,
+      autoCancel: true,
       ongoing: true,
       importance: Importance.max,
-      priority: Priority.high,
+      priority: Priority.max,
       icon: '@mipmap/ic_launcher',
     );
     const iOS = IOSNotificationDetails();

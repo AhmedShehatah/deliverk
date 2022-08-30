@@ -1,8 +1,12 @@
+import 'package:deliverk/presentation/screens/delivery/delivery_base_screen.dart';
+import 'package:deliverk/repos/delivery/delivery_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
+import '../../../business_logic/common/cubit/area_cubit.dart';
 import '../../../business_logic/delivery/cubit/delivery_login_cubit.dart';
+import '../../../business_logic/delivery/cubit/delivery_profile_cubit.dart';
 import '../../../business_logic/delivery/state/delivery_login_state.dart';
 import '../../../constants/enums.dart';
 import '../../../constants/strings.dart';
@@ -59,9 +63,26 @@ class DeliveryLoginScreen extends StatelessWidget {
                         DeliverkSharedPreferences.setZoneId(state.zoneId);
                         DeliverkSharedPreferences.setUserType(
                             UserType.delivery.name);
-                        Navigator.popAndPushNamed(
+                        Navigator.pushAndRemoveUntil<dynamic>(
                           context,
-                          deliveryBaseScreen,
+                          MaterialPageRoute<dynamic>(
+                              builder: (BuildContext context) =>
+                                  MultiBlocProvider(
+                                    providers: [
+                                      BlocProvider<DeliveryProfileCubit>(
+                                        create: (context) =>
+                                            DeliveryProfileCubit(
+                                                DeliveryRepo()),
+                                      ),
+                                      BlocProvider<AreaCubit>(
+                                        create: (context) => AreaCubit(),
+                                      ),
+                                    ],
+                                    child: const DeliveryBaseScreen(),
+                                  )),
+
+                          (route) =>
+                              false, //if you want to disable back feature set to false
                         );
                         Fluttertoast.showToast(msg: "تم تسجيل الدخول بنجاح");
                       });

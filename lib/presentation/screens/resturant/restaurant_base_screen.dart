@@ -4,6 +4,7 @@ import '../../../business_logic/common/cubit/refresh_cubit.dart';
 import '../../../business_logic/common/state/generic_state.dart';
 import '../../../business_logic/restaurant/cubit/all_orders_cubit.dart';
 import '../../../business_logic/restaurant/cubit/restaurants_current_orders_cubit.dart';
+import '../../../helpers/firebase_notification_handler.dart';
 import '../common/map_show_screen.dart';
 
 import '../../../repos/restaurant/resturant_repo.dart';
@@ -197,9 +198,11 @@ class _RestaurantBaseScreenState extends State<RestaurantBaseScreen> {
     ];
   }
 
+  FirebaseNotifications firebaseNotifications = FirebaseNotifications();
   @override
   void initState() {
     var id = DeliverkSharedPreferences.getRestId();
+    firebaseNotifications.setUp(context);
 
     if (id != null) {
       Areas().getRestAreas();

@@ -1,3 +1,6 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+
 import '../../../business_logic/common/cubit/area_cubit.dart';
 import '../../../business_logic/common/cubit/refresh_cubit.dart';
 import '../../../business_logic/common/state/generic_state.dart';
@@ -7,6 +10,7 @@ import '../../../business_logic/delivery/cubit/delivery_orders_cubit.dart';
 import '../../../business_logic/delivery/cubit/delivery_profile_cubit.dart';
 import '../../../business_logic/delivery/cubit/delivery_zone_orders_cubit.dart';
 
+import '../../../helpers/firebase_notification_handler.dart';
 import '../../../helpers/shared_preferences.dart';
 import '../../../repos/delivery/delivery_repo.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -185,9 +189,13 @@ class _DeliveryBaseScreenState extends State<DeliveryBaseScreen> {
     ];
   }
 
+  FirebaseNotifications firebaseNotifications = FirebaseNotifications();
   @override
   void initState() {
     BlocProvider.of<AreaCubit>(context).loadAreas();
+
+    firebaseNotifications.setUp(context);
+
     var id = DeliverkSharedPreferences.getDelivId();
     if (id != null) {
       BlocProvider.of<DeliveryProfileCubit>(context).getProfileData(id);

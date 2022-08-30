@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:deliverk/data/apis/upload_image.dart';
+import 'package:deliverk/presentation/screens/delivery/delivery_login_screen.dart';
+import 'package:deliverk/repos/delivery/delivery_repo.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart';
 import 'package:progress_dialog/progress_dialog.dart';
@@ -9,6 +11,7 @@ import '../../../business_logic/common/cubit/upload_image_cubit.dart';
 import '../../../business_logic/common/state/generic_state.dart';
 import '../../../business_logic/common/state/upload_image_state.dart';
 import '../../../business_logic/delivery/cubit/deliver_sign_up_cubit.dart';
+import '../../../business_logic/delivery/cubit/delivery_login_cubit.dart';
 import '../../../data/models/delivery/delivery_model.dart';
 import '../../../helpers/shared_preferences.dart';
 
@@ -342,7 +345,18 @@ class _DeliverySignUpScreenState extends State<DeliverySignUpScreen> {
       builder: (context, state) {
         if (state is GenericSuccessState) {
           Fluttertoast.showToast(msg: 'انتظر حتى يتم تفعيل حسابك');
-          Navigator.of(context).popAndPushNamed(deliveryLoginRoute);
+          Navigator.pushAndRemoveUntil<dynamic>(
+            context,
+            MaterialPageRoute<dynamic>(
+              builder: (BuildContext context) =>
+                  BlocProvider<DeliveryLoginCubit>(
+                create: (context) => DeliveryLoginCubit(DeliveryRepo()),
+                child: DeliveryLoginScreen(),
+              ),
+            ),
+
+            (route) => false, //if you want to disable back feature set to false
+          );
         } else if (state is GenericLoadingState) {
           return const CircularProgressIndicator(
             color: Colors.blue,
@@ -366,25 +380,6 @@ class _DeliverySignUpScreenState extends State<DeliverySignUpScreen> {
   }
 
   Future<void> doSignUp() async {
-    // if (_checker() &&
-    //     _data['avatar'] != null &&
-    //     _data['nat_img'] != null &&
-    //     _data['delv_lic_img'] != null &&
-    //     _data['veh_lic_img'] != null) {
-    //   _data['name'] = _deliveryNameController.text;
-    //   _data['phone'] = _deliveryPhoneNumberContoller.text;
-    //   _data['password'] = _passwordController.text;
-    //   _data['zone_id'] = null;
-    //   _data['online'] = false;
-    //   _data['firebase'] = DeliverkSharedPreferences.getFirebaseToken();
-    //   Logger().d(_data);
-
-    //   BlocProvider.of<DeliverySignUpCubit>(context)
-    //       .signUp(DeliveryModel.fromJson(_data).toJson());
-    // } else {
-    //   Fluttertoast.showToast(msg: 'ادخل كامل البيانات والصور صحيحة');
-    // }
-
     final ProgressDialog pr = ProgressDialog(context, isDismissible: false);
     if (_checker()) {
       pr.show();

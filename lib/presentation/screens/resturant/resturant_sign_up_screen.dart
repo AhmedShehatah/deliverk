@@ -1,6 +1,10 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:deliverk/presentation/screens/resturant/restaurant_login_screen.dart';
+import 'package:deliverk/repos/restaurant/resturant_repo.dart';
+
 import '../../../business_logic/common/cubit/spinner_cubit.dart';
+import '../../../business_logic/restaurant/cubit/restaurant_login_cubit.dart';
 import '../../../zones.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../../business_logic/common/cubit/upload_image_cubit.dart';
@@ -147,8 +151,19 @@ class _ResturantSignUpScreenState extends State<ResturantSignUpScreen> {
                           Fluttertoast.showToast(
                               msg:
                                   'تم تسجيل الدخول بنجاح انتظر حتى يتم تفعيلك');
-                          Navigator.of(context)
-                              .pushReplacementNamed(restaurantLoginRoute);
+                          Navigator.pushAndRemoveUntil<dynamic>(
+                            context,
+                            MaterialPageRoute<dynamic>(
+                                builder: (BuildContext context) =>
+                                    BlocProvider<RestaurantLoginCubit>(
+                                      create: (context) => RestaurantLoginCubit(
+                                          RestaurantRepo()),
+                                      child: RestaurantLoginScreen(),
+                                    )),
+
+                            (route) =>
+                                false, //if you want to disable back feature set to false
+                          );
                         });
                         return buildSignUpButton();
                       } else if (state is FailedState) {

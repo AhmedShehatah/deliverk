@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:683564516945:android:8a2e759d61f3c9695d1a70",
+        "mobilesdk_app_id": "1:683564516945:android:9a983d731a1520a55d1a70",
         "android_client_info": {
-          "package_name": "com.shehatah.deliverk"
+          "package_name": "com.ahmed.shehatah.deliverk"
         }
       },
       "oauth_client": [

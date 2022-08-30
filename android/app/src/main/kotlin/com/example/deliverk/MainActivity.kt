@@ -1,4 +1,4 @@
-package com.shehatah.deliverk
+package com.ahmed.shehatah.deliverk
 
 import io.flutter.embedding.android.FlutterActivity
 

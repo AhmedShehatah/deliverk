@@ -1,4 +1,9 @@
+import 'package:deliverk/presentation/screens/resturant/restaurant_base_screen.dart';
+import 'package:deliverk/repos/restaurant/resturant_repo.dart';
+
+import '../../../business_logic/common/cubit/area_cubit.dart';
 import '../../../business_logic/restaurant/cubit/restaurant_login_cubit.dart';
+import '../../../business_logic/restaurant/cubit/restaurant_profile_cubit.dart';
 import '../../../constants/enums.dart';
 import '../../../helpers/shared_preferences.dart';
 import 'package:flutter/material.dart';
@@ -62,9 +67,25 @@ class RestaurantLoginScreen extends StatelessWidget {
                         DeliverkSharedPreferences.setZoneId(state.zoneId);
                         DeliverkSharedPreferences.setUserType(
                             UserType.restaurant.name);
-                        Navigator.popAndPushNamed(
+                        Navigator.pushAndRemoveUntil<dynamic>(
                           context,
-                          restaurantBaseScreenRoute,
+                          MaterialPageRoute<dynamic>(
+                              builder: (BuildContext context) =>
+                                  MultiBlocProvider(
+                                    providers: [
+                                      BlocProvider<ResturantProfileCubit>(
+                                        create: (context) =>
+                                            ResturantProfileCubit(
+                                                RestaurantRepo()),
+                                      ),
+                                      BlocProvider<AreaCubit>(
+                                          create: (_) => AreaCubit()),
+                                    ],
+                                    child: const RestaurantBaseScreen(),
+                                  )),
+
+                          (route) =>
+                              false, //if you want to disable back feature set to false
                         );
                         Fluttertoast.showToast(msg: "تم تسجيل الدخول بنجاح");
                       });

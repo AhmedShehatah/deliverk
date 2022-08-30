@@ -54,12 +54,12 @@ class _RecordItemModelState extends State<RecordItemModel> {
             ),
           );
         } else if (state is GenericLoadingState) {
-          return Shimmer.fromColors(
-            baseColor: Colors.grey,
-            highlightColor: Colors.white,
-            child: Directionality(
-              textDirection: TextDirection.rtl,
-              child: Card(
+          return Directionality(
+            textDirection: TextDirection.rtl,
+            child: Card(
+              child: Shimmer.fromColors(
+                highlightColor: Colors.white,
+                baseColor: Colors.grey,
                 child: ListTile(
                   leading: Container(
                     width: 40.0,
