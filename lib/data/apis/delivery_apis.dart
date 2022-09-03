@@ -100,11 +100,6 @@ class DeliveryApis {
     try {
       response = await _dio.get(
         '/delivery/$id',
-        options: Options(
-          headers: {
-            'Authorization': "Bearer ${DeliverkSharedPreferences.getToken()}"
-          },
-        ),
       );
       return response.data;
     } on DioError catch (e) {

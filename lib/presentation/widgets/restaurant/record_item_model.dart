@@ -1,3 +1,5 @@
+import 'package:deliverk/helpers/time_cal.dart';
+
 import '../../../business_logic/common/state/generic_state.dart';
 import '../../../data/models/common/order_model.dart';
 import '../../../data/models/delivery/delivery_model.dart';
@@ -49,7 +51,21 @@ class _RecordItemModelState extends State<RecordItemModel> {
                 ),
                 title: Text(data.name!),
                 trailing: Text(widget.order.areaCost.toString() + "ج.م"),
-                subtitle: Text(areaName ?? ""),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(areaName ?? ""),
+                    FutureBuilder(
+                        future: TimeCalc.showTime(widget.order.createdAt!),
+                        builder: ((context, snapshot) {
+                          if (snapshot.hasData) {
+                            return Text(snapshot.data.toString());
+                          } else {
+                            return const Text('جاري تحميل التاريخ');
+                          }
+                        }))
+                  ],
+                ),
               ),
             ),
           );

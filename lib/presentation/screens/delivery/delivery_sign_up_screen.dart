@@ -345,18 +345,22 @@ class _DeliverySignUpScreenState extends State<DeliverySignUpScreen> {
       builder: (context, state) {
         if (state is GenericSuccessState) {
           Fluttertoast.showToast(msg: 'انتظر حتى يتم تفعيل حسابك');
-          Navigator.pushAndRemoveUntil<dynamic>(
-            context,
-            MaterialPageRoute<dynamic>(
-              builder: (BuildContext context) =>
-                  BlocProvider<DeliveryLoginCubit>(
-                create: (context) => DeliveryLoginCubit(DeliveryRepo()),
-                child: DeliveryLoginScreen(),
-              ),
-            ),
 
-            (route) => false, //if you want to disable back feature set to false
-          );
+          WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+            Navigator.pushAndRemoveUntil<dynamic>(
+              context,
+              MaterialPageRoute<dynamic>(
+                builder: (BuildContext context) =>
+                    BlocProvider<DeliveryLoginCubit>(
+                  create: (context) => DeliveryLoginCubit(DeliveryRepo()),
+                  child: DeliveryLoginScreen(),
+                ),
+              ),
+
+              (route) =>
+                  false, //if you want to disable back feature set to false
+            );
+          });
         } else if (state is GenericLoadingState) {
           return const CircularProgressIndicator(
             color: Colors.blue,
@@ -393,13 +397,7 @@ class _DeliverySignUpScreenState extends State<DeliverySignUpScreen> {
         _data['password'] = _passwordController.text;
         _data['zone_id'] = null;
         _data['online'] = false;
-        if (DeliverkSharedPreferences.getFirebaseToken() == null) {
-          var token = await FirebaseMessaging.instance.getToken();
-          DeliverkSharedPreferences.setFirebaseToken(token!);
-          _data['firebase'] = DeliverkSharedPreferences.getFirebaseToken();
-        } else {
-          _data['firebase'] = DeliverkSharedPreferences.getFirebaseToken();
-        }
+
         Logger().d(_data);
 
         BlocProvider.of<DeliverySignUpCubit>(context)

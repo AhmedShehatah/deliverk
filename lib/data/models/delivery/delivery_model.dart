@@ -6,41 +6,39 @@ class DeliveryModel {
   String? natImg;
   String? delvLicImg;
   String? vehLicImg;
-  dynamic cash;
+  int? cash;
   bool? online;
   int? zoneId;
   int? delivId;
-  String? firebase;
+  int? doneTotal;
 
-  DeliveryModel({
-    this.name,
-    this.phone,
-    this.firebase,
-    this.password,
-    this.avatar,
-    this.natImg,
-    this.delvLicImg,
-    this.vehLicImg,
-    this.cash,
-    this.online,
-    this.zoneId,
-    this.delivId,
-  });
+  DeliveryModel(
+      {this.name,
+      this.phone,
+      this.password,
+      this.avatar,
+      this.natImg,
+      this.delvLicImg,
+      this.vehLicImg,
+      this.cash,
+      this.online,
+      this.zoneId,
+      this.delivId,
+      this.doneTotal});
 
   factory DeliveryModel.fromJson(Map<String, dynamic> json) => DeliveryModel(
-        name: json['name'] as String?,
-        phone: json['phone'] as String?,
-        password: json['password'] as String?,
-        avatar: json['avatar'] as String?,
-        natImg: json['nat_img'] as String?,
-        delvLicImg: json['delv_lic_img'] as String?,
-        vehLicImg: json['veh_lic_img'] as String?,
-        cash: json['cash'] as dynamic,
-        online: json['online'] as bool?,
-        zoneId: json['zone_id'] as int?,
-        delivId: json['deliv_id'] as int?,
-        firebase: json['firebase'] as String?,
-      );
+      name: json['name'] as String?,
+      phone: json['phone'] as String?,
+      password: json['password'] as String?,
+      avatar: json['avatar'] as String?,
+      natImg: json['nat_img'] as String?,
+      delvLicImg: json['delv_lic_img'] as String?,
+      vehLicImg: json['veh_lic_img'] as String?,
+      cash: json['cash'] as dynamic,
+      online: json['online'] as bool?,
+      zoneId: json['zone_id'] as int?,
+      delivId: json['deliv_id'] as int?,
+      doneTotal: json['done_total'] as int?);
 
   Map<String, dynamic> toJson() => {
         'name': name,
@@ -54,6 +52,6 @@ class DeliveryModel {
         'online': online,
         'zone_id': zoneId,
         'deliv_id': delivId,
-        'firebase': firebase,
+        'done_total': doneTotal,
       };
 }

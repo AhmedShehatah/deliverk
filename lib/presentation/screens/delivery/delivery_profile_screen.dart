@@ -54,8 +54,8 @@ class _DeliveryProfileScreenState extends State<DeliveryProfileScreen> {
                         child: const PopupMenuDivider(),
                       ),
                       _buildMoneyInfo(
-                        info.cash,
-                        BlocProvider.of<DeliveryProfileCubit>(context).total,
+                        info.cash ?? 0,
+                        info.doneTotal ?? 0,
                       ),
                       const SizedBox(
                         height: 10,

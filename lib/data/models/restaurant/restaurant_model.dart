@@ -28,6 +28,8 @@ class RestaurantModel extends HiveObject {
   String? phone;
   @HiveField(11)
   int? zoneId;
+  @HiveField(12)
+  int? doneTotal;
 
   RestaurantModel({
     this.address,
@@ -42,6 +44,7 @@ class RestaurantModel extends HiveObject {
     this.name,
     this.phone,
     this.zoneId,
+    this.doneTotal,
   });
 
   factory RestaurantModel.fromJson(Map<String, dynamic> json) {
@@ -58,6 +61,7 @@ class RestaurantModel extends HiveObject {
       name: json['name'] as String?,
       phone: json['phone'] as String?,
       zoneId: json['zone_id'] as int?,
+      doneTotal: json['done_total'] as int?,
     );
   }
 
@@ -74,5 +78,6 @@ class RestaurantModel extends HiveObject {
         'name': name,
         'phone': phone,
         'zone_id': zoneId,
+        'done_total': doneTotal,
       };
 }

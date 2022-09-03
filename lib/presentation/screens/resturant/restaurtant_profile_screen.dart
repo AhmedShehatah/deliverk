@@ -204,9 +204,7 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
               ),
             ),
             _buildData(
-                "عدد الطلبات",
-                BlocProvider.of<ResturantProfileCubit>(context).total,
-                Colors.green),
+                "عدد الطلبات", _profileData.doneTotal ?? 0, Colors.green),
           ],
         ),
       ),

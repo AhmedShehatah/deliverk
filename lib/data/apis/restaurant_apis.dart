@@ -36,11 +36,6 @@ class RestaurantApis {
     try {
       response = await _dio.get(
         '/restaurant/$id',
-        options: Options(
-          headers: {
-            'Authorization': "Bearer ${DeliverkSharedPreferences.getToken()}"
-          },
-        ),
       );
 
       return response.data;
