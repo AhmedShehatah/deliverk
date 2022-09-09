@@ -15,6 +15,8 @@ class RestaurantRepo {
   Future<dynamic> signUp(Map<String, dynamic> data) async => _api.signUp(data);
 
   Future<dynamic> getRestProfileData(int id) => _api.getProfileData(id);
+  Future<dynamic> patchProfile(int id, Map<String, dynamic> data) =>
+      _api.patchProfile(id, data);
 
   Future<dynamic> getOrders(Map<String, dynamic> querys, int id) =>
       _api.getOrders(querys, id);

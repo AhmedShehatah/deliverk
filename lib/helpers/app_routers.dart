@@ -1,3 +1,5 @@
+import 'package:deliverk/presentation/screens/resturant/edit_profile.dart';
+
 import '../business_logic/common/cubit/area_cubit.dart';
 import '../business_logic/delivery/cubit/deliver_sign_up_cubit.dart';
 import '../business_logic/delivery/cubit/delivery_profile_cubit.dart';
@@ -131,6 +133,15 @@ class AppRouter {
           ),
         );
 
+      case editProfile:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => BlocProvider(
+            create: (context) => ResturantProfileCubit(_restaurantRepo),
+            child: const EditProifile(),
+          ),
+        );
+
       // delivery reoute
       case delivarySignUpRoute:
         return MaterialPageRoute(
@@ -160,6 +171,7 @@ class AppRouter {
                 ));
       case deliveryLoginRoute:
         return MaterialPageRoute(
+            settings: settings,
             builder: (_) => BlocProvider<DeliveryLoginCubit>(
                   create: (context) => DeliveryLoginCubit(_deliveryRepo),
                   child: DeliveryLoginScreen(),

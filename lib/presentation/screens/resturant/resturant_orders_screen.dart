@@ -88,7 +88,7 @@ class _RestaurantOrdersScreenState extends State<RestaurantOrdersScreen> {
           return _buildListItem(dataModel);
         } else {
           return const Center(
-            child: Text('حدث خطأ كما'),
+            child: Text('حدث خطأ ما'),
           );
         }
       }),

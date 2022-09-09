@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:deliverk/constants/strings.dart';
 import '../../../business_logic/common/state/generic_state.dart';
 
 import '../../../data/models/restaurant/restaurant_model.dart';
@@ -123,6 +124,19 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
                           double.parse(_profileData.mapLong!)));
                 },
                 child: _buildInfoTexts("العنوان على الخريطة", "اضغط للعرض")),
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.of(widget.context).pushNamed(editProfile, arguments: {
+                  'url': _profileData.avatar,
+                  'location': LatLng(
+                    double.parse(_profileData.mapLat!),
+                    double.parse(_profileData.mapLong!),
+                  ),
+                });
+              },
+              icon: const Icon(Icons.edit),
+              label: const Text('تعديل الملف'),
+            ),
             Row(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -266,7 +280,7 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
             ),
             errorWidget: (context, url, error) => const Icon(Icons.error),
           ),
-        )
+        ),
       ],
     );
   }

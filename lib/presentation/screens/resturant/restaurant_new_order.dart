@@ -312,7 +312,7 @@ class _RestaurantNewOrderState extends State<RestaurantNewOrder> {
             ? OrderType.cooked.name
             : OrderType.cooking.name
         ..cost = _priceController.text.isNotEmpty
-            ? int.parse(_priceController.text)
+            ? double.parse(_priceController.text)
             : null;
       Logger().d(order.toJson());
       Logger().d(

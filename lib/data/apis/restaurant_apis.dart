@@ -44,6 +44,25 @@ class RestaurantApis {
     }
   }
 
+  Future<dynamic> patchProfile(int id, Map<String, dynamic> data) async {
+    Response response;
+    try {
+      response = await _dio.patch(
+        '/restaurant/profile',
+        options: Options(
+          headers: {
+            'Authorization': "Bearer ${DeliverkSharedPreferences.getToken()}"
+          },
+        ),
+        data: data,
+      );
+
+      return response.data;
+    } on DioError catch (e) {
+      return e.response!.data;
+    }
+  }
+
   Future<dynamic> getOrders(Map<String, dynamic> querys, int id) async {
     Response response;
 

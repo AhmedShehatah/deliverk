@@ -84,7 +84,6 @@ class DeliveryLoginScreen extends StatelessWidget {
                           (route) =>
                               false, //if you want to disable back feature set to false
                         );
-                        Fluttertoast.showToast(msg: "تم تسجيل الدخول بنجاح");
                       });
 
                       return const Text('');

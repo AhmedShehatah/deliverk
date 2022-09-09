@@ -1,3 +1,7 @@
+import 'package:deliverk/business_logic/restaurant/cubit/restaurant_profile_cubit.dart';
+import 'package:deliverk/data/models/restaurant/restaurant_model.dart';
+import 'package:deliverk/repos/restaurant/resturant_repo.dart';
+
 import '../../../business_logic/common/cubit/patch_order_cubit.dart';
 import '../../../business_logic/common/state/generic_state.dart';
 import '../../../constants/enums.dart';
@@ -37,14 +41,27 @@ class _ZoneOrderModelState extends State<ZoneOrderModel> {
               ),
             ),
           ),
-          title: FittedBox(
-            fit: BoxFit.scaleDown,
-            child: areaName == null
-                ? Shimmer.fromColors(
-                    child: const Text('اسم المنطقة'),
-                    baseColor: Colors.black,
-                    highlightColor: Colors.white)
-                : Text(areaName!),
+          title: Column(
+            children: [
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: areaName == null
+                    ? Shimmer.fromColors(
+                        child: const Text('اسم المنطقة'),
+                        baseColor: Colors.black,
+                        highlightColor: Colors.white)
+                    : Text(areaName!),
+              ),
+              BlocBuilder<ResturantProfileCubit, GenericState>(
+                  builder: (_, state) {
+                if (state is GenericSuccessState) {
+                  var info = RestaurantModel.fromJson(state.data);
+                  return Text(info.name!);
+                } else {
+                  return const Text('جاري تحميل اسم المطعم...');
+                }
+              }),
+            ],
           ),
           trailing: BlocConsumer<PatchOrderCubit, GenericState>(
             listener: ((context, state) {
@@ -97,6 +114,8 @@ class _ZoneOrderModelState extends State<ZoneOrderModel> {
   @override
   void initState() {
     getAreaName();
+    BlocProvider.of<ResturantProfileCubit>(context)
+        .getProfileData(widget.order.resId!);
     super.initState();
   }
 }

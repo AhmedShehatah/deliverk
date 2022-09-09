@@ -63,12 +63,15 @@ class _DeliveryOrderDetialsDialogState
                     _rowData(" اسم المطعم", widget.restData.name!),
                     _rowData("مكان المطعم", widget.restData.address!),
                     _rowData('رقم المطعم', widget.restData.phone!),
-                    _rowData('تاريخ الطلب',
-                        TimeCalc.calcTime(widget.order.createdAt!).toString()),
+                    _rowData(
+                        'وقت الوصول',
+                        "منذ " +
+                            TimeCalc.calcTime(widget.order.stTime!).toString() +
+                            " دقيقة"),
                     _mapRow("مكان المطعم", "اظهر على الخريطة"),
                     _rowData("كود الطلب", widget.order.id!.toString()),
-                    _rowData(
-                        "تكلفة التوصيل", widget.order.delvCash!.toString()),
+                    _rowData("تكلفة التوصيل",
+                        widget.order.delvCash!.toString() + " ج.م"),
                     _rowData("منطقة التوصيل", widget.areaName),
                     if (widget.order.notes != null)
                       _rowData('ملاحظات', widget.order.notes!),

@@ -4,7 +4,7 @@ import 'package:json_annotation/json_annotation.dart';
 class OrderModel {
   int? areaCost;
   int? areaId;
-  int? cost;
+  dynamic cost;
   String? createdAt;
   dynamic delvId;
   int? duration;
@@ -35,7 +35,7 @@ class OrderModel {
   factory OrderModel.fromJson(Map<String, dynamic> json) => OrderModel(
         areaCost: json['area_cost'] as int?,
         areaId: json['area_id'] as int?,
-        cost: json['cost'] as int?,
+        cost: json['cost'] as dynamic,
         createdAt: json['created_at'] as String?,
         delvId: json['delv_id'] as dynamic,
         duration: json['duration'] as int?,

@@ -1,7 +1,7 @@
 class ZoneOrder {
   int? areaCost;
   int? areaId;
-  int? cost;
+  dynamic cost;
   String? createdAt;
   int? delvCash;
   dynamic delvId;
@@ -12,6 +12,7 @@ class ZoneOrder {
   String? notes;
   int? resId;
   String? resLogo;
+  String? stTime;
   String? status;
   int? zoneId;
 
@@ -29,27 +30,28 @@ class ZoneOrder {
     this.notes,
     this.resId,
     this.resLogo,
+    this.stTime,
     this.status,
     this.zoneId,
   });
 
   factory ZoneOrder.fromJson(Map<String, dynamic> json) => ZoneOrder(
-        areaCost: json['area_cost'] as int?,
-        areaId: json['area_id'] as int?,
-        cost: json['cost'] as int?,
-        createdAt: json['created_at'] as String?,
-        delvCash: json['delv_cash'] as int?,
-        delvId: json['delv_id'] as dynamic,
-        duration: json['duration'] as int?,
-        fnTime: json['fn_time'] as dynamic,
-        id: json['id'] as int?,
-        isPaid: json['isPaid'] as bool?,
-        notes: json['notes'] as String?,
-        resId: json['res_id'] as int?,
-        resLogo: json['res_logo'] as String?,
-        status: json['status'] as String?,
-        zoneId: json['zone_id'] as int?,
-      );
+      areaCost: json['area_cost'] as int?,
+      areaId: json['area_id'] as int?,
+      cost: json['cost'] as dynamic,
+      createdAt: json['created_at'] as String?,
+      delvCash: json['delv_cash'] as int?,
+      delvId: json['delv_id'] as dynamic,
+      duration: json['duration'] as int?,
+      fnTime: json['fn_time'] as dynamic,
+      id: json['id'] as int?,
+      isPaid: json['isPaid'] as bool?,
+      notes: json['notes'] as String?,
+      resId: json['res_id'] as int?,
+      resLogo: json['res_logo'] as String?,
+      status: json['status'] as String?,
+      zoneId: json['zone_id'] as int?,
+      stTime: json['st_time'] as String?);
 
   Map<String, dynamic> toJson() => {
         'area_cost': areaCost,
@@ -67,5 +69,6 @@ class ZoneOrder {
         'res_logo': resLogo,
         'status': status,
         'zone_id': zoneId,
+        'st_time': stTime,
       };
 }

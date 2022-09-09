@@ -18,6 +18,8 @@ const String restaurantLoginRoute = "/restaurant-login";
 const String restaurantBaseScreenRoute = "/restaurant-base-screen";
 const String restuarntNewOrderScreenRoute = "/new-order-screen";
 
+const String editProfile = "/edit-profile";
+
 // ~~~~~~~Delivery Routers names ~~~~~`
 const String delivarySignUpRoute = "/delivery-sign-up";
 const String deliveryBaseScreen = "/delivery-base-screen";
