@@ -17,5 +17,8 @@
     "stacktrace": "cpp",
     "regex": "cpp",
     "valarray": "cpp"
-  }
+  },
+  "dart.flutterRunAdditionalArgs": [
+    "--no-sound-null-safety"
+]
 }

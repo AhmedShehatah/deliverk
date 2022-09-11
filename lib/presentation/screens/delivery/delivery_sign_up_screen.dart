@@ -3,9 +3,8 @@ import 'dart:io';
 import 'package:deliverk/data/apis/upload_image.dart';
 import 'package:deliverk/presentation/screens/delivery/delivery_login_screen.dart';
 import 'package:deliverk/repos/delivery/delivery_repo.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:http/http.dart';
-import 'package:progress_dialog/progress_dialog.dart';
+
+import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 
 import '../../../business_logic/common/cubit/upload_image_cubit.dart';
 import '../../../business_logic/common/state/generic_state.dart';
@@ -13,8 +12,6 @@ import '../../../business_logic/common/state/upload_image_state.dart';
 import '../../../business_logic/delivery/cubit/deliver_sign_up_cubit.dart';
 import '../../../business_logic/delivery/cubit/delivery_login_cubit.dart';
 import '../../../data/models/delivery/delivery_model.dart';
-import '../../../helpers/shared_preferences.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';

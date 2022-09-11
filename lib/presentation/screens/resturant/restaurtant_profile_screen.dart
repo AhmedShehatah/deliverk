@@ -29,7 +29,6 @@ class RestaurantProfileScreen extends StatefulWidget {
 }
 
 class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
-  RestaurantModel _profileData = RestaurantModel();
   @override
   Widget build(BuildContext context) {
     int? id = DeliverkSharedPreferences.getRestId();
@@ -40,14 +39,14 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
       RestaurantBaseScreen.pop(widget.context);
     }
 
+    Logger().d('we rebuilded');
     return Scaffold(
         body: RefreshIndicator(
       onRefresh: refresh,
       child: BlocBuilder<ResturantProfileCubit, GenericState>(
         builder: (context, state) {
           if (state is GenericSuccessState) {
-            _profileData = RestaurantModel.fromJson(state.data);
-            return _buildTree();
+            return _buildTree(RestaurantModel.fromJson(state.data));
           }
           return _buildDownladingData();
         },
@@ -72,21 +71,21 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
     ));
   }
 
-  Widget _buildTree() {
+  Widget _buildTree(RestaurantModel _profileData) {
     return SafeArea(
       child: SingleChildScrollView(
         child: Column(
           children: [
-            _buildHeader(),
+            _buildHeader(_profileData),
             Container(
               margin: const EdgeInsets.only(top: 80, right: 30, left: 30),
               child: const PopupMenuDivider(),
             ),
-            _buildMoneyInfo(),
+            _buildMoneyInfo(_profileData),
             const SizedBox(
               height: 10,
             ),
-            _buildProfileInfo(),
+            _buildProfileInfo(_profileData),
             const SizedBox(
               height: 30,
             )
@@ -96,7 +95,7 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
     );
   }
 
-  Widget _buildProfileInfo() {
+  Widget _buildProfileInfo(RestaurantModel _profileData) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 30),
       child: Card(
@@ -197,7 +196,7 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
     );
   }
 
-  Widget _buildMoneyInfo() {
+  Widget _buildMoneyInfo(RestaurantModel _profileData) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 30),
       elevation: 5,
@@ -251,7 +250,7 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(RestaurantModel _profileData) {
     return Stack(
       alignment: Alignment.center,
       clipBehavior: Clip.none,
