@@ -32,8 +32,8 @@ class _RestaurantNewOrderState extends State<RestaurantNewOrder> {
     _preparationController.clear();
     _notesController.clear();
     _areaContrller.clear();
-    _pay = null;
-    _prep = null;
+    // _pay = null;
+    // _prep = null;
   }
 
   @override
@@ -107,27 +107,22 @@ class _RestaurantNewOrderState extends State<RestaurantNewOrder> {
               Row(
                 children: [
                   Expanded(
-                    child: Spinner(
-                      _prep == null ? "مدة التحضير" : _prep!,
-                      const ["جاهز", "غير جاهز"],
-                      SpinnerEnum.preparationTime,
-                    ),
-                  ),
-                  Expanded(
                     child: _buildPaymentStatus(),
                   ),
                 ],
               ),
             if (!_isForRest) _buildFields(context),
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: CustomTextField(
-                inputType: TextInputType.text,
-                controller: _notesController,
-                hint: 'ملاحظات',
-                validator: (_isForRest && _notesController.text.isEmpty)
-                    ? 'ادخل بيانات الطلب'
-                    : null,
+            IntrinsicHeight(
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: CustomTextField(
+                  inputType: TextInputType.multiline,
+                  controller: _notesController,
+                  hint: 'ملاحظات',
+                  validator: (_isForRest && _notesController.text.isEmpty)
+                      ? 'ادخل بيانات الطلب'
+                      : null,
+                ),
               ),
             ),
             Row(
@@ -164,14 +159,14 @@ class _RestaurantNewOrderState extends State<RestaurantNewOrder> {
     );
   }
 
-  String? _pay;
-  String? _prep;
+  String? _pay = "غير مدفوع";
+
   Widget _buildFields(BuildContext context) {
     return BlocBuilder<SpinnerCubit, SpinnerState>(
       builder: (ctx, state) {
         if (state is SpinnerInitial) {
           _pay = state.paymentState;
-          _prep = state.preparationState;
+          // _prep = state.preparationState;
           if (state.paymentState == "غير مدفوع" &&
               state.preparationState == "غير جاهز") {
             return Row(
@@ -294,8 +289,8 @@ class _RestaurantNewOrderState extends State<RestaurantNewOrder> {
 
   void addOrder(BuildContext context) {
     if (_formKey.currentState!.validate()) {
-      if (!_isForRest && (_pay == null || _prep == null)) {
-        Fluttertoast.showToast(msg: 'من فضلك ادخل مدة التحضير وحالة الدفع');
+      if (!_isForRest && (_pay == null)) {
+        Fluttertoast.showToast(msg: 'من فضلك ادخل حالة الدفع');
         return;
       }
       var order = OrderModel();

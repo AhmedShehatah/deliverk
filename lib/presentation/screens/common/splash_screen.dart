@@ -24,24 +24,24 @@ class SplashScreen extends StatelessWidget {
               width: MediaQuery.of(context).size.width - 100,
               child: ElevatedButton(
                 onPressed: () {
-                  modalBottomSheet(context);
+                  modalBottomSheetLogin(context);
                 },
-                child: const Text("انضم الينا"),
+                child: const Text("سجل دخول"),
               ),
             ),
             TextButton(
                 onPressed: () {
-                  modalBottomSheetLogin(context);
+                  modalBottomSheet(context);
                 },
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
                     Text(
-                      "هل لديك حساب ",
+                      "ليس لديك حساب ",
                       style: TextStyle(color: Colors.black),
                     ),
-                    Text("سجل دخول"),
+                    Text("انضم الينا"),
                   ],
                 )),
           ],

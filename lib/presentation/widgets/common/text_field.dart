@@ -23,6 +23,8 @@ class CustomTextField extends StatelessWidget {
       textDirection: TextDirection.rtl,
       child: TextFormField(
         keyboardType: inputType,
+        minLines: 1,
+        maxLines: secure == null ? null : 1,
         controller: controller,
         obscureText: secure == null ? false : secure!,
         decoration: InputDecoration(

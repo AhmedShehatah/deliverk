@@ -12,5 +12,15 @@ class ApiSettings {
       receiveTimeout: 20 * 1000,
     );
     dio = Dio(options);
+    // dio.interceptors.addAll([
+    //   LogInterceptor(
+    //     request: true,
+    //     responseBody: true,
+    //     requestBody: true,
+    //     requestHeader: true,
+    //     error: true,
+    //     responseHeader: true,
+    //   ),
+    // ]);
   }
 }

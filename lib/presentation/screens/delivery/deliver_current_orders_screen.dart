@@ -28,7 +28,6 @@ class _DeliveryCurrentOrdersScreenState
     extends State<DeliveryCurrentOrdersScreen> {
   @override
   Widget build(BuildContext context) {
-    // setupScrollController(context);
     var provider = BlocProvider.of<DeliveryZoneOrdersCubit>(context);
 
     provider.loadOrders();
@@ -122,17 +121,4 @@ class _DeliveryCurrentOrdersScreenState
       itemCount: orders.length,
     );
   }
-
-  // final _scrollController = ScrollController();
-
-  // void setupScrollController(context) {
-  //   _scrollController.addListener(() {
-  //     if (_scrollController.position.atEdge) {
-  //       if (_scrollController.position.pixels != 0) {
-  //         BlocProvider.of<DeliveryZoneOrdersCubit>(context)
-  //             .loadOrders(status: OrderType.pending.name);
-  //       }
-  //     }
-  //   });
-  // }
 }

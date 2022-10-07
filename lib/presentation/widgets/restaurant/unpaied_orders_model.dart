@@ -1,3 +1,5 @@
+import 'package:url_launcher/url_launcher.dart';
+
 import '../../../business_logic/common/cubit/refresh_cubit.dart';
 import '../../../business_logic/common/state/generic_state.dart';
 import '../../../business_logic/delivery/cubit/delivery_profile_cubit.dart';
@@ -12,76 +14,75 @@ import 'package:shimmer/shimmer.dart';
 
 import '../../../business_logic/common/cubit/patch_order_cubit.dart';
 
-class UnpaiedOrdersModel extends StatelessWidget {
+class UnpaiedOrdersModel extends StatefulWidget {
   const UnpaiedOrdersModel(this.order, {Key? key}) : super(key: key);
   final OrderModel order;
+
+  @override
+  State<UnpaiedOrdersModel> createState() => _UnpaiedOrdersModelState();
+}
+
+class _UnpaiedOrdersModelState extends State<UnpaiedOrdersModel> {
+  DeliveryModel? data;
+
   @override
   Widget build(BuildContext context) {
-    BlocProvider.of<DeliveryProfileCubit>(context).getProfileData(order.delvId);
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Container(
-        margin: const EdgeInsets.all(5),
-        child: Card(
-          elevation: 5,
-          child: Container(
-            height: 100,
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            width: double.infinity,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("كود الطلب: ${order.id!}"),
-                    BlocBuilder<DeliveryProfileCubit, GenericState>(
-                      builder: (context, state) {
-                        if (state is GenericSuccessState) {
-                          var data = DeliveryModel.fromJson(state.data);
-                          return Text(
-                            data.name!,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Colors.black38,
-                            ),
-                          );
-                        } else if (state is GenericLoadingState) {
-                          return Shimmer.fromColors(
-                              child: Container(
-                                width: 20,
-                                height: 15,
-                                color: Colors.black,
+    if (widget.order.delvId != null) {
+      BlocProvider.of<DeliveryProfileCubit>(context)
+          .getProfileData(widget.order.delvId);
+    }
+    return InkWell(
+      onTap: () {
+        showAlertDialog(context);
+      },
+      child: Directionality(
+        textDirection: TextDirection.rtl,
+        child: Container(
+          margin: const EdgeInsets.all(5),
+          child: Card(
+            elevation: 5,
+            child: Container(
+              height: 100,
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              width: double.infinity,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("كود الطلب: ${widget.order.id!}"),
+                      BlocBuilder<DeliveryProfileCubit, GenericState>(
+                        builder: (context, state) {
+                          if (state is GenericSuccessState) {
+                            data = DeliveryModel.fromJson(state.data);
+                            return Text(
+                              data != null ? data!.name! : 'لا يوجد ديليفري',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.black38,
                               ),
-                              baseColor: Colors.grey,
-                              highlightColor: Colors.white);
-                        } else {
-                          return const Text('');
-                        }
-                      },
-                    ),
-                    Text(order.cost.toString() + "ج.م"),
-                  ],
-                ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    SizedBox(
-                      width: 40,
-                      height: 40,
-                      child: FloatingActionButton(
-                        backgroundColor: Colors.green,
-                        onPressed: () {
-                          showAlertDialog(context);
+                            );
+                          } else if (state is GenericLoadingState) {
+                            return Shimmer.fromColors(
+                                child: Container(
+                                  width: 20,
+                                  height: 15,
+                                  color: Colors.black,
+                                ),
+                                baseColor: Colors.grey,
+                                highlightColor: Colors.white);
+                          } else {
+                            return const Text('لم يسلم لديلفري بعد');
+                          }
                         },
-                        child: const Icon(Icons.check),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                      Text(widget.order.cost.toString() + "ج.م"),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -95,6 +96,12 @@ class UnpaiedOrdersModel extends StatelessWidget {
       onPressed: () {
         Navigator.of(context).maybePop();
       },
+    );
+    Widget callDelivery = TextButton(
+      onPressed: () {
+        launchUrl(Uri(scheme: 'tel', path: data!.phone));
+      },
+      child: const Text('اتصل بالديلفري'),
     );
     Widget continueButton = BlocBuilder<PatchOrderCubit, GenericState>(
       builder: (context, state) {
@@ -116,7 +123,7 @@ class UnpaiedOrdersModel extends StatelessWidget {
           child: const Text("نعم"),
           onPressed: () {
             BlocProvider.of<PatchOrderCubit>(context)
-                .patchOrder(order.id!, {'isPaid': true});
+                .patchOrder(widget.order.id!, {'isPaid': true});
           },
         );
       },
@@ -127,6 +134,7 @@ class UnpaiedOrdersModel extends StatelessWidget {
       title: const Text("طلب تاكيد"),
       content: const Text('هل تريد تاكيد الدفع؟'),
       actions: [
+        if (data != null) callDelivery,
         cancelButton,
         continueButton,
       ],

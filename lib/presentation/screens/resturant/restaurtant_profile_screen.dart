@@ -141,7 +141,7 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(primary: Colors.red),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                   onPressed: () {
                     logout();
                   },
@@ -202,22 +202,32 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
       elevation: 5,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 15),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        child: Column(
           children: [
-            _buildData("الملبغ المستحق", _profileData.cash!, Colors.red),
-            SizedBox(
-              height: 60,
-              child: VerticalDivider(
-                color: Colors.grey.shade300,
-                thickness: 1,
-                indent: 5,
-                endIndent: 0,
-                width: 20,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildData("الملبغ المستحق", _profileData.cash!, Colors.red),
+                SizedBox(
+                  height: 60,
+                  child: VerticalDivider(
+                    color: Colors.grey.shade300,
+                    thickness: 1,
+                    indent: 5,
+                    endIndent: 0,
+                    width: 20,
+                  ),
+                ),
+                _buildData(
+                    "عدد الطلبات", _profileData.doneTotal ?? 0, Colors.green),
+              ],
             ),
-            _buildData(
-                "عدد الطلبات", _profileData.doneTotal ?? 0, Colors.green),
+            ElevatedButton(
+                onPressed: () {
+                  BlocProvider.of<ResturantProfileCubit>(context)
+                      .getProfileData(DeliverkSharedPreferences.getRestId()!);
+                },
+                child: const Text('تحديث')),
           ],
         ),
       ),

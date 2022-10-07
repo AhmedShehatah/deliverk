@@ -2,7 +2,6 @@ import '../../../business_logic/delivery/cubit/delivery_profile_cubit.dart';
 import '../../widgets/restaurant/empty_orders.dart';
 import '../../../repos/delivery/delivery_repo.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:logger/logger.dart';
 
 import '../../../business_logic/restaurant/cubit/restaurants_current_orders_cubit.dart';
 import '../../../business_logic/restaurant/state/restaurant_current_orders_state.dart';
@@ -32,7 +31,6 @@ class _RestaurantRecordScreenState extends State<RestaurantRecordScreen> {
     );
   }
 
-  final _log = Logger();
   List<OrderModel> orders = [];
   Widget _buildOrdersList() {
     return NestedScrollView(

@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:logger/logger.dart';
 import '../../../business_logic/common/state/generic_state.dart';
-import '../../../business_logic/delivery/cubit/delivery_online_cubit.dart';
+
 import '../../../business_logic/delivery/cubit/delivery_profile_cubit.dart';
 import '../../../data/models/delivery/delivery_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -95,30 +95,30 @@ class _DeliveryProfileScreenState extends State<DeliveryProfileScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                BlocBuilder<DeliveryOnlineCubit, GenericState>(
-                    builder: ((context, state) {
-                  if (state is GenericSuccessState) {
-                    _isActive = state.data;
-                  } else if (state is GenericLoadingState) {
-                    return const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: CircularProgressIndicator(color: Colors.blue),
-                    );
-                  }
-                  return Switch(
-                    value: _isActive!,
-                    onChanged: (value) {
-                      BlocProvider.of<DeliveryOnlineCubit>(context)
-                          .online(value);
-                    },
-                  );
-                })),
-                const Text('نشط'),
-              ],
-            ),
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.center,
+            //   children: [
+            //     BlocBuilder<DeliveryOnlineCubit, GenericState>(
+            //         builder: ((context, state) {
+            //       if (state is GenericSuccessState) {
+            //         _isActive = state.data;
+            //       } else if (state is GenericLoadingState) {
+            //         return const Padding(
+            //           padding: EdgeInsets.all(8.0),
+            //           child: CircularProgressIndicator(color: Colors.blue),
+            //         );
+            //       }
+            //       return Switch(
+            //         value: _isActive!,
+            //         onChanged: (value) {
+            //           BlocProvider.of<DeliveryOnlineCubit>(context)
+            //               .online(value);
+            //         },
+            //       );
+            //     })),
+            //     const Text('نشط'),
+            //   ],
+            // ),
             _buildInfoTexts("الاسم", name),
             const Divider(),
             _buildInfoTexts("رقم التلفون", phone),
@@ -127,7 +127,7 @@ class _DeliveryProfileScreenState extends State<DeliveryProfileScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(primary: Colors.red),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                   onPressed: () {
                     logout();
                   },
@@ -172,21 +172,31 @@ class _DeliveryProfileScreenState extends State<DeliveryProfileScreen> {
       elevation: 5,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 15),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        child: Column(
           children: [
-            _buildData("الملبغ المستحق", cost, Colors.red),
-            SizedBox(
-              height: 60,
-              child: VerticalDivider(
-                color: Colors.grey.shade300,
-                thickness: 1,
-                indent: 5,
-                endIndent: 0,
-                width: 20,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildData("الملبغ المستحق", cost, Colors.red),
+                SizedBox(
+                  height: 60,
+                  child: VerticalDivider(
+                    color: Colors.grey.shade300,
+                    thickness: 1,
+                    indent: 5,
+                    endIndent: 0,
+                    width: 20,
+                  ),
+                ),
+                _buildData("عدد الطلبات", total, Colors.green),
+              ],
             ),
-            _buildData("عدد الطلبات", total, Colors.green),
+            ElevatedButton(
+                onPressed: () {
+                  BlocProvider.of<DeliveryProfileCubit>(context)
+                      .getProfileData(DeliverkSharedPreferences.getDelivId()!);
+                },
+                child: const Text('تحديث')),
           ],
         ),
       ),

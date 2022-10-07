@@ -11,7 +11,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import '../../../business_logic/restaurant/state/restaurant_login_state.dart';
-import '../../../constants/strings.dart';
+
 import '../../widgets/common/text_field.dart';
 
 class RestaurantLoginScreen extends StatelessWidget {
@@ -53,6 +53,7 @@ class RestaurantLoginScreen extends StatelessWidget {
                   height: 20,
                 ),
                 BlocBuilder<RestaurantLoginCubit, RestaurantLoginState>(
+                  buildWhen: (previous, current) => previous != current,
                   builder: (_, state) {
                     if (state is RestaurantLoginInitial) {
                       return _buildLoginButton(context);
@@ -61,7 +62,7 @@ class RestaurantLoginScreen extends StatelessWidget {
                         color: Colors.blue,
                       );
                     } else if (state is SuccessState) {
-                      WidgetsBinding.instance?.addPostFrameCallback((_) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
                         DeliverkSharedPreferences.setToken(state.token);
                         DeliverkSharedPreferences.setRestId(state.id);
                         DeliverkSharedPreferences.setZoneId(state.zoneId);

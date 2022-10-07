@@ -32,11 +32,11 @@ class NotificationSender {
     Map<String, dynamic> body = {
       "to": "/topics/$zoneId",
       "notification": {
-        "title": "انتباه",
+        "title": "دليفرك",
         "body": "هناك طلب جديد",
       },
       "data": {
-        "title": "انتباه",
+        "title": "دليفرك",
         "body": "هناك طلب جديد",
       },
     };

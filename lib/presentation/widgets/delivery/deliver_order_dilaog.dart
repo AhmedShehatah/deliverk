@@ -1,3 +1,5 @@
+import 'package:url_launcher/url_launcher.dart';
+
 import '../../../business_logic/common/cubit/patch_order_cubit.dart';
 import '../../../business_logic/common/state/generic_state.dart';
 import '../../../constants/enums.dart';
@@ -40,45 +42,50 @@ class _DeliveryOrderDetialsDialogState
         child: SizedBox(
           child: Padding(
             padding: const EdgeInsets.all(4.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                DataTable(
-                  horizontalMargin: 10,
-                  columns: const [
-                    DataColumn(
-                      label: Text(
-                        'بيانات الطلب',
-                        style: TextStyle(fontStyle: FontStyle.italic),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  DataTable(
+                    dataRowHeight: 60,
+                    horizontalMargin: 10,
+                    columns: const [
+                      DataColumn(
+                        label: Text(
+                          'بيانات الطلب',
+                          style: TextStyle(fontStyle: FontStyle.italic),
+                        ),
                       ),
-                    ),
-                    DataColumn(
-                      label: Text(
-                        'القيمة',
-                        style: TextStyle(fontStyle: FontStyle.italic),
+                      DataColumn(
+                        label: Text(
+                          'القيمة',
+                          style: TextStyle(fontStyle: FontStyle.italic),
+                        ),
                       ),
-                    ),
-                  ],
-                  rows: <DataRow>[
-                    _rowData(" اسم المطعم", widget.restData.name!),
-                    _rowData("مكان المطعم", widget.restData.address!),
-                    _rowData('رقم المطعم', widget.restData.phone!),
-                    _rowData(
-                        'وقت الوصول',
-                        "منذ " +
-                            TimeCalc.calcTime(widget.order.stTime!).toString() +
-                            " دقيقة"),
-                    _mapRow("مكان المطعم", "اظهر على الخريطة"),
-                    _rowData("كود الطلب", widget.order.id!.toString()),
-                    _rowData("تكلفة التوصيل",
-                        widget.order.delvCash!.toString() + " ج.م"),
-                    _rowData("منطقة التوصيل", widget.areaName),
-                    if (widget.order.notes != null)
-                      _rowData('ملاحظات', widget.order.notes!),
-                  ],
-                ),
-                _buildActionButton(),
-              ],
+                    ],
+                    rows: <DataRow>[
+                      _rowData(" اسم المطعم", widget.restData.name!),
+                      _rowData("مكان المطعم", widget.restData.address!),
+                      _rowData('رقم المطعم', widget.restData.phone!,
+                          phone: true),
+                      _rowData(
+                          'وقت الوصول',
+                          "منذ " +
+                              TimeCalc.calcTime(widget.order.stTime!)
+                                  .toString() +
+                              " دقيقة"),
+                      _mapRow("مكان المطعم", "اظهر على الخريطة"),
+                      _rowData("كود الطلب", widget.order.id!.toString()),
+                      _rowData("تكلفة التوصيل",
+                          widget.order.delvCash!.toString() + " ج.م"),
+                      _rowData("منطقة التوصيل", widget.areaName),
+                      if (widget.order.notes != null)
+                        _rowData('ملاحظات', widget.order.notes!),
+                    ],
+                  ),
+                  _buildActionButton(),
+                ],
+              ),
             ),
           ),
         ),
@@ -86,22 +93,28 @@ class _DeliveryOrderDetialsDialogState
     );
   }
 
-  DataRow _rowData(String title, String value) {
+  DataRow _rowData(String title, String value, {bool? phone}) {
     return DataRow(
       cells: <DataCell>[
         DataCell(
           FittedBox(fit: BoxFit.scaleDown, child: Text(title)),
         ),
         DataCell(
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            child: SizedBox(
-              width: 150,
-              child: Text(
-                value,
-                maxLines: 3,
-                softWrap: true,
-                overflow: TextOverflow.ellipsis,
+          InkWell(
+            onTap: () {
+              if (phone == true) {
+                launchUrl(Uri(scheme: 'tel', path: value));
+              }
+            },
+            child: SingleChildScrollView(
+              child: SizedBox(
+                width: 150,
+                child: Text(
+                  value,
+                  maxLines: 4,
+                  softWrap: true,
+                  overflow: TextOverflow.visible,
+                ),
               ),
             ),
           ),
@@ -133,7 +146,7 @@ class _DeliveryOrderDetialsDialogState
                   value,
                   maxLines: 3,
                   softWrap: true,
-                  overflow: TextOverflow.ellipsis,
+                  overflow: TextOverflow.visible,
                 ),
               ),
             ),
@@ -172,7 +185,7 @@ class _DeliveryOrderDetialsDialogState
                     'status': OrderType.coming.name
                   });
                 },
-                style: ElevatedButton.styleFrom(primary: Colors.blue),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
                 child: const Text("قبول"),
               );
             },
@@ -199,7 +212,7 @@ class _DeliveryOrderDetialsDialogState
                       booking: "/booking");
                 },
                 child: const Text('تم التوصيل'),
-                style: ElevatedButton.styleFrom(primary: Colors.green),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
               );
             },
           )

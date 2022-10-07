@@ -1,8 +1,9 @@
 import 'dart:async';
+import 'package:logger/logger.dart';
+
 import '../../common/state/generic_state.dart';
 import 'package:bloc/bloc.dart';
 import '../../../repos/delivery/delivery_repo.dart';
-import 'package:logger/logger.dart';
 import '../../../constants/enums.dart';
 import '../../../data/models/delivery/zone_order.dart';
 import '../../../helpers/shared_preferences.dart';
@@ -23,6 +24,7 @@ class DeliveryAllOrdersCubit extends Cubit<GenericState> {
     querys['isPaid'] = isPaid;
     _repo.getOrders(id!, querys).then((response) {
       if (response['success']) {
+        Logger().d('main function');
         var x = response['data'] as List<dynamic>;
 
         var list = x.map((e) => ZoneOrder.fromJson(e)).toList();
@@ -43,20 +45,20 @@ class DeliveryAllOrdersCubit extends Cubit<GenericState> {
       Map<String, dynamic> querys = {};
       querys['page'] = '1';
       querys['status'] = OrderType.pending.name;
-
-      _repo.getOrders(id!, querys).then((response) {
-        if (response['success']) {
-          var rawData = response['data'] as List<dynamic>;
-          List<ZoneOrder> data =
-              rawData.map((element) => ZoneOrder.fromJson(element)).toList();
-
-          Logger().d(checkList(data, orders));
-          if (!checkList(data, orders)) {
-            orders = data;
-            emit(GenericSuccessState(orders));
+      if (!isClosed) {
+        Logger().d('doing here brooo');
+        _repo.getOrders(id!, querys).then((response) {
+          if (response['success']) {
+            var rawData = response['data'] as List<dynamic>;
+            List<ZoneOrder> data =
+                rawData.map((element) => ZoneOrder.fromJson(element)).toList();
+            if (!checkList(data, orders)) {
+              orders = data;
+              emit(GenericSuccessState(orders));
+            }
           }
-        }
-      });
+        });
+      }
     });
   }
 

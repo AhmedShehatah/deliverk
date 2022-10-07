@@ -49,7 +49,7 @@ class UnpaiedOrdersScreen extends StatelessWidget {
           expandedHeight: 200.0,
           flexibleSpace: FlexibleSpaceBar(
             centerTitle: true,
-            title: Text('طلبات لم يتم تسليم حسابها'),
+            title: Text('طلبات غير مدفوعة'),
           ),
         ),
       ],
@@ -68,7 +68,7 @@ class UnpaiedOrdersScreen extends StatelessWidget {
           }
 
           bool isLoading = false;
-          orders.clear();
+
           if (state is CurrentOrdersLoading) {
             orders = state.oldOrders;
             isLoading = true;
@@ -76,17 +76,9 @@ class UnpaiedOrdersScreen extends StatelessWidget {
             orders = state.currentOrders;
           }
 
-          orders
-              .where((element) => (element.delvId != null && !element.isPaid!))
-              .toList();
           if (orders.isEmpty) return const EmptyOrders();
 
-          return GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                childAspectRatio: 3 / 2),
+          return ListView.builder(
             controller: _scrollController,
             padding: EdgeInsets.zero,
             itemBuilder: (context, index) {

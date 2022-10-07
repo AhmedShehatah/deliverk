@@ -140,6 +140,7 @@ class _ResturantSignUpScreenState extends State<ResturantSignUpScreen> {
                     ),
                   ),
                   BlocBuilder<RestaurantSignUpCubit, RestaurantSignUpState>(
+                    buildWhen: (previous, current) => previous != current,
                     builder: (context, state) {
                       if (state is LoadingState) {
                         return const CircularProgressIndicator(
@@ -147,7 +148,7 @@ class _ResturantSignUpScreenState extends State<ResturantSignUpScreen> {
                         );
                       } else if (state is SuccessState) {
                         WidgetsBinding.instance
-                            ?.addPostFrameCallback((timeStamp) {
+                            .addPostFrameCallback((timeStamp) {
                           Fluttertoast.showToast(
                               msg:
                                   'تم تسجيل الدخول بنجاح انتظر حتى يتم تفعيلك');

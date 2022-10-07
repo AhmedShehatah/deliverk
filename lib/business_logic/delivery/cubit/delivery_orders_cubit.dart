@@ -5,9 +5,6 @@ import '../../../data/models/delivery/zone_order.dart';
 
 import '../../../helpers/shared_preferences.dart';
 import '../../../repos/delivery/delivery_repo.dart';
-import 'package:dio/dio.dart';
-
-import 'package:logger/logger.dart';
 
 class DeliveryOrdersCubit extends Cubit<DeliveryOrdersState> {
   DeliveryOrdersCubit(this._repo) : super(DeliveryOrdersInit());
@@ -32,10 +29,6 @@ class DeliveryOrdersCubit extends Cubit<DeliveryOrdersState> {
     querys['status'] = status;
     querys['isPaid'] = isPaid;
     _repo.getOrders(id!, querys).then((response) {
-      if (response is DioError) {
-        Logger().d(response);
-        return;
-      }
       if (response['success']) {
         page++;
         var x = response['data'] as List<dynamic>;

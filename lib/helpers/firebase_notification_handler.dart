@@ -21,7 +21,7 @@ class FirebaseNotifications {
   }
 
   void firebaseCloudMessagingListener(BuildContext context) async {
-    NotificationSettings seetings = await _messaging!.requestPermission(
+    await _messaging!.requestPermission(
       alert: true,
       announcement: true,
       badge: true,

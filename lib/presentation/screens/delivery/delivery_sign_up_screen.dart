@@ -18,7 +18,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
 
-import '../../../constants/strings.dart';
 import '../../widgets/common/text_field.dart';
 
 class DeliverySignUpScreen extends StatefulWidget {

@@ -6,7 +6,7 @@ abstract class SpinnerState {}
 class SpinnerInitial extends SpinnerState {
   final String? paymentState;
   final String? preparationState;
-  SpinnerInitial({this.paymentState, this.preparationState});
+  SpinnerInitial({this.paymentState = "غير مدفوع", this.preparationState});
 }
 
 class SpinnerZoneState extends SpinnerState {

@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../business_logic/common/state/generic_state.dart';
 import '../../../business_logic/delivery/cubit/delivery_profile_cubit.dart';
 
@@ -37,88 +38,98 @@ class OrderDetailsDialog extends StatelessWidget {
         child: SizedBox(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (order.delvId != null) _buildDeliveryInfo(),
-                DataTable(
-                  horizontalMargin: 10,
-                  columns: const [
-                    DataColumn(
-                      label: Text(
-                        'بيانات الطلب',
-                        style: TextStyle(fontStyle: FontStyle.italic),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (order.delvId != null) _buildDeliveryInfo(),
+                  DataTable(
+                    horizontalMargin: 10,
+                    dataRowHeight: 70,
+                    columns: const [
+                      DataColumn(
+                        label: Text(
+                          'بيانات الطلب',
+                          style: TextStyle(fontStyle: FontStyle.italic),
+                        ),
                       ),
-                    ),
-                    DataColumn(
-                      label: Text(
-                        'القيمة',
-                        style: TextStyle(fontStyle: FontStyle.italic),
+                      DataColumn(
+                        label: Text(
+                          'القيمة',
+                          style: TextStyle(fontStyle: FontStyle.italic),
+                        ),
                       ),
-                    ),
-                  ],
-                  rows: <DataRow>[
-                    DataRow(
-                      cells: <DataCell>[
-                        const DataCell(Text('كود الطلب')),
-                        DataCell(Text(order.id.toString())),
-                      ],
-                    ),
-                    DataRow(
-                      cells: <DataCell>[
-                        const DataCell(Text('تاريخ الطلب')),
-                        DataCell(Text("منذ " +
-                            TimeCalc.calcTime(order.createdAt!).toString() +
-                            " دقيقة")),
-                      ],
-                    ),
-                    DataRow(
-                      cells: <DataCell>[
-                        const DataCell(Text('حالة الطلب')),
-                        DataCell(Text(Trans.status[order.status!] as String)),
-                      ],
-                    ),
-                    DataRow(
-                      cells: <DataCell>[
-                        const DataCell(Text('تكلفة التوصيل')),
-                        DataCell(Text(order.areaCost.toString())),
-                      ],
-                    ),
-                    DataRow(
-                      cells: <DataCell>[
-                        const DataCell(Text('منطقة التوصيل')),
-                        DataCell(FittedBox(
-                            fit: BoxFit.scaleDown, child: Text(areaName))),
-                      ],
-                    ),
-                    if (order.notes != null)
+                    ],
+                    rows: <DataRow>[
                       DataRow(
                         cells: <DataCell>[
-                          const DataCell(Text('ملاحظات')),
-                          DataCell(FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(order.notes!))),
+                          const DataCell(Text('كود الطلب')),
+                          DataCell(Text(order.id.toString())),
                         ],
                       ),
-                  ],
-                ),
-                BlocBuilder<PatchOrderCubit, GenericState>(
-                  builder: (context, state) {
-                    if (state is GenericLoadingState) {
-                      return const CircularProgressIndicator(
-                        color: Colors.blue,
-                      );
-                    } else if (state is GenericFailureState) {
-                      Fluttertoast.showToast(msg: state.data);
+                      DataRow(
+                        cells: <DataCell>[
+                          const DataCell(Text('تاريخ الطلب')),
+                          DataCell(Text("منذ " +
+                              TimeCalc.calcTime(order.createdAt!).toString() +
+                              " دقيقة")),
+                        ],
+                      ),
+                      DataRow(
+                        cells: <DataCell>[
+                          const DataCell(Text('حالة الطلب')),
+                          DataCell(Text(Trans.status[order.status!] as String)),
+                        ],
+                      ),
+                      DataRow(
+                        cells: <DataCell>[
+                          const DataCell(Text('تكلفة التوصيل')),
+                          DataCell(Text(order.areaCost.toString())),
+                        ],
+                      ),
+                      DataRow(
+                        cells: <DataCell>[
+                          const DataCell(Text('منطقة التوصيل')),
+                          DataCell(FittedBox(
+                              fit: BoxFit.scaleDown, child: Text(areaName))),
+                        ],
+                      ),
+                      if (order.notes != null)
+                        DataRow(
+                          cells: <DataCell>[
+                            const DataCell(Text('ملاحظات')),
+                            DataCell(
+                              SingleChildScrollView(
+                                child: Text(
+                                  order.notes!,
+                                  softWrap: true,
+                                  overflow: TextOverflow.fade,
+                                  maxLines: 8,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
+                  BlocBuilder<PatchOrderCubit, GenericState>(
+                    builder: (context, state) {
+                      if (state is GenericLoadingState) {
+                        return const CircularProgressIndicator(
+                          color: Colors.blue,
+                        );
+                      } else if (state is GenericFailureState) {
+                        Fluttertoast.showToast(msg: state.data);
+                        return _buildActionButton(context);
+                      } else if (state is GenericSuccessState) {
+                        Fluttertoast.showToast(msg: 'تمت العملية بنجاح');
+                        Navigator.of(context).pop(true);
+                      }
                       return _buildActionButton(context);
-                    } else if (state is GenericSuccessState) {
-                      Fluttertoast.showToast(msg: 'تمت العملية بنجاح');
-                      Navigator.of(context).pop(true);
-                    }
-                    return _buildActionButton(context);
-                  },
-                ),
-              ],
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -136,7 +147,7 @@ class OrderDetailsDialog extends StatelessWidget {
             onPressed: () {
               BlocProvider.of<PatchOrderCubit>(context).deleteOrder(order.id!);
             },
-            style: ElevatedButton.styleFrom(primary: Colors.red),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             child: const Text("حذف"),
           ),
         if (order.status == OrderType.coming.name)
@@ -145,7 +156,7 @@ class OrderDetailsDialog extends StatelessWidget {
               BlocProvider.of<PatchOrderCubit>(context)
                   .patchOrder(order.id!, {'status': 'delivering'});
             },
-            style: ElevatedButton.styleFrom(primary: Colors.green),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
             child: const Text("تأكيد الوصول"),
           )
       ],
@@ -157,31 +168,36 @@ class OrderDetailsDialog extends StatelessWidget {
       builder: (context, state) {
         if (state is GenericSuccessState) {
           final data = DeliveryModel.fromJson(state.data);
-          return ListTile(
-            leading: CachedNetworkImage(
-              imageUrl: data.avatar!,
-              imageBuilder: (context, imageProvider) => Container(
-                width: 80.0,
-                height: 80.0,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image:
-                      DecorationImage(image: imageProvider, fit: BoxFit.cover),
+          return InkWell(
+            onTap: () {
+              launchUrl(Uri(scheme: 'tel', path: data.phone));
+            },
+            child: ListTile(
+              leading: CachedNetworkImage(
+                imageUrl: data.avatar!,
+                imageBuilder: (context, imageProvider) => Container(
+                  width: 80.0,
+                  height: 80.0,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                        image: imageProvider, fit: BoxFit.cover),
+                  ),
                 ),
-              ),
-              progressIndicatorBuilder: (context, url, downloadProgress) =>
-                  Shimmer.fromColors(
-                baseColor: Colors.grey,
-                highlightColor: Colors.white,
-                child: CircleAvatar(
-                  radius: 70,
-                  backgroundColor: Colors.grey.shade600,
+                progressIndicatorBuilder: (context, url, downloadProgress) =>
+                    Shimmer.fromColors(
+                  baseColor: Colors.grey,
+                  highlightColor: Colors.white,
+                  child: CircleAvatar(
+                    radius: 70,
+                    backgroundColor: Colors.grey.shade600,
+                  ),
                 ),
+                errorWidget: (context, url, error) => const Icon(Icons.error),
               ),
-              errorWidget: (context, url, error) => const Icon(Icons.error),
+              title: Text(data.name!),
+              subtitle: Text(data.phone!),
             ),
-            title: Text(data.name!),
-            subtitle: Text(data.phone!),
           );
         } else if (state is GenericLoadingState) {
           return Shimmer.fromColors(

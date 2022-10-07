@@ -1,5 +1,4 @@
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_offline/flutter_offline.dart';
 
 import '../../../business_logic/common/cubit/area_cubit.dart';
 import '../../../business_logic/common/cubit/refresh_cubit.dart';
@@ -48,6 +47,37 @@ class _DeliveryBaseScreenState extends State<DeliveryBaseScreen> {
 
   @override
   Widget build(BuildContext context) {
+    return OfflineBuilder(
+      connectivityBuilder: (
+        BuildContext context,
+        ConnectivityResult connectivity,
+        Widget child,
+      ) {
+        final bool connected = connectivity != ConnectivityResult.none;
+        if (connected) {
+          return _buildTree();
+        } else {
+          return Scaffold(
+            body: Center(
+              child: Column(
+                children: [
+                  Image.asset(
+                    'assets/images/no_internet.gif',
+                  ),
+                  const Text('لا يوجد اتصال بالانترنت'),
+                ],
+              ),
+            ),
+          );
+        }
+      },
+      builder: ((context) {
+        return const Text('');
+      }),
+    );
+  }
+
+  Widget _buildTree() {
     return BlocListener<DeliveryProfileCubit, GenericState>(
       listener: (context, state) {
         if (state is GenericFailureState) {
@@ -74,7 +104,7 @@ class _DeliveryBaseScreenState extends State<DeliveryBaseScreen> {
               onItemSelected: (idx) {},
               handleAndroidBackButtonPress: true,
               resizeToAvoidBottomInset: true,
-              stateManagement: false,
+              stateManagement: true,
               hideNavigationBarWhenKeyboardShows: true,
               decoration: NavBarDecoration(
                 borderRadius: BorderRadius.circular(10.0),

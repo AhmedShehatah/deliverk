@@ -9,7 +9,6 @@ import '../../../business_logic/delivery/cubit/delivery_login_cubit.dart';
 import '../../../business_logic/delivery/cubit/delivery_profile_cubit.dart';
 import '../../../business_logic/delivery/state/delivery_login_state.dart';
 import '../../../constants/enums.dart';
-import '../../../constants/strings.dart';
 import '../../../helpers/shared_preferences.dart';
 import '../../widgets/common/text_field.dart';
 
@@ -57,7 +56,7 @@ class DeliveryLoginScreen extends StatelessWidget {
                         color: Colors.blue,
                       );
                     } else if (state is SuccessState) {
-                      WidgetsBinding.instance?.addPostFrameCallback((_) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
                         DeliverkSharedPreferences.setToken(state.token);
                         DeliverkSharedPreferences.setDeliveryId(state.delivId);
                         DeliverkSharedPreferences.setZoneId(state.zoneId);

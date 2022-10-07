@@ -5,7 +5,6 @@ import '../../common/state/generic_state.dart';
 import '../../../data/models/delivery/zone_order.dart';
 import '../../../helpers/shared_preferences.dart';
 import '../../../repos/delivery/delivery_repo.dart';
-import 'package:flutter/widgets.dart';
 
 class DeliveryZoneOrdersCubit extends Cubit<GenericState> {
   DeliveryZoneOrdersCubit(this._repo) : super(GenericStateInit());

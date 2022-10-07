@@ -4,8 +4,6 @@ import '../../../data/models/common/order_model.dart';
 import '../../../helpers/shared_preferences.dart';
 import '../../../repos/restaurant/resturant_repo.dart';
 
-import 'package:logger/logger.dart';
-
 class RestaurantCurrentOrdersCubit extends Cubit<CurrentOrdersState> {
   RestaurantCurrentOrdersCubit(this._repo) : super(CurrentOrdersInit());
 
@@ -31,7 +29,6 @@ class RestaurantCurrentOrdersCubit extends Cubit<CurrentOrdersState> {
     querys['page'] = '$page';
     querys['status'] = status;
     querys['isPaid'] = isPaid;
-    Logger().d(querys);
 
     _repo.getOrders(querys, id).then((response) {
       if (response['success']) {
